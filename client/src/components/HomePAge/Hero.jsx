@@ -40,9 +40,9 @@ const Hero = () => {
     return (
         <section className="relative overflow-hidden bg-white dark:bg-background pt-20 pb-10">
             {/* Background decoration */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none opacity-50 dark:opacity-20">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-accent/30 rounded-full blur-[100px]" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none opacity-30 dark:opacity-10">
+                <div className="absolute top-[-5%] left-[-5%] w-[35%] h-[35%] bg-primary/10 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[10%] right-[0%] w-[25%] h-[25%] bg-accent/20 rounded-full blur-[80px]" />
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,10 +56,13 @@ const Hero = () => {
                     >
                         <motion.h1
                             variants={fadeInUp}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 leading-[1.1]"
+                            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6 leading-[1.1]"
                         >
                             Find a Ride in <br className="hidden sm:block" />
-                            <span className="text-primary italic">Your County</span>
+                            <span className="text-primary font-black relative px-1">
+                                Your County
+                                <span className="absolute bottom-1 left-0 w-full h-2 bg-primary/10 -z-10 rounded-sm"></span>
+                            </span>
                         </motion.h1>
 
                         <motion.p
@@ -76,7 +79,7 @@ const Hero = () => {
                         >
                             <Button
                                 size="default"
-                                className="group w-full sm:w-auto px-8 h-11 text-sm font-semibold shadow-[0_0_15px_rgba(var(--primary),0.5)] hover:scale-105 transition-transform"
+                                className="group w-full sm:w-auto px-8 h-11 text-sm font-semibold shadow-sm hover:shadow-primary/20 hover:-translate-y-0.5 transition-all"
                             >
                                 Start My Search
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -86,10 +89,10 @@ const Hero = () => {
                                 <Button
                                     variant="outline"
                                     size="default"
-                                    className="w-full group px-8 h-11 text-sm font-semibold border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-accent hover:text-accent-foreground transition-all"
+                                    className="w-full group px-8 h-11 text-sm font-semibold border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-accent/50 hover:-translate-y-0.5 transition-all"
                                 >
                                     Join Us
-                                    <UserPlus className="ml-2 w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    <UserPlus className="ml-2 w-4 h-4 group-hover:scale-105 transition-transform" />
                                 </Button>
                             </Link>
                         </motion.div>
@@ -103,9 +106,9 @@ const Hero = () => {
                         className="relative"
                     >
                         <motion.div
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                            className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-border"
+                            animate={{ y: [0, -6, 0] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            className="relative z-10 rounded-3xl overflow-hidden shadow-xl border border-white/20 dark:border-border"
                         >
                             <img
                                 src={heroImg}
@@ -123,18 +126,18 @@ const Hero = () => {
                     transition={{ delay: 0.4, duration: 0.8 }}
                     className="border-t border-slate-200 dark:border-border pt-10 overflow-hidden"
                 >
-                    <p className="text-center text-sm font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-widest mb-8">
+                    <p className="text-center text-xs font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-[0.2em] mb-10">
                         Trusted by our community partners
                     </p>
 
                     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background py-4">
-                        <Marquee pauseOnHover className="[--gap:3rem] [--duration:40s]">
+                        <Marquee pauseOnHover className="[--gap:4rem] [--duration:50s]">
                             {logos.map((logo, index) => (
-                                <div key={index} className="flex items-center justify-center px-4 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                                <div key={index} className="flex items-center justify-center px-4  dark:grayscale grayscale-0 hover:opacity-100 transition-all duration-500">
                                     <img
                                         src={logo.src}
                                         alt={logo.alt}
-                                        className="h-16 sm:h-20 w-auto object-contain"
+                                        className="h-16 sm:h-20 lg:h-24 w-auto object-contain"
                                     />
                                 </div>
                             ))}
