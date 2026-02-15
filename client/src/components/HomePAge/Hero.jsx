@@ -133,7 +133,7 @@ const Hero = () => {
                     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background py-4">
                         <Marquee pauseOnHover className="[--gap:4rem] [--duration:50s]">
                             {logos.map((logo, index) => (
-                                <div key={index} className="flex items-center justify-center px-4  dark:grayscale grayscale-0 hover:opacity-100 transition-all duration-500">
+                                <div key={index} className="flex items-center justify-center px-4 dark:grayscale grayscale-0 opacity-50 hover:opacity-100 transition-all duration-500">
                                     <img
                                         src={logo.src}
                                         alt={logo.alt}

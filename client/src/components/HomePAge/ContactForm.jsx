@@ -1,3 +1,4 @@
+// File: client/src/components/HomePage/ContactForm.jsx
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,22 +33,33 @@ const ContactForm = () => {
     };
 
     return (
-        <section className="bg-background py-12 px-6">
+        <section className="relative bg-background py-24 px-6 overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 pointer-events-none opacity-20 dark:opacity-10">
+                <div className="absolute bottom-0 left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]" />
+                <div className="absolute top-[10%] right-[-5%] w-[30%] h-[30%] bg-accent/20 rounded-full blur-[100px]" />
+            </div>
             <div className="container mx-auto max-w-2xl text-center">
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-3xl sm:text-4xl font-semibold text-foreground mb-12"
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-[1.1] mb-16"
                 >
-                    Do you have a suggested resource that we should know about? Let us know!
+                    Do you have a suggested resource <br className="hidden sm:block" />
+                    that we should know about?{" "}
+                    <span className="text-primary relative px-1 inline-block mt-2">
+                        Let us know!
+                        <span className="absolute bottom-1 left-0 w-full h-2 bg-primary/10 -z-10 rounded-sm"></span>
+                    </span>
                 </motion.h2>
 
                 <motion.form
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     onSubmit={handleSubmit(onSubmit)}
                     className="space-y-6 text-left"
                 >
