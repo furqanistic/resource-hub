@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Marquee from '@/components/ui/marquee';
 import heroImg from '@/assets/CloudLogos/hero-img.avif';
+import { Link } from 'react-router-dom';
 
 // Importing logos
 import logo1 from '@/assets/CloudLogos/brandLogo-1.png';
@@ -54,7 +55,7 @@ const Hero = () => {
                     >
                         <motion.h1
                             variants={fadeInUp}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]"
+                            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 leading-[1.1]"
                         >
                             Find a Ride in <br className="hidden sm:block" />
                             <span className="text-primary italic">Your County</span>
@@ -73,12 +74,23 @@ const Hero = () => {
                             className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
                         >
                             <Button
-                                size="lg"
-                                className="group h-14 px-8 text-lg font-semibold rounded-full shadow-lg hover:scale-105 transition-transform"
+                                size="default"
+                                className="group w-full sm:w-auto px-5 h-10 text-sm font-semibold rounded-full shadow-lg hover:scale-105 transition-transform"
                             >
                                 Start My Search
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Button>
+
+                            <Link to="/join" className="w-full sm:w-auto">
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    className="w-full group px-5 h-10 text-sm font-semibold rounded-full border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-accent hover:text-accent-foreground transition-all"
+                                >
+                                    Join Us
+                                    <UserPlus className="ml-2 w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </Button>
+                            </Link>
                         </motion.div>
                     </motion.div>
 
@@ -92,7 +104,7 @@ const Hero = () => {
                         <motion.div
                             animate={{ y: [0, -10, 0] }}
                             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                            className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-white/10"
+                            className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-border"
                         >
                             <img
                                 src={heroImg}
@@ -108,9 +120,9 @@ const Hero = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.4, duration: 0.8 }}
-                    className="border-t border-slate-200 dark:border-white/10 pt-10 overflow-hidden"
+                    className="border-t border-slate-200 dark:border-border pt-10 overflow-hidden"
                 >
-                    <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-widest mb-8">
+                    <p className="text-center text-sm font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-widest mb-8">
                         Trusted by our community partners
                     </p>
 
@@ -126,8 +138,8 @@ const Hero = () => {
                                 </div>
                             ))}
                         </Marquee>
-                        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background"></div>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background"></div>
+                        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-white dark:from-background"></div>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-white dark:from-background"></div>
                     </div>
                 </motion.div>
             </div>

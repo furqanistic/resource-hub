@@ -1,30 +1,32 @@
-// File: client/src/components/ui/marquee.jsx
 import React, { useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
-const useAnimationFrame = callback => {
+const useAnimationFrame = (callback) => {
     const requestRef = useRef(null);
     const previousTimeRef = useRef(null);
-    const animateRef = useRef(null);
-
-    const animate = time => {
-        if (previousTimeRef.current !== null && previousTimeRef.current !== undefined) {
-            const delta = time - previousTimeRef.current;
-            callback(time, delta);
-        }
-        previousTimeRef.current = time;
-        requestRef.current = requestAnimationFrame(animateRef.current);
-    };
+    const callbackRef = useRef(callback);
 
     useEffect(() => {
-        animateRef.current = animate;
-        requestRef.current = requestAnimationFrame(animateRef.current);
+        callbackRef.current = callback;
+    }, [callback]);
+
+    useEffect(() => {
+        const animate = (time) => {
+            if (previousTimeRef.current !== null && previousTimeRef.current !== undefined) {
+                const delta = time - previousTimeRef.current;
+                callbackRef.current(time, delta);
+            }
+            previousTimeRef.current = time;
+            requestRef.current = requestAnimationFrame(animate);
+        };
+
+        requestRef.current = requestAnimationFrame(animate);
         return () => {
             if (requestRef.current) {
                 cancelAnimationFrame(requestRef.current);
             }
         };
-    }, []); // Remove dependency on animate, as it's stable via ref
+    }, []);
 };
 
 function Marquee({

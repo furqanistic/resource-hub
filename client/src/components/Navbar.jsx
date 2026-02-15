@@ -20,7 +20,7 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className="w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm transition-all duration-300">
+        <nav className="w-full bg-white/80 dark:bg-background/80 backdrop-blur-md border-b border-slate-200 dark:border-border sticky top-0 z-50 shadow-sm transition-all duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-14">
                     {/* Logo */}
@@ -46,7 +46,7 @@ const Navbar = () => {
                                     "font-medium transition-colors duration-200 text-sm relative py-1 px-2 group",
                                     isActive(link.path)
                                         ? "text-teal-600"
-                                        : "text-slate-700 dark:text-slate-300 hover:text-teal-600"
+                                        : "text-slate-700 dark:text-muted-foreground hover:text-teal-600 dark:hover:text-primary"
                                 )}
                             >
                                 {link.name}
@@ -74,7 +74,7 @@ const Navbar = () => {
                         <ModeToggle />
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition-colors"
+                            className="p-2 rounded-md text-slate-700 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-accent focus:outline-none transition-colors"
                             aria-label="Toggle menu"
                         >
                             {isMobileMenuOpen ? (
@@ -93,7 +93,7 @@ const Navbar = () => {
                 {/* Mobile Menu */}
                 <div
                     className={cn(
-                        "md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t dark:border-slate-800",
+                        "md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white/95 dark:bg-background/95 backdrop-blur-lg border-t dark:border-border",
                         isMobileMenuOpen ? "max-h-96 opacity-100 py-4" : "max-h-0 opacity-0"
                     )}
                 >
@@ -107,7 +107,7 @@ const Navbar = () => {
                                     "block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200",
                                     isActive(link.path)
                                         ? "bg-teal-50 dark:bg-teal-900/20 text-teal-600"
-                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-teal-600"
+                                        : "text-slate-700 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-accent hover:text-teal-600 dark:hover:text-primary"
                                 )}
                             >
                                 {link.name}
