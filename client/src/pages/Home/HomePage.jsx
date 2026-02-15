@@ -3,6 +3,7 @@ import React from 'react'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import RegionalPartners from '@/components/RegionalPartners'
+import ServiceCategories from '@/components/ServiceCategories'
 
 const HomePage = () => {
   return (
@@ -11,6 +12,7 @@ const HomePage = () => {
       <main>
         <Hero />
         <RegionalPartners />
+        <ServiceCategories />
       </main>
       {/* Footer can go here */}
     </div>
