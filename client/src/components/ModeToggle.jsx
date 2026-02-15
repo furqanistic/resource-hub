@@ -51,8 +51,8 @@ export function ModeToggle({ className }) {
       className={cn(
         "group relative flex h-10 w-20 cursor-pointer items-center rounded-full border-2 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden",
         isDarkMode
-          ? "bg-slate-950 border-slate-800 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
-          : "bg-gradient-to-b from-sky-100 to-white border-slate-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]",
+          ? "bg-linear-to-br from-slate-900 via-slate-950 to-black border-slate-700/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_0_20px_rgba(0,0,0,0.4)]"
+          : "bg-linear-to-b from-sky-100 to-white border-slate-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]",
         className
       )}
       aria-label="Toggle theme"
@@ -96,7 +96,9 @@ export function ModeToggle({ className }) {
         }}
         className={cn(
           "relative z-10 ml-1.5 flex h-8 w-8 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-110 active:scale-95",
-          isDarkMode ? "bg-slate-900" : "bg-white"
+          isDarkMode
+            ? "bg-slate-800 shadow-[0_0_15px_rgba(253,224,71,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]"
+            : "bg-white shadow-[0_2px_5px_rgba(0,0,0,0.1)]"
         )}
       >
         <AnimatePresence mode="wait">
