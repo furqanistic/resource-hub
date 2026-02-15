@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import AboutPage from '@/pages/AboutPage/AboutPage'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
+import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
             <Route index element={<HomePage />} />
             <Route path='/directory' element={<DirectoryPage />} />
             <Route path='/about' element={<AboutPage />} />
+            <Route path='/partners' element={<PartnersPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
