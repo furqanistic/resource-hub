@@ -4,6 +4,7 @@ import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import AboutPage from '@/pages/AboutPage/AboutPage'
+import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 
@@ -15,6 +16,7 @@ const App = () => {
           <Route path='/'>
             <Route index element={<HomePage />} />
             <Route path='/directory' element={<DirectoryPage />} />
+            <Route path='/resources' element={<ResourcesPage />} />
             <Route path='/about' element={<AboutPage />} />
             <Route path='/partners' element={<PartnersPage />} />
           </Route>
