@@ -76,7 +76,7 @@ const Hero = () => {
                         >
                             <Button
                                 size="default"
-                                className="group w-full sm:w-auto px-5 h-10 text-sm font-semibold rounded-full shadow-lg hover:scale-105 transition-transform"
+                                className="group w-full sm:w-auto px-8 h-11 text-sm font-semibold shadow-[0_0_15px_rgba(var(--primary),0.5)] hover:scale-105 transition-transform"
                             >
                                 Start My Search
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -86,7 +86,7 @@ const Hero = () => {
                                 <Button
                                     variant="outline"
                                     size="default"
-                                    className="w-full group px-5 h-10 text-sm font-semibold rounded-full border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-accent hover:text-accent-foreground transition-all"
+                                    className="w-full group px-8 h-11 text-sm font-semibold border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-accent hover:text-accent-foreground transition-all"
                                 >
                                     Join Us
                                     <UserPlus className="ml-2 w-4 h-4 group-hover:scale-110 transition-transform" />
