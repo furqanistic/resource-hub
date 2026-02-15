@@ -1,3 +1,4 @@
+// File: client/src/components/RegionalPartners.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
@@ -29,7 +30,7 @@ const RegionalPartners = () => {
                         className="flex flex-col space-y-8"
                     >
                         <div className="space-y-4">
-                            <h2 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight">
+                            <h2 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight first-letter:text-primary">
                                 CHOICE Regional <span className="text-primary block mt-2">Partners</span>
                             </h2>
 

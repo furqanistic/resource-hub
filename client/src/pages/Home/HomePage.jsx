@@ -1,9 +1,10 @@
 // File: client/src/pages/Home/HomePage.jsx
 import React from 'react'
 import Navbar from '@/components/Navbar'
-import Hero from '@/components/Hero'
-import RegionalPartners from '@/components/RegionalPartners'
-import ServiceCategories from '@/components/ServiceCategories'
+import Hero from '@/components/HomePAge/Hero'
+import RegionalPartners from '@/components/HomePAge/RegionalPartners'
+import ServiceCategories from '@/components/HomePAge/ServiceCategories'
+
 
 const HomePage = () => {
   return (

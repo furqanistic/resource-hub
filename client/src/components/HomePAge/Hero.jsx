@@ -1,3 +1,4 @@
+// File: client/src/components/HomePAge/Hero.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, UserPlus } from 'lucide-react';
