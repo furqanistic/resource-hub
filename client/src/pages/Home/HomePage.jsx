@@ -2,6 +2,7 @@
 import React from 'react'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import RegionalPartners from '@/components/RegionalPartners'
 
 const HomePage = () => {
   return (
@@ -9,6 +10,7 @@ const HomePage = () => {
       <Navbar />
       <main>
         <Hero />
+        <RegionalPartners />
       </main>
       {/* Footer can go here */}
     </div>
