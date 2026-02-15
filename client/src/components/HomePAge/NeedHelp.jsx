@@ -6,12 +6,12 @@ import { ArrowRight } from 'lucide-react';
 
 const NeedHelp = () => {
     return (
-        <section className="relative py-24 bg-background border-t border-white/5 overflow-hidden">
-            {/* Faint Radial Gradient Background */}
+        <section className="relative py-24 bg-slate-50 dark:bg-zinc-900/40 border-y border-slate-200 dark:border-white/5 overflow-hidden">
+            {/* Spotlight Radial Gradient */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                    background: 'radial-gradient(circle at center, rgba(20, 184, 166, 0.05) 0%, transparent 70%)'
+                    background: 'radial-gradient(circle at center, rgba(45, 212, 191, 0.08) 0%, rgba(0, 0, 0, 0) 70%)'
                 }}
             />
 
@@ -23,8 +23,7 @@ const NeedHelp = () => {
                     transition={{ duration: 0.6 }}
                 >
                     <h2
-                        className="text-4xl sm:text-5xl font-bold text-foreground mb-8 text-center"
-                        style={{ textShadow: '0 0 10px rgba(255,255,255,0.3)' }}
+                        className="text-4xl sm:text-5xl font-bold text-foreground mb-8 text-center [text-shadow:none] dark:[text-shadow:0_0_10px_rgba(255,255,255,0.3)]"
                     >
                         Need Extra Help?
                     </h2>
