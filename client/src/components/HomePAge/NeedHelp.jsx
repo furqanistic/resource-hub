@@ -23,7 +23,7 @@ const NeedHelp = () => {
                     transition={{ duration: 0.6 }}
                 >
                     <h2
-                        className="text-4xl sm:text-5xl font-bold text-foreground mb-8 text-center [text-shadow:none] dark:[text-shadow:0_0_10px_rgba(255,255,255,0.3)]"
+                        className="text-4xl sm:text-5xl font-bold text-foreground mb-8 text-center text-shadow-none dark:[text-shadow:0_0_10px_rgba(255,255,255,0.3)]"
                     >
                         Need Extra Help?
                     </h2>
