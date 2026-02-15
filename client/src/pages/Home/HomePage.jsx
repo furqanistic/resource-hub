@@ -5,6 +5,7 @@ import Hero from '@/components/HomePage/Hero'
 import RegionalPartners from '@/components/HomePage/RegionalPartners'
 import ServiceCategories from '@/components/HomePage/ServiceCategories'
 import NeedHelp from '@/components/HomePage/NeedHelp'
+import ContactForm from '@/components/HomePage/ContactForm'
 
 
 const HomePage = () => {
@@ -16,8 +17,9 @@ const HomePage = () => {
         <RegionalPartners />
         <ServiceCategories />
         <NeedHelp />
+        <ContactForm />
       </main>
-      {/* Footer can go here */ }
+      {/* Footer can go here */}
     </div >
   )
 }
