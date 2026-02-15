@@ -49,7 +49,7 @@ export function ModeToggle({ className }) {
     <button
       onClick={toggleTheme}
       className={cn(
-        "group relative flex h-10 w-20 cursor-pointer items-center rounded-full border-2 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden",
+        "group relative flex h-10 w-20 cursor-pointer items-center rounded-full border-2 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden",
         isDarkMode
           ? "bg-linear-to-br from-slate-900 via-slate-950 to-black border-slate-700/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_0_20px_rgba(0,0,0,0.4)]"
           : "bg-linear-to-b from-sky-100 to-white border-slate-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]",
@@ -75,24 +75,28 @@ export function ModeToggle({ className }) {
         />
       </svg>
 
-      {/* Hidden indicator icons */}
-      <div className="absolute inset-x-3 flex justify-between px-1 opacity-10">
-        <Sun className="h-4 w-4" />
-        <Moon className="h-4 w-4" />
+      {/* Background indicator icons */}
+      <div className="absolute inset-x-3 flex justify-between px-1">
+        <Sun className={cn(
+          "h-4 w-4 transition-opacity duration-300",
+          isDarkMode ? "opacity-90 text-yellow-500/50" : "opacity-0"
+        )} />
+        <Moon className={cn(
+          "h-4 w-4 transition-opacity duration-300",
+          !isDarkMode ? "opacity-90 text-slate-400" : "opacity-0"
+        )} />
       </div>
 
       {/* The Animated Handle (Sun/Moon) */}
       <motion.div
         initial={false}
         animate={{
-          x: isDarkMode ? 42 : 0,
-          y: [0, 8, 0], // Creates the curved movement effect
-          scale: [1, 0.9, 1],
+          x: isDarkMode ? 36 : 0,
+          y: 0,
+          scale: 1,
         }}
         transition={{
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          y: { duration: 0.4, times: [0, 0.5, 1] },
-          scale: { duration: 0.4 }
+       
         }}
         className={cn(
           "relative z-10 ml-1.5 flex h-8 w-8 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-110 active:scale-95",
@@ -101,13 +105,13 @@ export function ModeToggle({ className }) {
             : "bg-white shadow-[0_2px_5px_rgba(0,0,0,0.1)]"
         )}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={isDarkMode ? "dark" : "light"}
             initial={{ scale: 0, rotate: -180, opacity: 0 }}
             animate={{ scale: 1, rotate: 0, opacity: 1 }}
             exit={{ scale: 0, rotate: 180, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+           
           >
             {isDarkMode ? (
               <Moon className="h-5 w-5 text-yellow-300 fill-yellow-300/20" />
