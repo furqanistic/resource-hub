@@ -312,10 +312,10 @@ const DirectoryPage = () => {
                     </div>
                 ) : (
                     <motion.div
+                        key={`${activeSearch}-${activeCounty}-${activeService}`}
                         variants={container}
                         initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, margin: "-50px" }}
+                        animate="show"
                         className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
                     >
                         {currentServices.length > 0 ? (
