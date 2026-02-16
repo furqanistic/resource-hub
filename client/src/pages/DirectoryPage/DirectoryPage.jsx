@@ -224,82 +224,93 @@ const DirectoryPage = () => {
                     </h1>
 
                     {/* Filter Section */}
-                    <div className="space-y-6 max-w-4xl p-8 rounded-3xl bg-card/30 border border-white/5 backdrop-blur-md">
-                        <div className="flex items-center gap-3 mb-2 text-xl font-bold tracking-tight">
-                            <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                                <Filter className="w-5 h-5" />
+                    <div className="rounded-2xl bg-card/30 border border-white/10 backdrop-blur-md p-4 lg:p-5">
+                        {/* Header */}
+                        <div className="flex items-center gap-2.5 mb-4">
+                            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                <Filter className="w-4 h-4" />
                             </div>
-                            <span>Quick Filters</span>
+                            <span className="text-sm font-bold tracking-tight">Quick Filters</span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="relative group">
+                        {/* Desktop: Single Row | Mobile: Stacked */}
+                        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+                            {/* Search Input - full width on mobile, grows on desktop */}
+                            <div className="relative group lg:flex-1 lg:min-w-0">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                                 <Input
-                                    placeholder="Search by name"
-                                    className="pl-10 bg-background/50 border-white/10 focus-visible:ring-primary h-12 text-lg transition-all rounded-xl"
+                                    placeholder="Search by name..."
+                                    className="pl-10 bg-card border-white/10 focus-visible:ring-primary h-10 transition-all rounded-lg w-full"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
                             </div>
 
-                            <Select
-                                value={countyFilter}
-                                onValueChange={setCountyFilter}
-                                key={`county-${countyFilter}`}
-                            >
-                                <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
-                                    <SelectValue placeholder="All Counties" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl max-h-[300px]">
-                                    <SelectItem value="all">All Counties</SelectItem>
-                                    {allCounties.map(county => (
-                                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            {/* Selects - 2-col grid on mobile, inline on desktop */}
+                            <div className="grid grid-cols-2 lg:flex gap-3">
+                                <Select
+                                    value={countyFilter}
+                                    onValueChange={setCountyFilter}
+                                    key={`county-${countyFilter}`}
+                                >
+                                    <SelectTrigger className="bg-card border-white/10 focus:ring-primary h-10 rounded-lg lg:w-42.5">
+                                        <SelectValue placeholder="All Counties" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-lg max-h-75">
+                                        <SelectItem value="all">All Counties</SelectItem>
+                                        {allCounties.map(county => (
+                                            <SelectItem key={county} value={county}>{county}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                            <Select
-                                value={serviceFilter}
-                                onValueChange={setServiceFilter}
-                                key={`service-${serviceFilter}`}
-                            >
-                                <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
-                                    <SelectValue placeholder="All Services" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl max-h-[300px]">
-                                    <SelectItem value="all">All Services</SelectItem>
-                                    {allServices.map(service => (
-                                        <SelectItem key={service} value={service}>{service}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                                <Select
+                                    value={serviceFilter}
+                                    onValueChange={setServiceFilter}
+                                    key={`service-${serviceFilter}`}
+                                >
+                                    <SelectTrigger className="bg-card border-white/10 focus:ring-primary h-10 rounded-lg lg:w-42.5">
+                                        <SelectValue placeholder="All Services" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-lg max-h-75">
+                                        <SelectItem value="all">All Services</SelectItem>
+                                        {allServices.map(service => (
+                                            <SelectItem key={service} value={service}>{service}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/5">
-                            <Button
-                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] h-12 px-8 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
-                                onClick={handleSearch}
-                                disabled={isSearching}
-                            >
-                                {isSearching ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Searching...
-                                    </>
-                                ) : (
-                                    'Start My Search'
-                                )}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="border-white/10 hover:bg-white/5 text-foreground h-12 px-8 bg-transparent transition-all rounded-xl font-medium w-full sm:w-auto"
-                                onClick={clearFilters}
-                                disabled={isSearching}
-                            >
-                                Reset Filters
-                            </Button>
+                            {/* Buttons - row on mobile (flex-1 each), inline on desktop */}
+                            <div className="flex gap-3 lg:shrink-0">
+                                <Button
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.25)] h-10 px-5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98] flex-1 lg:flex-none"
+                                    onClick={handleSearch}
+                                    disabled={isSearching}
+                                >
+                                    {isSearching ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Searching...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Search className="mr-2 h-4 w-4" />
+                                            Search
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="border-white/10 hover:bg-white/5 text-foreground h-10 px-5 bg-transparent transition-all rounded-lg font-medium flex-1 lg:flex-none"
+                                    onClick={clearFilters}
+                                    disabled={isSearching}
+                                >
+                                    <X className="mr-2 h-4 w-4" />
+                                    Reset
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -316,7 +327,7 @@ const DirectoryPage = () => {
                         variants={container}
                         initial="hidden"
                         animate="show"
-                        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
                     >
                         {currentServices.length > 0 ? (
                             currentServices.map((service, index) => (
