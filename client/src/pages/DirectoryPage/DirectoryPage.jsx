@@ -29,6 +29,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+import rawServicesData from '@/lib/data/Transportation Services in Washington.json';
+
 const getDetailIcon = (label) => {
     const iconMap = {
         'Phone': <Phone className="w-4 h-4" />,
@@ -36,7 +38,7 @@ const getDetailIcon = (label) => {
         'Access': <Accessibility className="w-4 h-4" />,
         'Cost': <CreditCard className="w-4 h-4" />,
         'County': <MapPin className="w-4 h-4" />,
-        'Schedule Method': <Calendar className="w-4 h-4" />,
+        'Website': <ExternalLink className="w-4 h-4" />,
     };
     return iconMap[label] || <ChevronRight className="w-4 h-4" />;
 };
@@ -88,106 +90,22 @@ const SpotlightCard = ({ children, className = "" }) => {
     );
 };
 
-
-const servicesData = [
-    {
-        type: 'Transport',
-        category: 'Door to door',
-        title: 'disabled american veterans (DAV) washington',
-        subtitle: 'door to door',
-        details: [
-            { label: 'Phone', value: '(888) 604-0234' },
-            { label: 'Hours', value: 'Sun–Sat: Depends on availability' },
-            { label: 'Access', value: 'Walker' },
-            { label: 'Cost', value: 'Free for veterans' },
-            { label: 'County', value: 'Lewis County' },
-            { label: 'Schedule Method', value: 'Call Ahead' },
-        ],
-    },
-    {
-        type: 'Transport',
-        category: 'Door to door',
-        title: 'golden chariot',
-        subtitle: 'door to door',
-        details: [
-            { label: 'Phone', value: '(360) 944-9833' },
-            { label: 'Hours', value: 'Sun–Sat: 24 hours' },
-            { label: 'Access', value: 'Foldable Wheelchair; Walker' },
-            {
-                label: 'Cost',
-                value:
-                    'Wheelchair Service: $100 One way (in county); $120 Round Trip (in county); Comfort Car Service: $50 One Way (in county); $60 Round Trip (in county) — Out of county rates vary',
-            },
-            { label: 'County', value: 'Lewis County' },
-            { label: 'Schedule Method', value: 'Call Ahead' },
-        ],
-    },
-    {
-        type: 'Transport',
-        category: 'Fixed route',
-        title: 'grays harbor transit',
-        subtitle: 'fixed route',
-        details: [
-            { label: 'Phone', value: '(360) 532-2770' },
-            {
-                label: 'Hours',
-                value:
-                    'Sun–Sat: 5:00 AM–10:00 PM; Sat–Sun 7:20 AM–8:45 PM',
-            },
-            {
-                label: 'Access',
-                value:
-                    'Bike Rack; Foldable Wheelchair; Powerchair; Scooter; Walker; Wheelchair',
-            },
-            { label: 'Cost', value: 'Free' },
-            { label: 'County', value: 'Pacific County' },
-            { label: 'Schedule Method', value: 'Just Show Up' },
-        ],
-    },
-    {
-        type: 'Transport',
-        category: 'On-demand',
-        title: 'grays harbor transit ADA specialized van service',
-        subtitle: 'on-demand',
-        details: [
-            { label: 'Phone', value: '(360) 532-2770' },
-            {
-                label: 'Hours',
-                value:
-                    'Sun–Sat: 5:00 AM–10:00 PM; Sat–Sun 7:20 AM–8:45 PM',
-            },
-            {
-                label: 'Access',
-                value:
-                    'Foldable Wheelchair; Powerchair; Scooter; Walker; Wheelchair',
-            },
-            { label: 'Cost', value: 'Free' },
-            { label: 'County', value: 'Clark County' },
-            {
-                label: 'Schedule Method',
-                value: 'Call Ahead + Complete Application',
-            },
-        ],
-    },
-    {
-        type: 'Transport',
-        category: 'On-demand',
-        title: 'grays harbor transit general public dial-a-ride',
-        subtitle: 'on-demand',
-        details: [
-            { label: 'Phone', value: '(360) 532-2770' },
-            { label: 'Hours', value: 'Mon–Fri: Route times vary' },
-            {
-                label: 'Access',
-                value:
-                    '"Bike Rack; Foldable Wheelchair; Powerchair; Scooter; Walker; Wheelchair"',
-            },
-            { label: 'Cost', value: 'Free' },
-            { label: 'County', value: 'Grays Harbor County' },
-            { label: 'Schedule Method', value: 'Call Ahead' },
-        ],
-    },
-];
+// Transform raw data to match component structure
+const servicesData = rawServicesData.map(item => ({
+    type: item["Service Category"] || 'Transport',
+    category: item["Service Type(s)"] || 'General',
+    title: item["Provider Name"],
+    subtitle: item["Service Type(s)"] || 'Transportation Service',
+    url: item["Website Url"],
+    details: [
+        { label: 'Phone', value: item["Phone"] },
+        { label: 'Hours', value: item["Service Times"] },
+        { label: 'Access', value: item["Accessibility"] },
+        { label: 'Cost', value: item["Cost"] },
+        { label: 'County', value: item["Counties Served"] },
+        // { label: 'Website', value: item["Website Url"] } // Optional to show as detail
+    ].filter(detail => detail.value) // Filter out missing details
+}));
 
 const container = {
     hidden: { opacity: 0 },
@@ -209,10 +127,24 @@ const DirectoryPage = () => {
     const [selectedCounty, setSelectedCounty] = useState('all');
     const [selectedService, setSelectedService] = useState('all');
 
+    // Extract unique counties and services for filter dropdowns
+    const allCounties = [...new Set(servicesData.flatMap(service =>
+        service.details.find(d => d.label === 'County')?.value.split(',').map(c => c.trim()) || []
+    ))].sort();
+
+    const allServices = [...new Set(servicesData.flatMap(service =>
+        service.category.split(',').map(s => s.trim()) || []
+    ))].sort();
+
     const filteredServices = servicesData.filter(service => {
         const matchesName = service.title.toLowerCase().includes(searchName.toLowerCase());
-        const matchesCounty = selectedCounty === 'all' || service.details.some(d => d.label === 'County' && d.value === selectedCounty);
-        const matchesService = selectedService === 'all' || service.category === selectedService;
+
+        const serviceCounties = service.details.find(d => d.label === 'County')?.value.toLowerCase() || '';
+        const matchesCounty = selectedCounty === 'all' || serviceCounties.includes(selectedCounty.toLowerCase());
+
+        const serviceTypes = service.category.toLowerCase();
+        const matchesService = selectedService === 'all' || serviceTypes.includes(selectedService.toLowerCase());
+
         return matchesName && matchesCounty && matchesService;
     });
 
@@ -265,16 +197,11 @@ const DirectoryPage = () => {
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Counties" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl">
+                                <SelectContent className="rounded-xl max-h-75">
                                     <SelectItem value="all">All Counties</SelectItem>
-                                    <SelectItem value="Lewis County">Lewis County</SelectItem>
-                                    <SelectItem value="Pacific County">Pacific County</SelectItem>
-                                    <SelectItem value="Clark County">Clark County</SelectItem>
-                                    <SelectItem value="Wahkiakum County">Wahkiakum County</SelectItem>
-                                    <SelectItem value="Grays Harbor County">Grays Harbor County</SelectItem>
-                                    <SelectItem value="Cowlitz County">Cowlitz County</SelectItem>
-                                    <SelectItem value="Mason County">Mason County</SelectItem>
-                                    <SelectItem value="Thurston County">Thurston County</SelectItem>
+                                    {allCounties.map(county => (
+                                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
 
@@ -282,11 +209,11 @@ const DirectoryPage = () => {
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Services" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl">
+                                <SelectContent className="rounded-xl max-h-75">
                                     <SelectItem value="all">All Services</SelectItem>
-                                    <SelectItem value="Door to door">Door to door</SelectItem>
-                                    <SelectItem value="On-demand">On-demand</SelectItem>
-                                    <SelectItem value="Fixed route">Fixed route</SelectItem>
+                                    {allServices.map(service => (
+                                        <SelectItem key={service} value={service}>{service}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -363,8 +290,12 @@ const DirectoryPage = () => {
                                         ))}
                                     </div>
 
-                                    <Button className="w-full mt-auto rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02]">
-                                        Contact Service
+                                    <Button
+                                        className="w-full mt-auto rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02]"
+                                        onClick={() => service.url && window.open(service.url, '_blank')}
+                                        disabled={!service.url}
+                                    >
+                                        {service.url ? 'Visit Website' : 'No Website Available'}
                                         <ChevronRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
                                     </Button>
                                 </SpotlightCard>
