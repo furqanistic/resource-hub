@@ -340,48 +340,67 @@ const DirectoryPage = () => {
                                         transition: { duration: 0.3, ease: "easeOut" }
                                     }}
                                 >
-                                    <SpotlightCard className="p-6">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
+                                    <SpotlightCard className="p-5">
+                                        {/* Card Header */}
+                                        <div className="flex items-start justify-between mb-3">
+                                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-0.5 px-2 rounded-md text-[9px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
                                                 {service.category}
                                             </Badge>
-                                            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
-                                                <ExternalLink className="w-4 h-4" />
+                                            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-lg shadow-primary/10">
+                                                <ExternalLink className="w-3.5 h-3.5" />
                                             </div>
                                         </div>
 
-                                        <h3 className="text-xl font-black mb-1 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                        <h3 className="text-lg font-black mb-0.5 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight">
                                             {service.title}
                                         </h3>
-                                        <p className="text-muted-foreground mb-4 text-xs font-medium leading-relaxed">
+                                        <p className="text-muted-foreground text-[11px] font-medium leading-snug">
                                             {service.subtitle}
                                         </p>
 
-                                        <div className="space-y-3 mb-6 grow">
+                                        {/* Divider */}
+                                        <div className="border-b border-white/5 my-3" />
+
+                                        {/* Details Grid */}
+                                        <div className="space-y-2 grow">
                                             {service.details.map((detail, idx) => (
-                                                <div key={idx} className="flex gap-3 group/detail">
-                                                    <div className="mt-0.5 shrink-0 w-6 h-6 rounded-lg bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
-                                                        {getDetailIcon(detail.label)}
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">
+                                                <div key={idx} className="flex items-start gap-2 group/detail">
+                                                    {/* Icon + Label (fixed width) */}
+                                                    <div className="flex items-center gap-1.5 shrink-0 w-20">
+                                                        <div className="w-5 h-5 rounded-md bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary transition-colors duration-200">
+                                                            {getDetailIcon(detail.label)}
+                                                        </div>
+                                                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider leading-none">
                                                             {detail.label}
                                                         </span>
-                                                        <span className="text-foreground text-xs font-bold leading-tight">
+                                                    </div>
+                                                    {/* Value */}
+                                                    {detail.label === 'County' ? (
+                                                        <div className="columns-2 gap-x-3 text-[11px] font-semibold text-foreground leading-snug min-w-0">
+                                                            {detail.value.split(',').map((county, cIdx) => (
+                                                                <span key={cIdx} className="block break-inside-avoid">{county.trim()}</span>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-[11px] font-semibold text-foreground leading-snug min-w-0">
                                                             {detail.value}
                                                         </span>
-                                                    </div>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
 
+                                        {/* Divider */}
+                                        <div className="border-b border-white/5 my-3" />
+
+                                        {/* Footer Button */}
                                         <Button
-                                            className="w-full mt-auto rounded-lg h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02] text-sm"
+                                            className="w-full mt-auto rounded-lg h-9 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-lg shadow-primary/20 group-hover:scale-[1.02] text-xs"
                                             onClick={() => service.url && window.open(service.url, '_blank')}
                                             disabled={!service.url}
                                         >
                                             {service.url ? 'Visit Website' : 'No Website Available'}
-                                            <ChevronRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                                            <ChevronRight className="ml-1.5 w-3 h-3 transition-transform group-hover:translate-x-1" />
                                         </Button>
                                     </SpotlightCard>
                                 </motion.div>
