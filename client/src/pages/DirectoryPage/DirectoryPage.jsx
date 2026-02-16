@@ -13,7 +13,8 @@ import {
     Accessibility,
     ExternalLink,
     ChevronRight,
-    MapPinned
+    MapPinned,
+    Loader2
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -131,9 +132,17 @@ const itemVariants = {
 };
 
 const DirectoryPage = () => {
-    const [searchName, setSearchName] = useState('');
-    const [selectedCounty, setSelectedCounty] = useState('all');
-    const [selectedService, setSelectedService] = useState('all');
+    // Input State (Controlled by user interaction)
+    const [searchTerm, setSearchTerm] = useState('');
+    const [countyFilter, setCountyFilter] = useState('all');
+    const [serviceFilter, setServiceFilter] = useState('all');
+
+    // Active Filter State (Applied only when "Start My Search" is clicked)
+    const [activeSearch, setActiveSearch] = useState('');
+    const [activeCounty, setActiveCounty] = useState('all');
+    const [activeService, setActiveService] = useState('all');
+
+    const [isSearching, setIsSearching] = useState(false);
 
     // Extract unique counties and services for filter dropdowns with useMemo
     const allCounties = useMemo(() => [...new Set(servicesData.flatMap(service =>
@@ -145,13 +154,13 @@ const DirectoryPage = () => {
     ))].sort(), []);
 
     const filteredServices = servicesData.filter(service => {
-        const matchesName = service.title.toLowerCase().includes(searchName.toLowerCase());
+        const matchesName = service.title.toLowerCase().includes(activeSearch.toLowerCase());
 
         const serviceCounties = service.details.find(d => d.label === 'County')?.value.toLowerCase() || '';
-        const matchesCounty = selectedCounty === 'all' || serviceCounties.includes(selectedCounty.toLowerCase());
+        const matchesCounty = activeCounty === 'all' || serviceCounties.includes(activeCounty.toLowerCase());
 
         const serviceTypes = service.category.toLowerCase();
-        const matchesService = selectedService === 'all' || serviceTypes.includes(selectedService.toLowerCase());
+        const matchesService = activeService === 'all' || serviceTypes.includes(activeService.toLowerCase());
 
         return matchesName && matchesCounty && matchesService;
     });
@@ -160,10 +169,10 @@ const DirectoryPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
 
-    // Reset page when filters change
+    // Reset page when ACTIVE filters change
     React.useEffect(() => {
         setCurrentPage(1);
-    }, [searchName, selectedCounty, selectedService]);
+    }, [activeSearch, activeCounty, activeService]);
 
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -174,10 +183,25 @@ const DirectoryPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const handleSearch = () => {
+        setIsSearching(true);
+        // Simulate network delay for better UX
+        setTimeout(() => {
+            setActiveSearch(searchTerm);
+            setActiveCounty(countyFilter);
+            setActiveService(serviceFilter);
+            setIsSearching(false);
+        }, 600);
+    };
+
     const clearFilters = () => {
-        setSearchName('');
-        setSelectedCounty('all');
-        setSelectedService('all');
+        setSearchTerm('');
+        setCountyFilter('all');
+        setServiceFilter('all');
+
+        setActiveSearch('');
+        setActiveCounty('all');
+        setActiveService('all');
     };
 
     return (
@@ -214,12 +238,17 @@ const DirectoryPage = () => {
                                 <Input
                                     placeholder="Search by name"
                                     className="pl-10 bg-background/50 border-white/10 focus-visible:ring-primary h-12 text-lg transition-all rounded-xl"
-                                    value={searchName}
-                                    onChange={(e) => setSearchName(e.target.value)}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
                             </div>
 
-                            <Select value={selectedCounty} onValueChange={setSelectedCounty}>
+                            <Select
+                                value={countyFilter}
+                                onValueChange={setCountyFilter}
+                                key={`county-${countyFilter}`}
+                            >
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Counties" />
                                 </SelectTrigger>
@@ -231,7 +260,11 @@ const DirectoryPage = () => {
                                 </SelectContent>
                             </Select>
 
-                            <Select value={selectedService} onValueChange={setSelectedService}>
+                            <Select
+                                value={serviceFilter}
+                                onValueChange={setServiceFilter}
+                                key={`service-${serviceFilter}`}
+                            >
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Services" />
                                 </SelectTrigger>
@@ -244,17 +277,26 @@ const DirectoryPage = () => {
                             </Select>
                         </div>
 
-                        <div className="flex flex-wrap gap-4 pt-4 border-t border-white/5">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/5">
                             <Button
-                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] h-12 px-8 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                onClick={() => { }}
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] h-12 px-8 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                                onClick={handleSearch}
+                                disabled={isSearching}
                             >
-                                Start My Search
+                                {isSearching ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Searching...
+                                    </>
+                                ) : (
+                                    'Start My Search'
+                                )}
                             </Button>
                             <Button
                                 variant="outline"
-                                className="border-white/10 hover:bg-white/5 text-foreground h-12 px-8 bg-transparent transition-all rounded-xl font-medium"
+                                className="border-white/10 hover:bg-white/5 text-foreground h-12 px-8 bg-transparent transition-all rounded-xl font-medium w-full sm:w-auto"
                                 onClick={clearFilters}
+                                disabled={isSearching}
                             >
                                 Reset Filters
                             </Button>
@@ -263,87 +305,94 @@ const DirectoryPage = () => {
                 </div>
 
                 {/* Service Cards Grid */}
-                <motion.div
-                    variants={container}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: "-50px" }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                >
-                    {currentServices.length > 0 ? (
-                        currentServices.map((service, index) => (
-                            <motion.div
-                                key={index}
-                                variants={itemVariants}
-                                className="h-full"
-                                whileHover={{
-                                    y: -8,
-                                    transition: { duration: 0.3, ease: "easeOut" }
-                                }}
-                            >
-                                <SpotlightCard className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
-                                            {service.category}
-                                        </Badge>
-                                        <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
-                                            <ExternalLink className="w-4 h-4" />
-                                        </div>
-                                    </div>
-
-                                    <h3 className="text-xl font-black mb-1 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-2">
-                                        {service.title}
-                                    </h3>
-                                    <p className="text-muted-foreground mb-4 text-xs font-medium leading-relaxed line-clamp-1">
-                                        {service.subtitle}
-                                    </p>
-
-                                    <div className="space-y-3 mb-6 grow">
-                                        {service.details.map((detail, idx) => (
-                                            <div key={idx} className="flex gap-3 group/detail">
-                                                <div className="mt-0.5 shrink-0 w-6 h-6 rounded-lg bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
-                                                    {getDetailIcon(detail.label)}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">
-                                                        {detail.label}
-                                                    </span>
-                                                    <span className="text-foreground text-xs font-bold leading-tight">
-                                                        {detail.value}
-                                                    </span>
-                                                </div>
+                {isSearching ? (
+                    <div className="flex flex-col items-center justify-center py-40 space-y-4">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                        <p className="text-muted-foreground font-medium">Finding the best services for you...</p>
+                    </div>
+                ) : (
+                    <motion.div
+                        variants={container}
+                        initial="hidden"
+                        whileInView="show"
+                        viewport={{ once: true, margin: "-50px" }}
+                        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+                    >
+                        {currentServices.length > 0 ? (
+                            currentServices.map((service, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={itemVariants}
+                                    className="h-full"
+                                    whileHover={{
+                                        y: -8,
+                                        transition: { duration: 0.3, ease: "easeOut" }
+                                    }}
+                                >
+                                    <SpotlightCard className="p-6">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
+                                                {service.category}
+                                            </Badge>
+                                            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
+                                                <ExternalLink className="w-4 h-4" />
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
 
-                                    <Button
-                                        className="w-full mt-auto rounded-lg h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02] text-sm"
-                                        onClick={() => service.url && window.open(service.url, '_blank')}
-                                        disabled={!service.url}
-                                    >
-                                        {service.url ? 'Visit Website' : 'No Website Available'}
-                                        <ChevronRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                                    </Button>
-                                </SpotlightCard>
-                            </motion.div>
-                        ))
-                    ) : (
-                        <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
-                            <div className="p-6 rounded-3xl bg-secondary/20 text-muted-foreground">
-                                <Search className="w-12 h-12 opacity-20" />
+                                        <h3 className="text-xl font-black mb-1 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                            {service.title}
+                                        </h3>
+                                        <p className="text-muted-foreground mb-4 text-xs font-medium leading-relaxed">
+                                            {service.subtitle}
+                                        </p>
+
+                                        <div className="space-y-3 mb-6 grow">
+                                            {service.details.map((detail, idx) => (
+                                                <div key={idx} className="flex gap-3 group/detail">
+                                                    <div className="mt-0.5 shrink-0 w-6 h-6 rounded-lg bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
+                                                        {getDetailIcon(detail.label)}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">
+                                                            {detail.label}
+                                                        </span>
+                                                        <span className="text-foreground text-xs font-bold leading-tight">
+                                                            {detail.value}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <Button
+                                            className="w-full mt-auto rounded-lg h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02] text-sm"
+                                            onClick={() => service.url && window.open(service.url, '_blank')}
+                                            disabled={!service.url}
+                                        >
+                                            {service.url ? 'Visit Website' : 'No Website Available'}
+                                            <ChevronRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                                        </Button>
+                                    </SpotlightCard>
+                                </motion.div>
+                            ))
+                        ) : (
+                            <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
+                                <div className="p-6 rounded-3xl bg-secondary/20 text-muted-foreground">
+                                    <Search className="w-12 h-12 opacity-20" />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-2">No Services Found</h3>
+                                    <p className="text-muted-foreground max-w-xs">
+                                        We couldn't find any services matching your current filters. Try adjusting your search criteria.
+                                    </p>
+                                </div>
+                                <Button variant="link" onClick={clearFilters} className="text-primary font-bold">
+                                    Clear all filters
+                                </Button>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-bold mb-2">No Services Found</h3>
-                                <p className="text-muted-foreground max-w-xs">
-                                    We couldn't find any services matching your current filters. Try adjusting your search criteria.
-                                </p>
-                            </div>
-                            <Button variant="link" onClick={clearFilters} className="text-primary font-bold">
-                                Clear all filters
-                            </Button>
-                        </div>
-                    )}
-                </motion.div>
+                        )}
+                    </motion.div>
+                )}
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
