@@ -1,5 +1,5 @@
 // File: client/src/pages/DirectoryPage/DirectoryPage.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
     Filter,
@@ -28,6 +28,14 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import rawServicesData from '@/lib/data/Transportation Services in Washington.json';
 
@@ -71,7 +79,7 @@ const SpotlightCard = ({ children, className = "" }) => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={cn(
-                "relative overflow-hidden rounded-2xl border border-white/10 bg-card text-card-foreground shadow-2xl transition-all duration-300 flex flex-col group min-h-[500px]",
+                "relative overflow-hidden rounded-2xl border border-white/10 bg-card text-card-foreground shadow-2xl transition-all duration-300 flex flex-col group min-h-[400px]",
                 "hover:border-primary/40 hover:shadow-primary/10 hover:bg-card/80",
                 className
             )}
@@ -127,14 +135,14 @@ const DirectoryPage = () => {
     const [selectedCounty, setSelectedCounty] = useState('all');
     const [selectedService, setSelectedService] = useState('all');
 
-    // Extract unique counties and services for filter dropdowns
-    const allCounties = [...new Set(servicesData.flatMap(service =>
+    // Extract unique counties and services for filter dropdowns with useMemo
+    const allCounties = useMemo(() => [...new Set(servicesData.flatMap(service =>
         service.details.find(d => d.label === 'County')?.value.split(',').map(c => c.trim()) || []
-    ))].sort();
+    ))].sort(), []);
 
-    const allServices = [...new Set(servicesData.flatMap(service =>
+    const allServices = useMemo(() => [...new Set(servicesData.flatMap(service =>
         service.category.split(',').map(s => s.trim()) || []
-    ))].sort();
+    ))].sort(), []);
 
     const filteredServices = servicesData.filter(service => {
         const matchesName = service.title.toLowerCase().includes(searchName.toLowerCase());
@@ -147,6 +155,24 @@ const DirectoryPage = () => {
 
         return matchesName && matchesCounty && matchesService;
     });
+
+    // Pagination Logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9;
+
+    // Reset page when filters change
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchName, selectedCounty, selectedService]);
+
+    const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentServices = filteredServices.slice(startIndex, startIndex + itemsPerPage);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const clearFilters = () => {
         setSearchName('');
@@ -197,7 +223,7 @@ const DirectoryPage = () => {
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Counties" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl max-h-75">
+                                <SelectContent className="rounded-xl max-h-[300px]">
                                     <SelectItem value="all">All Counties</SelectItem>
                                     {allCounties.map(county => (
                                         <SelectItem key={county} value={county}>{county}</SelectItem>
@@ -209,7 +235,7 @@ const DirectoryPage = () => {
                                 <SelectTrigger className="bg-background/50 border-white/10 focus:ring-primary h-12 rounded-xl">
                                     <SelectValue placeholder="All Services" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl max-h-75">
+                                <SelectContent className="rounded-xl max-h-[300px]">
                                     <SelectItem value="all">All Services</SelectItem>
                                     {allServices.map(service => (
                                         <SelectItem key={service} value={service}>{service}</SelectItem>
@@ -244,8 +270,8 @@ const DirectoryPage = () => {
                     viewport={{ once: true, margin: "-50px" }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
-                    {filteredServices.length > 0 ? (
-                        filteredServices.map((service, index) => (
+                    {currentServices.length > 0 ? (
+                        currentServices.map((service, index) => (
                             <motion.div
                                 key={index}
                                 variants={itemVariants}
@@ -255,34 +281,34 @@ const DirectoryPage = () => {
                                     transition: { duration: 0.3, ease: "easeOut" }
                                 }}
                             >
-                                <SpotlightCard className="p-8">
-                                    <div className="flex items-start justify-between mb-6">
-                                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1.5 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
+                                <SpotlightCard className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
                                             {service.category}
                                         </Badge>
-                                        <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
-                                            <ExternalLink className="w-5 h-5" />
+                                        <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
+                                            <ExternalLink className="w-4 h-4" />
                                         </div>
                                     </div>
 
-                                    <h3 className="text-2xl font-black mb-2 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    <h3 className="text-xl font-black mb-1 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-2">
                                         {service.title}
                                     </h3>
-                                    <p className="text-muted-foreground mb-8 text-sm font-medium leading-relaxed">
+                                    <p className="text-muted-foreground mb-4 text-xs font-medium leading-relaxed line-clamp-1">
                                         {service.subtitle}
                                     </p>
 
-                                    <div className="space-y-5 mb-8 grow">
+                                    <div className="space-y-3 mb-6 grow">
                                         {service.details.map((detail, idx) => (
-                                            <div key={idx} className="flex gap-4 group/detail">
-                                                <div className="mt-1 shrink-0 w-8 h-8 rounded-xl bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
+                                            <div key={idx} className="flex gap-3 group/detail">
+                                                <div className="mt-0.5 shrink-0 w-6 h-6 rounded-lg bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
                                                     {getDetailIcon(detail.label)}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">
+                                                    <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">
                                                         {detail.label}
                                                     </span>
-                                                    <span className="text-foreground text-sm font-bold leading-tight">
+                                                    <span className="text-foreground text-xs font-bold leading-tight">
                                                         {detail.value}
                                                     </span>
                                                 </div>
@@ -291,12 +317,12 @@ const DirectoryPage = () => {
                                     </div>
 
                                     <Button
-                                        className="w-full mt-auto rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02]"
+                                        className="w-full mt-auto rounded-lg h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02] text-sm"
                                         onClick={() => service.url && window.open(service.url, '_blank')}
                                         disabled={!service.url}
                                     >
                                         {service.url ? 'Visit Website' : 'No Website Available'}
-                                        <ChevronRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                        <ChevronRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                                     </Button>
                                 </SpotlightCard>
                             </motion.div>
@@ -318,6 +344,41 @@ const DirectoryPage = () => {
                         </div>
                     )}
                 </motion.div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="mt-16">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    />
+                                </PaginationItem>
+
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    <PaginationItem key={page}>
+                                        <PaginationLink
+                                            isActive={currentPage === page}
+                                            onClick={() => handlePageChange(page)}
+                                            className="cursor-pointer"
+                                        >
+                                            {page}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </main>
 
             <Footer />
