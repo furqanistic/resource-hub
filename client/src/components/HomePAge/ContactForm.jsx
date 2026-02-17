@@ -1,14 +1,14 @@
 // File: client/src/components/HomePage/ContactForm.jsx
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const formSchema = z.object({
     firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
@@ -19,6 +19,7 @@ const formSchema = z.object({
 
 const ContactForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: zodResolver(formSchema),
     });
@@ -29,97 +30,118 @@ const ContactForm = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
         console.log(data);
         setIsSubmitting(false);
+        setIsSuccess(true);
         reset();
+        setTimeout(() => setIsSuccess(false), 5000);
     };
 
     return (
-        <section className="relative bg-background py-24 px-6 overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 pointer-events-none opacity-20 dark:opacity-10">
-                <div className="absolute bottom-0 left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]" />
-                <div className="absolute top-[10%] right-[-5%] w-[30%] h-[30%] bg-accent/20 rounded-full blur-[100px]" />
-            </div>
-            <div className="container mx-auto max-w-2xl text-center">
-                <motion.h2
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-[1.1] mb-16"
-                >
-                    Do you have a suggested resource <br className="hidden sm:block" />
-                    that we should know about?{" "}
-                    <span className="text-primary relative px-1 inline-block mt-2">
-                        Let us know!
-                        <span className="absolute bottom-1 left-0 w-full h-2 bg-primary/10 -z-10 rounded-sm"></span>
-                    </span>
-                </motion.h2>
+        <section className="relative bg-white py-24 px-4 overflow-hidden">
+            <div className="max-w-3xl mx-auto">
+                <AnimatePresence mode="wait">
+                    {!isSuccess ? (
+                        <motion.div
+                            key="form-container"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0, y: -20 }}
+                        >
+                            <div className="text-center mb-14">
+                                <motion.h2
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.8 }}
+                                    className="text-3xl sm:text-4xl font-medium text-black tracking-tight leading-[1.2]"
+                                >
+                                    Do you have a suggested resource that we
+                                    <br className="hidden sm:block" />
+                                    should know about? Let us know!
+                                </motion.h2>
+                            </div>
 
-                <motion.form
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="space-y-6 text-left"
-                >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="firstName" className="text-foreground">First name</Label>
-                            <Input
-                                id="firstName"
-                                {...register("firstName")}
-                                className="bg-card border-white/10 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                            />
-                            {errors.firstName && <p className="text-destructive text-sm">{errors.firstName.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-foreground">Last name</Label>
-                            <Input
-                                id="lastName"
-                                {...register("lastName")}
-                                className="bg-card border-white/10 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                            />
-                            {errors.lastName && <p className="text-destructive text-sm">{errors.lastName.message}</p>}
-                        </div>
-                    </div>
+                            <motion.form
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.1, duration: 0.8 }}
+                                onSubmit={handleSubmit(onSubmit)}
+                                className="space-y-6"
+                            >
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="firstName" className="text-black font-medium">First name</Label>
+                                        <Input
+                                            id="firstName"
+                                            {...register("firstName")}
+                                            className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                        />
+                                        {errors.firstName && <p className="text-destructive text-sm">{errors.firstName.message}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="lastName" className="text-black font-medium">Last name</Label>
+                                        <Input
+                                            id="lastName"
+                                            {...register("lastName")}
+                                            className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                        />
+                                        {errors.lastName && <p className="text-destructive text-sm">{errors.lastName.message}</p>}
+                                    </div>
+                                </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="text-foreground">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            {...register("email")}
-                            className="bg-card border-white/10 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                        />
-                        {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
-                    </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email" className="text-black font-medium">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        {...register("email")}
+                                        className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                    />
+                                    {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
+                                </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="feedback" className="text-foreground">Feedback</Label>
-                        <Textarea
-                            id="feedback"
-                            {...register("feedback")}
-                            className="bg-card border-white/10 focus-visible:ring-primary focus-visible:border-primary min-h-37.5 transition-all text-foreground"
-                        />
-                        {errors.feedback && <p className="text-destructive text-sm">{errors.feedback.message}</p>}
-                    </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="feedback" className="text-black font-medium">Feedback</Label>
+                                    <Textarea
+                                        id="feedback"
+                                        {...register("feedback")}
+                                        className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] min-h-40 transition-all text-black rounded-none shadow-none"
+                                    />
+                                    {errors.feedback && <p className="text-destructive text-sm">{errors.feedback.message}</p>}
+                                </div>
 
-                    <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_-3px_var(--primary)] hover:shadow-[0_0_25px_-5px_var(--primary)] transition-all duration-300"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Submitting...
-                            </>
-                        ) : (
-                            "Submit"
-                        )}
-                    </Button>
-                </motion.form>
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-none h-12 transition-all rounded-none font-medium text-base"
+                                >
+                                    {isSubmitting ? "Submitting..." : "Submit"}
+                                </Button>
+                            </motion.form>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="success-message"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="py-12 flex flex-col items-center text-center space-y-4"
+                        >
+                            <CheckCircle2 className="w-16 h-16 text-[#03385e] mb-2" />
+                            <h3 className="text-2xl font-semibold text-black">Thank You!</h3>
+                            <p className="text-slate-600 max-w-sm">
+                                Your message has been sent successfully. We'll get back to you soon.
+                            </p>
+                            <Button 
+                                variant="link" 
+                                onClick={() => setIsSuccess(false)}
+                                className="text-[#03385e] font-medium p-0 h-auto"
+                            >
+                                Send another message
+                            </Button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </section>
     );

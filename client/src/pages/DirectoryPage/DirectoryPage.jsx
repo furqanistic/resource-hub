@@ -3,18 +3,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
     Filter,
-    Search,
-    X,
-    Phone,
-    Clock,
-    CreditCard,
-    MapPin,
-    Calendar,
-    Accessibility,
-    ExternalLink,
-    ChevronRight,
-    MapPinned,
-    Loader2
+    Search
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -27,7 +16,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
     Pagination,
@@ -39,19 +27,6 @@ import {
 } from "@/components/ui/pagination";
 
 import rawServicesData from '@/lib/data/Transportation Services in Washington.json';
-
-const getDetailIcon = (label) => {
-    const iconMap = {
-        'Phone': <Phone className="w-4 h-4" />,
-        'Hours': <Clock className="w-4 h-4" />,
-        'Access': <Accessibility className="w-4 h-4" />,
-        'Cost': <CreditCard className="w-4 h-4" />,
-        'County': <MapPin className="w-4 h-4" />,
-        'Website': <ExternalLink className="w-4 h-4" />,
-    };
-    return iconMap[label] || <ChevronRight className="w-4 h-4" />;
-};
-
 
 // Spotlight Card Component (Cleaned up and adapted)
 const SpotlightCard = ({ children, className = "" }) => {
@@ -80,8 +55,8 @@ const SpotlightCard = ({ children, className = "" }) => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={cn(
-                "relative overflow-hidden rounded-2xl border border-white/10 bg-card text-card-foreground shadow-2xl transition-all duration-300 flex flex-col group min-h-[400px]",
-                "hover:border-primary/40 hover:shadow-primary/10 hover:bg-card/80",
+                "relative overflow-hidden border border-black/10 bg-white text-black transition-colors duration-200 flex flex-col group min-h-[380px]",
+                "hover:border-black/20",
                 className
             )}
         >
@@ -90,7 +65,7 @@ const SpotlightCard = ({ children, className = "" }) => {
                 className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
                 style={{
                     opacity,
-                    background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(var(--primary-rgb), 0.1), transparent 80%)`,
+                    background: `radial-gradient(360px circle at ${position.x}px ${position.y}px, rgba(3, 56, 94, 0.06), transparent 80%)`,
                 }}
             />
             {/* Content Container */}
@@ -136,13 +111,9 @@ const DirectoryPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [countyFilter, setCountyFilter] = useState('all');
     const [serviceFilter, setServiceFilter] = useState('all');
-
-    // Active Filter State (Applied only when "Start My Search" is clicked)
-    const [activeSearch, setActiveSearch] = useState('');
-    const [activeCounty, setActiveCounty] = useState('all');
-    const [activeService, setActiveService] = useState('all');
-
-    const [isSearching, setIsSearching] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [countyQuery, setCountyQuery] = useState('');
+    const [serviceQuery, setServiceQuery] = useState('');
 
     // Extract unique counties and services for filter dropdowns with useMemo
     const allCounties = useMemo(() => [...new Set(servicesData.flatMap(service =>
@@ -153,14 +124,26 @@ const DirectoryPage = () => {
         service.category.split(',').map(s => s.trim()) || []
     ))].sort(), []);
 
+    const filteredCounties = useMemo(() => {
+        if (!countyQuery.trim()) return allCounties;
+        const q = countyQuery.toLowerCase();
+        return allCounties.filter(c => c.toLowerCase().includes(q));
+    }, [allCounties, countyQuery]);
+
+    const filteredServicesList = useMemo(() => {
+        if (!serviceQuery.trim()) return allServices;
+        const q = serviceQuery.toLowerCase();
+        return allServices.filter(s => s.toLowerCase().includes(q));
+    }, [allServices, serviceQuery]);
+
     const filteredServices = servicesData.filter(service => {
-        const matchesName = service.title.toLowerCase().includes(activeSearch.toLowerCase());
+        const matchesName = service.title.toLowerCase().includes(searchTerm.toLowerCase());
 
         const serviceCounties = service.details.find(d => d.label === 'County')?.value.toLowerCase() || '';
-        const matchesCounty = activeCounty === 'all' || serviceCounties.includes(activeCounty.toLowerCase());
+        const matchesCounty = countyFilter === 'all' || serviceCounties.includes(countyFilter.toLowerCase());
 
         const serviceTypes = service.category.toLowerCase();
-        const matchesService = activeService === 'all' || serviceTypes.includes(activeService.toLowerCase());
+        const matchesService = serviceFilter === 'all' || serviceTypes.includes(serviceFilter.toLowerCase());
 
         return matchesName && matchesCounty && matchesService;
     });
@@ -172,7 +155,13 @@ const DirectoryPage = () => {
     // Reset page when ACTIVE filters change
     React.useEffect(() => {
         setCurrentPage(1);
-    }, [activeSearch, activeCounty, activeService]);
+    }, [searchTerm, countyFilter, serviceFilter]);
+
+    React.useEffect(() => {
+        setIsLoading(true);
+        const t = setTimeout(() => setIsLoading(false), 300);
+        return () => clearTimeout(t);
+    }, [searchTerm, countyFilter, serviceFilter, currentPage]);
 
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -183,152 +172,168 @@ const DirectoryPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleSearch = () => {
-        setIsSearching(true);
-        // Simulate network delay for better UX
-        setTimeout(() => {
-            setActiveSearch(searchTerm);
-            setActiveCounty(countyFilter);
-            setActiveService(serviceFilter);
-            setIsSearching(false);
-        }, 600);
-    };
-
     const clearFilters = () => {
         setSearchTerm('');
         setCountyFilter('all');
         setServiceFilter('all');
-
-        setActiveSearch('');
-        setActiveCounty('all');
-        setActiveService('all');
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
+        <div className="min-h-screen bg-white text-black flex flex-col font-sans">
             <Navbar />
 
-            <main className="grow py-20 px-6 sm:px-12 container mx-auto max-w-7xl">
-                <div className="mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
-                    >
-                        <MapPinned className="w-4 h-4" />
-                        <span>Transportation Directory</span>
-                    </motion.div>
+            <main className="grow">
+                <div className="bg-[#f6f9fb] py-20">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h1 className="text-4xl md:text-6xl font-medium text-black tracking-tight">
+                            Find Transportation Services
+                        </h1>
+                    </div>
+                </div>
 
-                    <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/70">
-                        Find Transportation <br />Services
-                    </h1>
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div className="flex items-center gap-3 text-black mb-6">
+                        <Filter className="w-6 h-6 text-[#03385e]" />
+                        <span className="text-xl font-medium">Filter Services</span>
+                    </div>
 
-                    {/* Filter Section */}
-                    <div className="rounded-2xl bg-card/30 border border-white/10 backdrop-blur-md p-4 lg:p-5">
-                        {/* Header */}
-                        <div className="flex items-center gap-2.5 mb-4">
-                            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                                <Filter className="w-4 h-4" />
-                            </div>
-                            <span className="text-sm font-bold tracking-tight">Quick Filters</span>
+                    <div className="space-y-5">
+                        <div className="relative">
+                            <Input
+                                placeholder="Search by name"
+                                className="bg-white border border-black/30 h-12 rounded-lg w-full text-black placeholder:text-black/60 focus-visible:ring-0 focus-visible:border-[#03385e]"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
 
-                        {/* Desktop: Single Row | Mobile: Stacked */}
-                        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-                            {/* Search Input - full width on mobile, grows on desktop */}
-                            <div className="relative group lg:flex-1 lg:min-w-0">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                <Input
-                                    placeholder="Search by name..."
-                                    className="pl-10 bg-card border-white/10 focus-visible:ring-primary h-10 transition-all rounded-lg w-full"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                />
-                            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            <Select
+                                value={countyFilter}
+                                onValueChange={(value) => {
+                                    setCountyFilter(value);
+                                    setCountyQuery('');
+                                }}
+                                key={`county-${countyFilter}`}
+                            >
+                                <SelectTrigger className="w-full bg-white border border-black/40 h-12 rounded-lg text-black focus-visible:ring-0 focus-visible:border-[#03385e]">
+                                    <SelectValue placeholder="All Counties" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-lg max-h-75 border-black/20">
+                                    <div className="p-2">
+                                        <Input
+                                            placeholder="Search counties"
+                                            value={countyQuery}
+                                            onChange={(e) => setCountyQuery(e.target.value)}
+                                            className="h-9 bg-white border border-black/30 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]"
+                                        />
+                                    </div>
+                                    <SelectItem value="all">All Counties</SelectItem>
+                                    {filteredCounties.map(county => (
+                                        <SelectItem
+                                            key={county}
+                                            value={county}
+                                            className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                        >
+                                            {county}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
 
-                            {/* Selects - 2-col grid on mobile, inline on desktop */}
-                            <div className="grid grid-cols-2 lg:flex gap-3">
-                                <Select
-                                    value={countyFilter}
-                                    onValueChange={setCountyFilter}
-                                    key={`county-${countyFilter}`}
-                                >
-                                    <SelectTrigger className="bg-card border-white/10 focus:ring-primary h-10 rounded-lg lg:w-42.5">
-                                        <SelectValue placeholder="All Counties" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-lg max-h-75">
-                                        <SelectItem value="all">All Counties</SelectItem>
-                                        {allCounties.map(county => (
-                                            <SelectItem key={county} value={county}>{county}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <Select
+                                value={serviceFilter}
+                                onValueChange={(value) => {
+                                    setServiceFilter(value);
+                                    setServiceQuery('');
+                                }}
+                                key={`service-${serviceFilter}`}
+                            >
+                                <SelectTrigger className="w-full bg-white border border-black/40 h-12 rounded-lg text-black focus-visible:ring-0 focus-visible:border-[#03385e]">
+                                    <SelectValue placeholder="All Services" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-lg max-h-75 border-black/20">
+                                    <div className="p-2">
+                                        <Input
+                                            placeholder="Search services"
+                                            value={serviceQuery}
+                                            onChange={(e) => setServiceQuery(e.target.value)}
+                                            className="h-9 bg-white border border-black/30 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]"
+                                        />
+                                    </div>
+                                    <SelectItem value="all">All Services</SelectItem>
+                                    {filteredServicesList.map(service => (
+                                        <SelectItem
+                                            key={service}
+                                            value={service}
+                                            className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                        >
+                                            {service}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                                <Select
-                                    value={serviceFilter}
-                                    onValueChange={setServiceFilter}
-                                    key={`service-${serviceFilter}`}
-                                >
-                                    <SelectTrigger className="bg-card border-white/10 focus:ring-primary h-10 rounded-lg lg:w-42.5">
-                                        <SelectValue placeholder="All Services" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-lg max-h-75">
-                                        <SelectItem value="all">All Services</SelectItem>
-                                        {allServices.map(service => (
-                                            <SelectItem key={service} value={service}>{service}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Buttons - row on mobile (flex-1 each), inline on desktop */}
-                            <div className="flex gap-3 lg:shrink-0">
-                                <Button
-                                    className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.25)] h-10 px-5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98] flex-1 lg:flex-none"
-                                    onClick={handleSearch}
-                                    disabled={isSearching}
-                                >
-                                    {isSearching ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Searching...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Search className="mr-2 h-4 w-4" />
-                                            Search
-                                        </>
-                                    )}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="border-white/10 hover:bg-white/5 text-foreground h-10 px-5 bg-transparent transition-all rounded-lg font-medium flex-1 lg:flex-none"
-                                    onClick={clearFilters}
-                                    disabled={isSearching}
-                                >
-                                    <X className="mr-2 h-4 w-4" />
-                                    Reset
-                                </Button>
-                            </div>
+                        <div className="flex items-center gap-4 pt-2">
+                            <Button
+                                className="bg-[#03385e] hover:bg-[#03385e]/90 text-white h-12 px-8 rounded-none font-medium shadow-none"
+                                onClick={() => setCurrentPage(1)}
+                            >
+                                Start My Search
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="border border-[#03385e] text-[#03385e] h-12 px-8 rounded-none font-medium hover:bg-transparent"
+                                onClick={clearFilters}
+                            >
+                                Clear All
+                            </Button>
                         </div>
                     </div>
                 </div>
 
-                {/* Service Cards Grid */}
-                {isSearching ? (
-                    <div className="flex flex-col items-center justify-center py-40 space-y-4">
-                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                        <p className="text-muted-foreground font-medium">Finding the best services for you...</p>
-                    </div>
-                ) : (
-                    <motion.div
-                        key={`${activeSearch}-${activeCounty}-${activeService}`}
-                        variants={container}
-                        initial="hidden"
-                        animate="show"
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
-                    >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+                    {/* Service Cards Grid */}
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                            {Array.from({ length: 6 }).map((_, idx) => (
+                                <div key={idx} className="border border-black/10 bg-white p-6 rounded-none">
+                                    <div className="h-5 w-2/3 bg-black/10 rounded-sm mb-3 animate-pulse" />
+                                    <div className="h-4 w-1/3 bg-black/10 rounded-sm mb-6 animate-pulse" />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                        <div>
+                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-5/6 bg-black/10 rounded-sm animate-pulse" />
+                                        </div>
+                                        <div>
+                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-4/5 bg-black/10 rounded-sm animate-pulse" />
+                                        </div>
+                                        <div>
+                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-3/4 bg-black/10 rounded-sm animate-pulse" />
+                                        </div>
+                                        <div>
+                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-2/3 bg-black/10 rounded-sm animate-pulse" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <motion.div
+                            key={`${searchTerm}-${countyFilter}-${serviceFilter}`}
+                            variants={container}
+                            initial="hidden"
+                            animate="show"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+                        >
                         {currentServices.length > 0 ? (
                             currentServices.map((service, index) => (
                                 <motion.div
@@ -340,105 +345,91 @@ const DirectoryPage = () => {
                                         transition: { duration: 0.3, ease: "easeOut" }
                                     }}
                                 >
-                                    <SpotlightCard className="p-6">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest backdrop-blur-sm transition-all duration-300">
-                                                {service.category}
-                                            </Badge>
-                                            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-primary/10">
-                                                <ExternalLink className="w-4 h-4" />
-                                            </div>
-                                        </div>
-
-                                        <h3 className="text-xl font-black mb-1 leading-tight text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    <SpotlightCard className="p-6 bg-white border border-black/10 shadow-none hover:shadow-none hover:border-black/20 rounded-none">
+                                        <h3 className="text-xl font-medium mb-1 leading-tight text-black tracking-tight">
                                             {service.title}
                                         </h3>
-                                        <p className="text-muted-foreground mb-4 text-xs font-medium leading-relaxed">
+                                        <p className="text-black/70 mb-5 text-sm font-normal leading-relaxed">
                                             {service.subtitle}
                                         </p>
 
-                                        <div className="space-y-3 mb-6 grow">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                             {service.details.map((detail, idx) => (
-                                                <div key={idx} className="flex gap-3 group/detail">
-                                                    <div className="mt-0.5 shrink-0 w-6 h-6 rounded-lg bg-card border border-white/10 flex items-center justify-center text-primary/70 group-hover/detail:text-primary group-hover/detail:scale-110 transition-all duration-300">
-                                                        {getDetailIcon(detail.label)}
+                                                <div key={idx}>
+                                                    <div className="text-[#03385e] font-semibold text-sm mb-1">
+                                                        {detail.label}
                                                     </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">
-                                                            {detail.label}
-                                                        </span>
-                                                        <span className="text-foreground text-xs font-bold leading-tight">
-                                                            {detail.value}
-                                                        </span>
+                                                    <div
+                                                        className="text-black text-xs leading-snug"
+                                                        style={{
+                                                            display: '-webkit-box',
+                                                            WebkitLineClamp: 4,
+                                                            WebkitBoxOrient: 'vertical',
+                                                            overflow: 'hidden',
+                                                        }}
+                                                    >
+                                                        {detail.value}
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
-
-                                        <Button
-                                            className="w-full mt-auto rounded-lg h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all duration-300 border-none shadow-xl shadow-primary/20 group-hover:scale-[1.02] text-sm"
-                                            onClick={() => service.url && window.open(service.url, '_blank')}
-                                            disabled={!service.url}
-                                        >
-                                            {service.url ? 'Visit Website' : 'No Website Available'}
-                                            <ChevronRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                                        </Button>
                                     </SpotlightCard>
                                 </motion.div>
                             ))
                         ) : (
                             <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="p-6 rounded-3xl bg-secondary/20 text-muted-foreground">
+                                <div className="p-6 rounded-3xl bg-[#03385e]/10 text-black/50">
                                     <Search className="w-12 h-12 opacity-20" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold mb-2">No Services Found</h3>
-                                    <p className="text-muted-foreground max-w-xs">
+                                    <p className="text-black/60 max-w-xs">
                                         We couldn't find any services matching your current filters. Try adjusting your search criteria.
                                     </p>
                                 </div>
-                                <Button variant="link" onClick={clearFilters} className="text-primary font-bold">
+                                <Button variant="link" onClick={clearFilters} className="text-[#03385e] font-bold">
                                     Clear all filters
                                 </Button>
                             </div>
                         )}
-                    </motion.div>
-                )}
+                        </motion.div>
+                    )}
 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                    <div className="mt-16">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    />
-                                </PaginationItem>
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="mt-16">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious
+                                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
 
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                    <PaginationItem key={page}>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <PaginationItem key={page}>
                                         <PaginationLink
                                             isActive={currentPage === page}
                                             onClick={() => handlePageChange(page)}
-                                            className="cursor-pointer"
+                                            className="cursor-pointer hover:bg-[#03385e]/10 hover:text-[#03385e]"
                                         >
                                             {page}
                                         </PaginationLink>
                                     </PaginationItem>
                                 ))}
 
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
-                )}
+                                    <PaginationItem>
+                                        <PaginationNext
+                                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    )}
+                </div>
             </main>
 
             <Footer />
