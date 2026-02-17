@@ -6,18 +6,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
-const formSchema = z.object({
-    firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
-    lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
-    email: z.string().email({ message: "Please enter a valid email address." }),
-    feedback: z.string().min(10, { message: "Feedback must be at least 10 characters." }),
-});
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ContactForm = () => {
+    const { t } = useLanguage();
+    const formSchema = useMemo(() => z.object({
+        firstName: z.string().min(2, { message: t('home.validation.firstNameMin') }),
+        lastName: z.string().min(2, { message: t('home.validation.lastNameMin') }),
+        email: z.string().email({ message: t('home.validation.emailInvalid') }),
+        feedback: z.string().min(10, { message: t('home.validation.feedbackMin') }),
+    }), [t]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -54,9 +55,7 @@ const ContactForm = () => {
                                     transition={{ duration: 0.8 }}
                                     className="text-3xl sm:text-4xl font-medium text-black tracking-tight leading-[1.2]"
                                 >
-                                    Do you have a suggested resource that we
-                                    <br className="hidden sm:block" />
-                                    should know about? Let us know!
+                                    {t('home.contactTitle')}
                                 </motion.h2>
                             </div>
 
@@ -70,7 +69,7 @@ const ContactForm = () => {
                             >
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="firstName" className="text-black font-medium">First name</Label>
+                                        <Label htmlFor="firstName" className="text-black font-medium">{t('home.contactFirstName')}</Label>
                                         <Input
                                             id="firstName"
                                             {...register("firstName")}
@@ -79,7 +78,7 @@ const ContactForm = () => {
                                         {errors.firstName && <p className="text-destructive text-sm">{errors.firstName.message}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="lastName" className="text-black font-medium">Last name</Label>
+                                        <Label htmlFor="lastName" className="text-black font-medium">{t('home.contactLastName')}</Label>
                                         <Input
                                             id="lastName"
                                             {...register("lastName")}
@@ -90,7 +89,7 @@ const ContactForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="email" className="text-black font-medium">Email</Label>
+                                    <Label htmlFor="email" className="text-black font-medium">{t('home.contactEmail')}</Label>
                                     <Input
                                         id="email"
                                         type="email"
@@ -101,7 +100,7 @@ const ContactForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="feedback" className="text-black font-medium">Feedback</Label>
+                                    <Label htmlFor="feedback" className="text-black font-medium">{t('home.contactFeedback')}</Label>
                                     <Textarea
                                         id="feedback"
                                         {...register("feedback")}
@@ -115,7 +114,7 @@ const ContactForm = () => {
                                     disabled={isSubmitting}
                                     className="w-full bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-none h-12 transition-all rounded-none font-medium text-base"
                                 >
-                                    {isSubmitting ? "Submitting..." : "Submit"}
+                                    {isSubmitting ? t('home.contactSubmitting') : t('home.contactSubmit')}
                                 </Button>
                             </motion.form>
                         </motion.div>
@@ -128,16 +127,16 @@ const ContactForm = () => {
                             className="py-12 flex flex-col items-center text-center space-y-4"
                         >
                             <CheckCircle2 className="w-16 h-16 text-[#03385e] mb-2" />
-                            <h3 className="text-2xl font-semibold text-black">Thank You!</h3>
+                            <h3 className="text-2xl font-semibold text-black">{t('home.contactSuccessTitle')}</h3>
                             <p className="text-slate-600 max-w-sm">
-                                Your message has been sent successfully. We'll get back to you soon.
+                                {t('home.contactSuccessBody')}
                             </p>
                             <Button 
                                 variant="link" 
                                 onClick={() => setIsSuccess(false)}
                                 className="text-[#03385e] font-medium p-0 h-auto"
                             >
-                                Send another message
+                                {t('home.contactSendAnother')}
                             </Button>
                         </motion.div>
                     )}

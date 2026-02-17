@@ -2,20 +2,59 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const { language, setLanguage, t } = useLanguage();
 
     const navLinks = [
-        { name: 'Home', path: '/' },
-        { name: 'Directory', path: '/directory' },
-        { name: 'Resources', path: '/resources' },
-        { name: 'About', path: '/about' },
-        { name: 'Partners', path: '/partners' },
+        { name: t('nav.home'), path: '/' },
+        { name: t('nav.directory'), path: '/directory' },
+        { name: t('nav.resources'), path: '/resources' },
+        { name: t('nav.about'), path: '/about' },
+        { name: t('nav.partners'), path: '/partners' },
     ];
 
     const isActive = (path) => location.pathname === path;
+    const LanguageToggle = ({ compact = false }) => (
+        <div
+            className={cn(
+                "flex items-center gap-2 rounded-full border border-[#03385e]/20 bg-white/90 p-1 shadow-sm",
+                compact ? "text-[11px]" : "text-xs"
+            )}
+            role="group"
+            aria-label={t('nav.language')}
+        >
+            <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={cn(
+                    "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
+                    language === 'en'
+                        ? "bg-[#03385e] text-white"
+                        : "text-[#03385e]/70 hover:text-[#03385e]"
+                )}
+                aria-pressed={language === 'en'}
+            >
+                EN
+            </button>
+            <button
+                type="button"
+                onClick={() => setLanguage('es')}
+                className={cn(
+                    "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
+                    language === 'es'
+                        ? "bg-[#03385e] text-white"
+                        : "text-[#03385e]/70 hover:text-[#03385e]"
+                )}
+                aria-pressed={language === 'es'}
+            >
+                ES
+            </button>
+        </div>
+    );
 
     return (
         <nav className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -52,8 +91,13 @@ const Navbar = () => {
                         ))}
                     </div>
 
+                    <div className="hidden md:flex items-center gap-3">
+                        <LanguageToggle />
+                    </div>
+
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-3">
+                        <LanguageToggle compact />
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className="p-2 rounded-md text-[#03385e] hover:bg-slate-100 focus:outline-none transition-colors"

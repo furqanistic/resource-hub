@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Building2, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import arborHealthLogo from '@/assets/Brand/Arbon Health.png';
 import bhrLogo from '@/assets/Brand/Behavioral Health Resources BHR.png';
@@ -26,8 +27,8 @@ import dohLogo from '@/assets/Brand/Washington State Department of Health (DOH).
 import hcaLogo from '@/assets/Brand/Washington State Health Care Authority (HCA).png';
 
 const partners = [
-    { name: 'RiverCities Transit', logo: rctLogo, url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.' },
-    { name: 'Washington State Health Care Authority (HCA)', logo: hcaLogo, url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority' },
+    { name: 'RiverCities Transit', logo: rctLogo, url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.', descriptionEs: 'RiverCities Transit – Estamos aquí para llevarte allí.' },
+    { name: 'Washington State Health Care Authority (HCA)', logo: hcaLogo, url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority', descriptionEs: 'Inicio | Autoridad de Atención Médica del Estado de Washington' },
     {
         name: 'Greater Columbia River Behavioral Health Administrative Services Organization (GCRBHASO)',
         logo: gcrLogo,
@@ -36,6 +37,11 @@ const partners = [
             'Great Rivers Behavioral Health Administrative Services Organization',
             'Great Rivers Behavioral Health Administrative Services Organization, Great Rivers BHASO, Great Rivers BH, Great Rivers BH-ASO. Great Rivers ASO, Lewis County Crisis, Wahkiakum County Crisis, Cowlitz County Crisis, Pacific County Crisis, Grays Harbor County Crisis',
             'Great Rivers Behavioral Health Administrative Services Organization',
+        ].join('\n'),
+        descriptionEs: [
+            'Organización Administrativa de Servicios de Salud Conductual Great Rivers',
+            'Great Rivers Behavioral Health Administrative Services Organization, Great Rivers BHASO, Great Rivers BH, Great Rivers BH-ASO. Great Rivers ASO, Lewis County Crisis, Wahkiakum County Crisis, Cowlitz County Crisis, Pacific County Crisis, Grays Harbor County Crisis',
+            'Organización Administrativa de Servicios de Salud Conductual Great Rivers',
         ].join('\n'),
     },
     {
@@ -47,6 +53,11 @@ const partners = [
             'Looking for Washington State Apple Health (Medicaid) information? Community Health Plan of WA can help! Learn more about eligibility and more.',
             'Washington State Local Health Insurance',
         ].join('\n'),
+        descriptionEs: [
+            'Inicio',
+            '¿Buscas información sobre Apple Health (Medicaid) del estado de Washington? Community Health Plan of WA puede ayudar. Aprende más sobre elegibilidad y más.',
+            'Seguro médico local del Estado de Washington',
+        ].join('\n'),
     },
     {
         name: 'Behavioral Health Resources (BHR)',
@@ -57,11 +68,16 @@ const partners = [
             'BHR is a multi-county non profit provider for behavioral health and substance use disorder treatment.',
             'Behavioral Health Resources - Helping People Live Healthy Lives',
         ].join('\n'),
+        descriptionEs: [
+            'Inicio - Behavioral Health Resources',
+            'BHR es un proveedor sin fines de lucro que atiende a varios condados para tratamiento de salud conductual y trastornos por uso de sustancias.',
+            'Behavioral Health Resources - Ayudando a las personas a vivir vidas saludables',
+        ].join('\n'),
     },
-    { name: 'Paratransit Services', logo: paraLogo, url: 'https://www.paratransit.net', description: ['Paratransit Services', 'Paratransit Services'].join('\n') },
-    { name: 'Wahkiakum County', logo: wahLogo, url: 'https://www.co.wahkiakum.wa.us', description: 'Wahkiakum County, WA | Official Website' },
-    { name: 'Washington State Department of Health (DOH)', logo: dohLogo, url: 'https://doh.wa.gov', description: 'Washington State Department of Health' },
-    { name: 'Grays Harbor Transit', logo: ghtLogo, url: 'https://www.ghtransit.com', description: ['Grays Harbor Transit', 'Grays Harbor Transit Home Page'].join('\n') },
+    { name: 'Paratransit Services', logo: paraLogo, url: 'https://www.paratransit.net', description: ['Paratransit Services', 'Paratransit Services'].join('\n'), descriptionEs: ['Paratransit Services', 'Paratransit Services'].join('\n') },
+    { name: 'Wahkiakum County', logo: wahLogo, url: 'https://www.co.wahkiakum.wa.us', description: 'Wahkiakum County, WA | Official Website', descriptionEs: 'Condado de Wahkiakum, WA | Sitio web oficial' },
+    { name: 'Washington State Department of Health (DOH)', logo: dohLogo, url: 'https://doh.wa.gov', description: 'Washington State Department of Health', descriptionEs: 'Departamento de Salud del Estado de Washington' },
+    { name: 'Grays Harbor Transit', logo: ghtLogo, url: 'https://www.ghtransit.com', description: ['Grays Harbor Transit', 'Grays Harbor Transit Home Page'].join('\n'), descriptionEs: ['Grays Harbor Transit', 'Página de inicio de Grays Harbor Transit'].join('\n') },
     {
         name: 'Destination Hope & Recovery',
         logo: dhrLogo,
@@ -69,6 +85,11 @@ const partners = [
         description: [
             'Case Management Specialists | Destination Hope & Recovery | Washington',
             'At Destination Hope & Recovery, We offer specialized case management on a personal level to our most at risk individuals in our community. Ranging from Employment and Housing, to Behavioral Health and Judicial Services, or goal is to connect those most in vulnerable to the resources they need to not only survive, but succeed.',
+            'DHR',
+        ].join('\n'),
+        descriptionEs: [
+            'Especialistas en gestión de casos | Destination Hope & Recovery | Washington',
+            'En Destination Hope & Recovery ofrecemos gestión de casos especializada a nivel personal para las personas más vulnerables de nuestra comunidad. Desde empleo y vivienda hasta servicios de salud conductual y judiciales, nuestro objetivo es conectar a quienes más lo necesitan con los recursos para no solo sobrevivir, sino prosperar.',
             'DHR',
         ].join('\n'),
     },
@@ -82,9 +103,15 @@ const partners = [
             'CHOICE Regional',
             'Home',
         ].join('\n'),
+        descriptionEs: [
+            'CHOICE Regional Health Network | equidad en salud | 724 Columbia Street Northwest, Olympia, WA, USA',
+            'En CHOICE Regional Health Network nuestra misión es mejorar la salud comunitaria en el centro-oeste de Washington mediante la planificación y acción colectiva de líderes de salud. Nuestra visión: mejor salud para todos a menor costo.',
+            'CHOICE Regional',
+            'Inicio',
+        ].join('\n'),
     },
-    { name: 'Arbor Health', logo: arborHealthLogo, url: 'https://www.myarborhealth.org', logoClass: 'invert', description: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.' },
-    { name: 'Disability Rights Washington (Disability Mobility Initiative)', logo: dhrwLogo, url: 'https://www.dr-wa.org', description: 'Advocating for the rights of people with disabilities and improving transportation accessibility across Washington state.' },
+    { name: 'Arbor Health', logo: arborHealthLogo, url: 'https://www.myarborhealth.org', logoClass: 'invert', description: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.', descriptionEs: 'Arbor Health es su proveedor de atención médica comunitaria y ofrece una amplia gama de servicios médicos para apoyar su salud y bienestar.' },
+    { name: 'Disability Rights Washington (Disability Mobility Initiative)', logo: dhrwLogo, url: 'https://www.dr-wa.org', description: 'Advocating for the rights of people with disabilities and improving transportation accessibility across Washington state.', descriptionEs: 'Defendiendo los derechos de las personas con discapacidades y mejorando la accesibilidad del transporte en todo el estado de Washington.' },
     {
         name: 'Community Transportation Association of the Northwest (CTANW)',
         logo: ctanwLogo,
@@ -93,10 +120,14 @@ const partners = [
             'Community Transportation Association of the Northwest',
             'CTANW provides our members, partners and communities with tools, resources and information, and advocates for favorable policies and practices so they can provide equal opportunities and mobility and transportation options for all people, particularly those with specialized transportation needs.',
         ].join('\n'),
+        descriptionEs: [
+            'Community Transportation Association of the Northwest',
+            'CTANW brinda a nuestros miembros, socios y comunidades herramientas, recursos e información, y aboga por políticas y prácticas favorables para que puedan ofrecer igualdad de oportunidades y opciones de movilidad y transporte para todas las personas, en especial aquellas con necesidades de transporte especializado.',
+        ].join('\n'),
     },
-    { name: 'Community in Motion', logo: cimLogo, url: 'https://www.communityinmotion.org', description: 'Welcome | Community in Motion: The means to stay mobile' },
-    { name: 'Coastal Community Action Program (Coastal CAP)', logo: coastalCapLogo, url: 'https://www.coastalcap.org', description: 'Coastal Community Action Program | Part of the Community Action Network fighting to eliminate Poverty' },
-    { name: 'Olympic Ambulance', logo: oaLogo, url: 'https://www.olympicambulance.com', description: 'Providing professional medical transportation services with a focus on patient care and safety.' },
+    { name: 'Community in Motion', logo: cimLogo, url: 'https://www.communityinmotion.org', description: 'Welcome | Community in Motion: The means to stay mobile', descriptionEs: 'Bienvenido | Community in Motion: Los medios para mantenerse en movimiento' },
+    { name: 'Coastal Community Action Program (Coastal CAP)', logo: coastalCapLogo, url: 'https://www.coastalcap.org', description: 'Coastal Community Action Program | Part of the Community Action Network fighting to eliminate Poverty', descriptionEs: 'Coastal Community Action Program | Parte de la Community Action Network que lucha para eliminar la pobreza' },
+    { name: 'Olympic Ambulance', logo: oaLogo, url: 'https://www.olympicambulance.com', description: 'Providing professional medical transportation services with a focus on patient care and safety.', descriptionEs: 'Ofrece servicios profesionales de transporte médico con enfoque en la atención del paciente y la seguridad.' },
     {
         name: 'Coastal Washington Council of Governments (CWCOG)',
         logo: cwcogLogo,
@@ -104,6 +135,11 @@ const partners = [
         description: [
             'Cowlitz-Wahkiakum Council of Governments • CWCOG • Home',
             'CWCOG is a regional planning organization serving Cowlitz and Wahkiakum counties with programs in economic development, transportation, and community planning.',
+            'Cowlitz-Wahkiakum Council of Governments',
+        ].join('\n'),
+        descriptionEs: [
+            'Cowlitz-Wahkiakum Council of Governments • CWCOG • Inicio',
+            'CWCOG es una organización regional de planificación que sirve a los condados de Cowlitz y Wahkiakum con programas de desarrollo económico, transporte y planificación comunitaria.',
             'Cowlitz-Wahkiakum Council of Governments',
         ].join('\n'),
     },
@@ -133,6 +169,7 @@ const itemVariants = {
 };
 
 const PartnersPage = () => {
+    const { t, language } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -145,11 +182,12 @@ const PartnersPage = () => {
     const filteredPartners = useMemo(() => {
         const query = searchQuery.trim().toLowerCase();
         if (!query) return partners;
-        return partners.filter(p => 
-            p.name.toLowerCase().includes(query) || 
-            (p.description && p.description.toLowerCase().includes(query))
-        );
-    }, [searchQuery]);
+        return partners.filter(p => {
+            const description = language === 'es' ? (p.descriptionEs || p.description) : p.description;
+            return p.name.toLowerCase().includes(query) ||
+                (description && description.toLowerCase().includes(query));
+        });
+    }, [language, searchQuery]);
 
     return (
         <div className="min-h-screen bg-[#fcfdfe] text-[#03385e] flex flex-col font-sans selection:bg-[#b1ccdf]/30">
@@ -168,7 +206,7 @@ const PartnersPage = () => {
                         </div>
                         <Input
                             type="text"
-                            placeholder="Search partners..."
+                            placeholder={t('partners.searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-11 h-12 bg-white border-black/10 rounded-xl focus-visible:ring-[#03385e]/10 focus-visible:border-[#03385e]/30 transition-all text-sm shadow-none"
@@ -227,33 +265,39 @@ const PartnersPage = () => {
                                                 </div>
 
                                                 <div className="grow">
-                                                    {partner.description && (
-                                                        <div className="relative">
-                                                            <motion.p 
-                                                                initial={false}
-                                                                animate={{ height: expandedIndex === partners.indexOf(partner) ? "auto" : "2.5rem" }}
-                                                                className={cn(
-                                                                    "text-[13px] text-black/50 leading-relaxed overflow-hidden",
-                                                                    expandedIndex === partners.indexOf(partner) ? "" : "line-clamp-2"
-                                                                )}
-                                                            >
-                                                                {partner.description}
-                                                            </motion.p>
-                                                            
-                                                            {partner.description.length > 80 && (
-                                                                <button
-                                                                    onClick={(e) => toggleExpanded(e, partners.indexOf(partner))}
-                                                                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#03385e]/60 hover:text-[#03385e] transition-colors"
-                                                                >
-                                                                    {expandedIndex === partners.indexOf(partner) ? (
-                                                                        <>Show less <ChevronUp className="w-3 h-3" /></>
-                                                                    ) : (
-                                                                        <>Read more <ChevronDown className="w-3 h-3" /></>
+                                                    {(() => {
+                                                        const description = language === 'es'
+                                                            ? (partner.descriptionEs || partner.description)
+                                                            : partner.description;
+                                                        if (!description) return null;
+                                                        return (
+                                                            <div className="relative">
+                                                                <motion.p 
+                                                                    initial={false}
+                                                                    animate={{ height: expandedIndex === partners.indexOf(partner) ? "auto" : "2.5rem" }}
+                                                                    className={cn(
+                                                                        "text-[13px] text-black/50 leading-relaxed overflow-hidden",
+                                                                        expandedIndex === partners.indexOf(partner) ? "" : "line-clamp-2"
                                                                     )}
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    )}
+                                                                >
+                                                                    {description}
+                                                                </motion.p>
+                                                                
+                                                                {description.length > 80 && (
+                                                                    <button
+                                                                        onClick={(e) => toggleExpanded(e, partners.indexOf(partner))}
+                                                                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#03385e]/60 hover:text-[#03385e] transition-colors"
+                                                                    >
+                                                                        {expandedIndex === partners.indexOf(partner) ? (
+                                                                            <>{t('partners.showLess')} <ChevronUp className="w-3 h-3" /></>
+                                                                        ) : (
+                                                                            <>{t('partners.readMore')} <ChevronDown className="w-3 h-3" /></>
+                                                                        )}
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
 
                                                 <div className="mt-4 pt-4 border-t border-black/[0.02] flex items-center justify-end">
@@ -263,7 +307,7 @@ const PartnersPage = () => {
                                                         rel="noreferrer"
                                                         className="text-xs font-bold text-[#03385e]/70 hover:text-[#03385e] flex items-center gap-1 group/link"
                                                     >
-                                                        Website <ExternalLink className="w-3 h-3 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                                                        {t('partners.website')} <ExternalLink className="w-3 h-3 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                                                     </a>
                                                 </div>
                                             </div>
@@ -279,7 +323,7 @@ const PartnersPage = () => {
                                 exit={{ opacity: 0 }}
                                 className="text-center py-20 bg-white rounded-2xl border border-dashed border-black/10"
                             >
-                                <p className="text-sm text-black/30 text-center">No results found</p>
+                                <p className="text-sm text-black/30 text-center">{t('partners.noResults')}</p>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -292,4 +336,3 @@ const PartnersPage = () => {
 };
 
 export default PartnersPage;
-

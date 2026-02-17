@@ -1,9 +1,10 @@
 // File: client/src/components/ServiceCategories.jsx
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const categories = [
     {
-        title: "Rides to See a Doctor",
+        key: "doctor",
         icon: (
             <svg viewBox="0 0 64 64" aria-hidden="true" className="h-12 w-12 sm:h-14 sm:w-14">
                 <circle cx="32" cy="32" r="22" fill="#111111" />
@@ -13,7 +14,7 @@ const categories = [
         ),
     },
     {
-        title: "Rides for Food & Groceries",
+        key: "groceries",
         icon: (
             <svg viewBox="0 0 64 64" aria-hidden="true" className="h-12 w-12 sm:h-14 sm:w-14">
                 <path
@@ -26,7 +27,7 @@ const categories = [
         ),
     },
     {
-        title: "Rides for Housing & Work",
+        key: "work",
         icon: (
             <svg viewBox="0 0 64 64" aria-hidden="true" className="h-12 w-12 sm:h-14 sm:w-14">
                 <path d="M16 30l16-14 16 14v18H16V30z" fill="#0b5b8d" />
@@ -37,7 +38,7 @@ const categories = [
         ),
     },
     {
-        title: "Buses & Public Transit",
+        key: "transit",
         icon: (
             <svg viewBox="0 0 64 64" aria-hidden="true" className="h-12 w-12 sm:h-14 sm:w-14">
                 <rect x="16" y="14" width="32" height="36" rx="6" fill="#0b5b8d" />
@@ -51,6 +52,7 @@ const categories = [
 ];
 
 const ServiceCategories = () => {
+    const { t } = useLanguage();
     return (
         <section className="bg-white py-14">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +64,7 @@ const ServiceCategories = () => {
                         >
                             <div className="mb-6">{category.icon}</div>
                             <h3 className="text-lg sm:text-xl font-medium text-black leading-snug">
-                                {category.title}
+                                {t(`home.categories.${category.key}`)}
                             </h3>
                         </div>
                     ))}

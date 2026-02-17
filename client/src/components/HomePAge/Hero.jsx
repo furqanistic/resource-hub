@@ -5,6 +5,7 @@ import Marquee from '@/components/ui/marquee';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import logo1 from '@/assets/CloudLogos/Logo 1.avif';
 import logo2 from '@/assets/CloudLogos/Logo 2.avif';
@@ -22,6 +23,7 @@ const logos = [
 
 
 const Hero = () => {
+    const { t } = useLanguage();
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
@@ -52,16 +54,16 @@ const Hero = () => {
                             variants={fadeInUp}
                             className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#03385e] mb-5 leading-[1.12]"
                         >
-                            Find a Ride in
+                            {t('home.heroTitleLine1')}
                             <br className="hidden sm:block" />
-                            Your County
+                            {t('home.heroTitleLine2')}
                         </motion.h1>
 
                         <motion.p
                             variants={fadeInUp}
                             className="text-xs sm:text-sm text-black mb-8 whitespace-nowrap"
                         >
-                            Free or low-cost rides to the doctor, the store, and more.
+                            {t('home.heroSubtitle')}
                         </motion.p>
 
                         <motion.div
@@ -72,7 +74,7 @@ const Hero = () => {
                                 size="default"
                                 className="group w-full sm:w-auto px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
                             >
-                                Start My Search
+                                {t('home.heroCta')}
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </motion.div>
@@ -92,7 +94,7 @@ const Hero = () => {
                         >
                             <img
                                 src={heroImg}
-                                alt="Supportive driver providing transportation"
+                                alt={t('home.heroImageAlt')}
                                 className="w-full aspect-4/3 object-cover"
                             />
                         </motion.div>
@@ -108,7 +110,7 @@ const Hero = () => {
                             >
                                 <img
                                     src={logo.src}
-                                    alt={logo.alt}
+                                    alt={`${t('home.partnerLogoAlt')} ${index + 1}`}
                                     className="max-h-full max-w-full object-contain"
                                 />
                             </div>

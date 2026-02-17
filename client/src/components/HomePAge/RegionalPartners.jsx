@@ -2,8 +2,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import waMap from '@/assets/wa-map.avif';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const RegionalPartners = () => {
+    const { t } = useLanguage();
     return (
         <section className="py-20 bg-white overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,20 +20,20 @@ const RegionalPartners = () => {
                         className="flex flex-col gap-6"
                     >
                         <h2 className="text-4xl sm:text-5xl font-semibold text-black leading-tight">
-                            CHOICE Regional
+                            {t('home.regionalTitleLine1')}
                             <br />
-                            Partners
+                            {t('home.regionalTitleLine2')}
                         </h2>
 
                         <div className="text-black text-base sm:text-lg leading-relaxed max-w-xl space-y-4">
                             <p>
-                                We believe that healthy communities are built on strong relationships, where people and community members are connected with one another and to essential services.
+                                {t('home.regionalP1')}
                             </p>
                             <p>
-                                We are dedicated to working together on community-driven solutions to solve some our most complex challenges in the central western Washington state region.
+                                {t('home.regionalP2')}
                             </p>
                             <p>
-                                This is a CHOICE regional transportation resource hub. CHOICE is working with local partners to help you get where you need to go.
+                                {t('home.regionalP3')}
                             </p>
                         </div>
                     </motion.div>
@@ -47,7 +49,7 @@ const RegionalPartners = () => {
                         <div className="relative">
                             <img
                                 src={waMap}
-                                alt="Washington State Map showing CHOICE Regional Partners"
+                                alt={t('home.regionalMapAlt')}
                                 className="w-full h-auto object-contain"
                             />
                         </div>

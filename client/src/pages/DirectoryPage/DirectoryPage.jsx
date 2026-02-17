@@ -25,26 +25,28 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import rawServicesData from '@/lib/data/Transportation Services in Washington.json';
 
 // Spotlight Card Component (Cleaned up and adapted)
-const SpotlightCard = ({ children, className = "" }) => {
+const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => {
     const divRef = useRef(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [opacity, setOpacity] = useState(0);
 
     const handleMouseMove = (e) => {
         if (!divRef.current) return;
+        if (!enableSpotlight) return;
         const div = divRef.current;
         const rect = div.getBoundingClientRect();
         setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
     };
 
-    const handleFocus = () => setOpacity(1);
-    const handleBlur = () => setOpacity(0);
-    const handleMouseEnter = () => setOpacity(1);
-    const handleMouseLeave = () => setOpacity(0);
+    const handleFocus = () => enableSpotlight && setOpacity(1);
+    const handleBlur = () => enableSpotlight && setOpacity(0);
+    const handleMouseEnter = () => enableSpotlight && setOpacity(1);
+    const handleMouseLeave = () => enableSpotlight && setOpacity(0);
 
     return (
         <div
@@ -61,13 +63,15 @@ const SpotlightCard = ({ children, className = "" }) => {
             )}
         >
             {/* Spotlight Gradient */}
-            <div
-                className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
-                style={{
-                    opacity,
-                    background: `radial-gradient(360px circle at ${position.x}px ${position.y}px, rgba(3, 56, 94, 0.06), transparent 80%)`,
-                }}
-            />
+            {enableSpotlight && (
+                <div
+                    className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
+                    style={{
+                        opacity,
+                        background: `radial-gradient(360px circle at ${position.x}px ${position.y}px, rgba(3, 56, 94, 0.06), transparent 80%)`,
+                    }}
+                />
+            )}
             {/* Content Container */}
             <div className="relative h-full z-10 flex flex-col">{children}</div>
         </div>
@@ -81,12 +85,13 @@ const servicesData = rawServicesData.map(item => ({
     title: item["Provider Name"],
     subtitle: item["Service Type(s)"] || 'Transportation Service',
     url: item["Website Url"],
+    accessibility: item["Accessibility"] || '',
     details: [
-        { label: 'Phone', value: item["Phone"] },
-        { label: 'Hours', value: item["Service Times"] },
-        { label: 'Access', value: item["Accessibility"] },
-        { label: 'Cost', value: item["Cost"] },
-        { label: 'County', value: item["Counties Served"] },
+        { key: 'phone', labelKey: 'directory.detail.phone', value: item["Phone"] },
+        { key: 'hours', labelKey: 'directory.detail.hours', value: item["Service Times"] },
+        { key: 'access', labelKey: 'directory.detail.access', value: item["Accessibility"] },
+        { key: 'cost', labelKey: 'directory.detail.cost', value: item["Cost"] },
+        { key: 'county', labelKey: 'directory.detail.county', value: item["Counties Served"] },
         // { label: 'Website', value: item["Website Url"] } // Optional to show as detail
     ].filter(detail => detail.value) // Filter out missing details
 }));
@@ -107,6 +112,7 @@ const itemVariants = {
 };
 
 const DirectoryPage = () => {
+    const { t } = useLanguage();
     // Input State (Controlled by user interaction)
     const [searchTerm, setSearchTerm] = useState('');
     const [countyFilter, setCountyFilter] = useState('all');
@@ -114,15 +120,25 @@ const DirectoryPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [countyQuery, setCountyQuery] = useState('');
     const [serviceQuery, setServiceQuery] = useState('');
+    const [accessibilityFilter, setAccessibilityFilter] = useState('all');
+    const [accessibilityQuery, setAccessibilityQuery] = useState('');
+    const [expandedServiceIndices, setExpandedServiceIndices] = useState([]);
+    const [maxPreviewHeight, setMaxPreviewHeight] = useState(0);
+    const previewHeightsRef = useRef([]);
 
     // Extract unique counties and services for filter dropdowns with useMemo
     const allCounties = useMemo(() => [...new Set(servicesData.flatMap(service =>
-        service.details.find(d => d.label === 'County')?.value.split(',').map(c => c.trim()) || []
+        service.details.find(d => d.key === 'county')?.value.split(',').map(c => c.trim()) || []
     ))].sort(), []);
 
     const allServices = useMemo(() => [...new Set(servicesData.flatMap(service =>
         service.category.split(',').map(s => s.trim()) || []
     ))].sort(), []);
+
+    const allAccessibility = useMemo(() => [...new Set(servicesData
+        .map(service => service.accessibility)
+        .filter(Boolean)
+    )].sort(), []);
 
     const filteredCounties = useMemo(() => {
         if (!countyQuery.trim()) return allCounties;
@@ -136,16 +152,24 @@ const DirectoryPage = () => {
         return allServices.filter(s => s.toLowerCase().includes(q));
     }, [allServices, serviceQuery]);
 
+    const filteredAccessibilityList = useMemo(() => {
+        if (!accessibilityQuery.trim()) return allAccessibility;
+        const q = accessibilityQuery.toLowerCase();
+        return allAccessibility.filter(a => a.toLowerCase().includes(q));
+    }, [allAccessibility, accessibilityQuery]);
+
     const filteredServices = servicesData.filter(service => {
         const matchesName = service.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-        const serviceCounties = service.details.find(d => d.label === 'County')?.value.toLowerCase() || '';
+        const serviceCounties = service.details.find(d => d.key === 'county')?.value.toLowerCase() || '';
         const matchesCounty = countyFilter === 'all' || serviceCounties.includes(countyFilter.toLowerCase());
 
         const serviceTypes = service.category.toLowerCase();
         const matchesService = serviceFilter === 'all' || serviceTypes.includes(serviceFilter.toLowerCase());
 
-        return matchesName && matchesCounty && matchesService;
+        const matchesAccessibility = accessibilityFilter === 'all' || (service.accessibility || '').toLowerCase().includes(accessibilityFilter.toLowerCase());
+
+        return matchesName && matchesCounty && matchesService && matchesAccessibility;
     });
 
     // Pagination Logic
@@ -155,13 +179,17 @@ const DirectoryPage = () => {
     // Reset page when ACTIVE filters change
     React.useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, countyFilter, serviceFilter]);
+    }, [searchTerm, countyFilter, serviceFilter, accessibilityFilter]);
+
+    React.useEffect(() => {
+        setExpandedServiceIndices([]);
+    }, [currentPage]);
 
     React.useEffect(() => {
         setIsLoading(true);
         const t = setTimeout(() => setIsLoading(false), 300);
         return () => clearTimeout(t);
-    }, [searchTerm, countyFilter, serviceFilter, currentPage]);
+    }, [searchTerm, countyFilter, serviceFilter, accessibilityFilter, currentPage]);
 
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -176,119 +204,182 @@ const DirectoryPage = () => {
         setSearchTerm('');
         setCountyFilter('all');
         setServiceFilter('all');
+        setAccessibilityFilter('all');
     };
+
+    const toggleService = (index) => {
+        setExpandedServiceIndices((prev) =>
+            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+        );
+    };
+
+    const registerPreviewHeight = (index, height) => {
+        previewHeightsRef.current[index] = height;
+    };
+
+    React.useEffect(() => {
+        const heights = previewHeightsRef.current.filter(Boolean);
+        if (!heights.length) return;
+        const nextMax = Math.max(...heights);
+        if (nextMax !== maxPreviewHeight) {
+            setMaxPreviewHeight(nextMax);
+        }
+    }, [currentServices, maxPreviewHeight]);
 
     return (
         <div className="min-h-screen bg-white text-black flex flex-col font-sans">
             <Navbar />
 
             <main className="grow">
-                <div className="bg-[#f6f9fb] py-20">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="text-4xl md:text-6xl font-medium text-black tracking-tight">
-                            Find Transportation Services
-                        </h1>
+                <div className="bg-[#f6f9fb] border-b border-black/5">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+                        <div className="max-w-3xl">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black tracking-tight leading-[1.05]">
+                                {t('directory.title')}
+                            </h1>
+                        </div>
                     </div>
                 </div>
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div className="flex items-center gap-3 text-black mb-6">
-                        <Filter className="w-6 h-6 text-[#03385e]" />
-                        <span className="text-xl font-medium">Filter Services</span>
-                    </div>
-
-                    <div className="space-y-5">
-                        <div className="relative">
-                            <Input
-                                placeholder="Search by name"
-                                className="bg-white border border-black/30 h-12 rounded-lg w-full text-black placeholder:text-black/60 focus-visible:ring-0 focus-visible:border-[#03385e]"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                    <div className="rounded-2xl border border-black/10 bg-white shadow-[0_20px_60px_-50px_rgba(3,56,94,0.4)]">
+                        <div className="flex items-center justify-between gap-3 px-6 sm:px-8 py-6 border-b border-black/5">
+                            <div className="flex items-center gap-3 text-black">
+                                <div className="h-10 w-10 rounded-full bg-[#03385e]/10 flex items-center justify-center">
+                                    <Filter className="w-5 h-5 text-[#03385e]" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-semibold">{t('directory.filterTitle')}</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                            <Select
-                                value={countyFilter}
-                                onValueChange={(value) => {
-                                    setCountyFilter(value);
-                                    setCountyQuery('');
-                                }}
-                                key={`county-${countyFilter}`}
-                            >
-                                <SelectTrigger className="w-full bg-white border border-black/40 h-12 rounded-lg text-black focus-visible:ring-0 focus-visible:border-[#03385e]">
-                                    <SelectValue placeholder="All Counties" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-lg max-h-75 border-black/20">
-                                    <div className="p-2">
-                                        <Input
-                                            placeholder="Search counties"
-                                            value={countyQuery}
-                                            onChange={(e) => setCountyQuery(e.target.value)}
-                                            className="h-9 bg-white border border-black/30 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]"
-                                        />
-                                    </div>
-                                    <SelectItem value="all">All Counties</SelectItem>
-                                    {filteredCounties.map(county => (
-                                        <SelectItem
-                                            key={county}
-                                            value={county}
-                                            className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
-                                        >
-                                            {county}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="px-6 sm:px-8 py-6 space-y-5">
+                            <div className="relative">
+                                <Input
+                                    placeholder={t('directory.searchByName')}
+                                    className="bg-white border border-black/15 h-12 rounded-xl w-full text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
 
-                            <Select
-                                value={serviceFilter}
-                                onValueChange={(value) => {
-                                    setServiceFilter(value);
-                                    setServiceQuery('');
-                                }}
-                                key={`service-${serviceFilter}`}
-                            >
-                                <SelectTrigger className="w-full bg-white border border-black/40 h-12 rounded-lg text-black focus-visible:ring-0 focus-visible:border-[#03385e]">
-                                    <SelectValue placeholder="All Services" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-lg max-h-75 border-black/20">
-                                    <div className="p-2">
-                                        <Input
-                                            placeholder="Search services"
-                                            value={serviceQuery}
-                                            onChange={(e) => setServiceQuery(e.target.value)}
-                                            className="h-9 bg-white border border-black/30 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]"
-                                        />
-                                    </div>
-                                    <SelectItem value="all">All Services</SelectItem>
-                                    {filteredServicesList.map(service => (
-                                        <SelectItem
-                                            key={service}
-                                            value={service}
-                                            className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
-                                        >
-                                            {service}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                                <Select
+                                    value={countyFilter}
+                                    onValueChange={(value) => {
+                                        setCountyFilter(value);
+                                        setCountyQuery('');
+                                    }}
+                                    key={`county-${countyFilter}`}
+                                >
+                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                        <SelectValue placeholder={t('directory.allCounties')} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                        <div className="p-2">
+                                            <Input
+                                                placeholder={t('directory.searchCounties')}
+                                                value={countyQuery}
+                                                onChange={(e) => setCountyQuery(e.target.value)}
+                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                            />
+                                        </div>
+                                        <SelectItem value="all">{t('directory.allCounties')}</SelectItem>
+                                        {filteredCounties.map(county => (
+                                            <SelectItem
+                                                key={county}
+                                                value={county}
+                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                            >
+                                                {county}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                        <div className="flex items-center gap-4 pt-2">
-                            <Button
-                                className="bg-[#03385e] hover:bg-[#03385e]/90 text-white h-12 px-8 rounded-none font-medium shadow-none"
-                                onClick={() => setCurrentPage(1)}
-                            >
-                                Start My Search
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="border border-[#03385e] text-[#03385e] h-12 px-8 rounded-none font-medium hover:bg-transparent"
-                                onClick={clearFilters}
-                            >
-                                Clear All
-                            </Button>
+                                <Select
+                                    value={serviceFilter}
+                                    onValueChange={(value) => {
+                                        setServiceFilter(value);
+                                        setServiceQuery('');
+                                    }}
+                                    key={`service-${serviceFilter}`}
+                                >
+                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                        <SelectValue placeholder={t('directory.allServices')} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                        <div className="p-2">
+                                            <Input
+                                                placeholder={t('directory.searchServices')}
+                                                value={serviceQuery}
+                                                onChange={(e) => setServiceQuery(e.target.value)}
+                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                            />
+                                        </div>
+                                        <SelectItem value="all">{t('directory.allServices')}</SelectItem>
+                                        {filteredServicesList.map(service => (
+                                            <SelectItem
+                                                key={service}
+                                                value={service}
+                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                            >
+                                                {service}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Select
+                                    value={accessibilityFilter}
+                                    onValueChange={(value) => {
+                                        setAccessibilityFilter(value);
+                                        setAccessibilityQuery('');
+                                    }}
+                                    key={`accessibility-${accessibilityFilter}`}
+                                >
+                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                        <SelectValue placeholder={t('directory.allAccessibility')} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                        <div className="p-2">
+                                            <Input
+                                                placeholder={t('directory.searchAccessibility')}
+                                                value={accessibilityQuery}
+                                                onChange={(e) => setAccessibilityQuery(e.target.value)}
+                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                            />
+                                        </div>
+                                        <SelectItem value="all">{t('directory.allAccessibility')}</SelectItem>
+                                        {filteredAccessibilityList.map((accessibility) => (
+                                            <SelectItem
+                                                key={accessibility}
+                                                value={accessibility}
+                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                            >
+                                                {accessibility}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+                                <Button
+                                    className="bg-[#03385e] hover:bg-[#03385e]/90 text-white h-12 px-8 rounded-xl font-medium shadow-none"
+                                    onClick={() => setCurrentPage(1)}
+                                >
+                                    {t('directory.startSearch')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="border border-[#03385e]/40 text-[#03385e] h-12 px-8 rounded-xl font-medium hover:bg-[#03385e]/5"
+                                    onClick={clearFilters}
+                                >
+                                    {t('directory.clearAll')}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -335,9 +426,18 @@ const DirectoryPage = () => {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
                         >
                         {currentServices.length > 0 ? (
-                            currentServices.map((service, index) => (
+                            currentServices.map((service, index) => {
+                                const previewDetails = service.details.slice(0, 2);
+                                const remainingDetails = service.details.slice(2);
+                                const cardKey = startIndex + index;
+                                const isExpanded = expandedServiceIndices.includes(cardKey);
+                                const getPreviewHeight = (node) => {
+                                    if (!node) return;
+                                    registerPreviewHeight(index, node.getBoundingClientRect().height);
+                                };
+                                return (
                                 <motion.div
-                                    key={index}
+                                    key={cardKey}
                                     variants={itemVariants}
                                     className="h-full"
                                     whileHover={{
@@ -345,50 +445,96 @@ const DirectoryPage = () => {
                                         transition: { duration: 0.3, ease: "easeOut" }
                                     }}
                                 >
-                                    <SpotlightCard className="p-6 bg-white border border-black/10 shadow-none hover:shadow-none hover:border-black/20 rounded-none">
-                                        <h3 className="text-xl font-medium mb-1 leading-tight text-black tracking-tight">
-                                            {service.title}
-                                        </h3>
-                                        <p className="text-black/70 mb-5 text-sm font-normal leading-relaxed">
-                                            {service.subtitle}
-                                        </p>
+                                    <SpotlightCard enableSpotlight={false} className="p-6 bg-white border border-black/10 shadow-none hover:shadow-none hover:border-black/20 rounded-none min-h-0">
+                                        <div ref={getPreviewHeight} className="flex flex-col gap-3" style={{ minHeight: maxPreviewHeight ? `${maxPreviewHeight}px` : undefined }}>
+                                            <div className="flex items-start justify-between gap-4">
+                                            <div>
+                                                <h3 className="text-xl font-medium mb-1 leading-tight text-black tracking-tight">
+                                                    {service.title}
+                                                </h3>
+                                                <p className="text-black/70 mb-4 text-sm font-normal leading-relaxed">
+                                                    {service.subtitle}
+                                                </p>
+                                            </div>
+                                            </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                            {service.details.map((detail, idx) => (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                            {previewDetails.map((detail, idx) => (
                                                 <div key={idx}>
                                                     <div className="text-[#03385e] font-semibold text-sm mb-1">
-                                                        {detail.label}
+                                                        {t(detail.labelKey)}
                                                     </div>
                                                     <div
                                                         className="text-black text-xs leading-snug"
-                                                        style={{
-                                                            display: '-webkit-box',
-                                                            WebkitLineClamp: 4,
-                                                            WebkitBoxOrient: 'vertical',
-                                                            overflow: 'hidden',
-                                                        }}
+                                                        style={
+                                                            isExpanded
+                                                                ? undefined
+                                                                : {
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 3,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                    overflow: 'hidden',
+                                                                }
+                                                        }
                                                     >
                                                         {detail.value}
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
+                                        </div>
+
+                                        {remainingDetails.length > 0 && (
+                                            <div className={cn("mt-4 pt-4 border-t border-black/5", isExpanded ? "block" : "hidden")}>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                                    {remainingDetails.map((detail, idx) => (
+                                                        <div key={idx}>
+                                                            <div className="text-[#03385e] font-semibold text-sm mb-1">
+                                                                {t(detail.labelKey)}
+                                                            </div>
+                                                            <div className="text-black text-xs leading-snug">
+                                                                {detail.value}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {remainingDetails.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleService(cardKey)}
+                                                className="mt-4 w-full inline-flex items-center justify-end gap-2 text-xs font-semibold text-[#03385e] hover:text-[#03385e]/80"
+                                            >
+                                                {isExpanded ? t('partners.showLess') : t('partners.readMore')}
+                                                <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path
+                                                        d={isExpanded
+                                                            ? "M5.23 12.23a.75.75 0 0 0 1.06 1.06L10 9.56l3.71 3.73a.75.75 0 1 0 1.06-1.06l-4.24-4.25a.75.75 0 0 0-1.06 0L5.23 12.23z"
+                                                            : "M14.77 7.77a.75.75 0 0 0-1.06-1.06L10 10.44 6.29 6.71a.75.75 0 0 0-1.06 1.06l4.24 4.25a.75.75 0 0 0 1.06 0l4.24-4.25z"
+                                                        }
+                                                    />
+                                                </svg>
+                                            </button>
+                                        )}
                                     </SpotlightCard>
                                 </motion.div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
                                 <div className="p-6 rounded-3xl bg-[#03385e]/10 text-black/50">
                                     <Search className="w-12 h-12 opacity-20" />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold mb-2">No Services Found</h3>
+                                    <h3 className="text-2xl font-bold mb-2">{t('directory.noServicesTitle')}</h3>
                                     <p className="text-black/60 max-w-xs">
-                                        We couldn't find any services matching your current filters. Try adjusting your search criteria.
+                                        {t('directory.noServicesBody')}
                                     </p>
                                 </div>
                                 <Button variant="link" onClick={clearFilters} className="text-[#03385e] font-bold">
-                                    Clear all filters
+                                    {t('directory.clearFilters')}
                                 </Button>
                             </div>
                         )}

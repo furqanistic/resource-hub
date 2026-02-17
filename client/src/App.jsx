@@ -7,6 +7,7 @@ import AboutPage from '@/pages/AboutPage/AboutPage'
 import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import PartnersPage from '@/pages/PartnersPage/PartnersPage'
+import { LanguageProvider } from '@/contexts/LanguageContext'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -21,18 +22,20 @@ const ScrollToTop = () => {
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="choice-theme">
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path='/'>
-            <Route index element={<HomePage />} />
-            <Route path='/directory' element={<DirectoryPage />} />
-            <Route path='/resources' element={<ResourcesPage />} />
-            <Route path='/about' element={<AboutPage />} />
-            <Route path='/partners' element={<PartnersPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <LanguageProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path='/'>
+              <Route index element={<HomePage />} />
+              <Route path='/directory' element={<DirectoryPage />} />
+              <Route path='/resources' element={<ResourcesPage />} />
+              <Route path='/about' element={<AboutPage />} />
+              <Route path='/partners' element={<PartnersPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
     </ThemeProvider>
   )
 }
