@@ -1,24 +1,18 @@
 // File: client/src/components/HomePAge/Hero.jsx
 import heroImg from '@/assets/CloudLogos/hero-img.jpg';
 import { Button } from '@/components/ui/button';
-import Marquee from '@/components/ui/marquee';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import logo1 from '@/assets/CloudLogos/Logo 1.avif';
-import logo2 from '@/assets/CloudLogos/Logo 2.avif';
-import logo3 from '@/assets/CloudLogos/Logo 3.avif';
-import logo4 from '@/assets/CloudLogos/Logo 4.avif';
-import logo5 from '@/assets/CloudLogos/Logo 5.avif';
+import gcrLogo from '@/assets/Brand/Greater Columbia River Behavioral Health Administrative Services Organization (GCRBHASO).png';
+import cwcogLogo from '@/assets/Brand/Coastal Washington Council of Governments (CWCOG).png';
 
 const logos = [
-    { src: logo1, alt: 'Partner 1' },
-    { src: logo2, alt: 'Partner 2' },
-    { src: logo3, alt: 'Partner 3' },
-    { src: logo4, alt: 'Partner 4' },
-    { src: logo5, alt: 'Partner 5' },
+    { name: 'Great Rivers BH-ASO', src: gcrLogo },
+    { name: 'UnitedHealthcare', src: null },
+    { name: 'Cowlitz-Wahkiakum Council of Governments', src: cwcogLogo },
 ];
 
 
@@ -39,10 +33,10 @@ const Hero = () => {
     };
 
     return (
-        <section className="relative overflow-hidden bg-white py-16">
+        <section className="relative overflow-hidden bg-white py-10 sm:py-14 lg:py-16">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="bg-[#b1ccdf] rounded-none p-10 sm:p-12 lg:p-16">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <div className="bg-[#b1ccdf] rounded-none p-6 sm:p-10 lg:p-14">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 sm:gap-10 lg:gap-14 items-center">
                     {/* Left Column: Content */}
                     <motion.div
                         variants={stagger}
@@ -52,19 +46,19 @@ const Hero = () => {
                     >
                         <motion.h1
                             variants={fadeInUp}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#03385e] mb-5 leading-[1.12]"
+                            className="max-w-xl text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-[-0.01em] text-[#03385e] mb-4 leading-[1.08]"
                         >
-                            {t('home.heroTitleLine1')}
-                            <br className="hidden sm:block" />
-                            {t('home.heroTitleLine2')}
+                            {t('home.heroTitle')}
                         </motion.h1>
 
-                        <motion.p
-                            variants={fadeInUp}
-                            className="text-xs sm:text-sm text-black mb-8 whitespace-nowrap"
-                        >
-                            {t('home.heroSubtitle')}
-                        </motion.p>
+                        <motion.div variants={fadeInUp} className="mb-6 sm:mb-8 space-y-3">
+                            <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
+                                {t('home.heroDescription1')}
+                            </p>
+                            <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
+                                {t('home.heroDescription2')}
+                            </p>
+                        </motion.div>
 
                         <motion.div
                             variants={fadeInUp}
@@ -72,7 +66,7 @@ const Hero = () => {
                         >
                             <Button
                                 size="default"
-                                className="group w-full sm:w-auto px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
+                                className="group w-full sm:w-auto px-6 sm:px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
                             >
                                 {t('home.heroCta')}
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -85,7 +79,7 @@ const Hero = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative"
+                        className="relative max-w-lg lg:max-w-none mx-auto lg:mx-0"
                     >
                         <motion.div
                             animate={{ y: [0, -6, 0] }}
@@ -102,20 +96,31 @@ const Hero = () => {
                 </div>
                 </div>
                 <div className="mt-12">
-                    <Marquee speed={18} pauseOnHover className="[--gap:2.5rem]">
+                    <p className="mb-4 text-center text-xs sm:text-sm font-semibold tracking-wide uppercase text-[#03385e]/70">
+                        {t('home.supportingPartners')}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
                         {logos.map((logo, index) => (
                             <div
                                 key={index}
-                                className="flex items-center justify-center w-44 h-32"
+                                className="flex items-center justify-center w-36 h-16"
                             >
-                                <img
-                                    src={logo.src}
-                                    alt={`${t('home.partnerLogoAlt')} ${index + 1}`}
-                                    className="max-h-full max-w-full object-contain"
-                                />
+                                {logo.src ? (
+                                    <img
+                                        src={logo.src}
+                                        alt={logo.name}
+                                        className="max-h-full max-w-full object-contain grayscale opacity-70"
+                                    />
+                                ) : (
+                                    <div className="h-full w-full flex items-center justify-center rounded-sm bg-black/85 px-2">
+                                        <span className="text-[10px] sm:text-xs text-white text-center leading-tight">
+                                            {logo.name}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         ))}
-                    </Marquee>
+                    </div>
                 </div>
             </div>
         </section>

@@ -81,7 +81,7 @@ const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => 
 // Transform raw data to match component structure
 const servicesData = rawServicesData.map(item => ({
     type: item["Service Category"] || 'Transport',
-    category: item["Service Type(s)"] || 'General',
+    category: item["Service Category"] || '',
     title: item["Provider Name"],
     subtitle: item["Service Type(s)"] || 'Transportation Service',
     url: item["Website Url"],
@@ -111,6 +111,31 @@ const itemVariants = {
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 50, damping: 20 } },
 };
 
+const supportedCounties = [
+    'Thurston',
+    'Mason',
+    'Lewis',
+    'Cowlitz',
+    'Pacific',
+    'Grays Harbor',
+    'Wahkiakum',
+];
+
+const typeOfHelpOptions = [
+    'Medical care',
+    'Mental health care',
+    'Substance use support',
+    'Pregnancy and perinatal services',
+    'Pharmacy / prescriptions',
+    'Food and groceries',
+    'Housing services',
+    'Social services and benefits',
+    'Employment and job support',
+    'Youth services',
+    'Senior services',
+    'Disability services',
+];
+
 const DirectoryPage = () => {
     const { t } = useLanguage();
     // Input State (Controlled by user interaction)
@@ -127,13 +152,9 @@ const DirectoryPage = () => {
     const previewHeightsRef = useRef([]);
 
     // Extract unique counties and services for filter dropdowns with useMemo
-    const allCounties = useMemo(() => [...new Set(servicesData.flatMap(service =>
-        service.details.find(d => d.key === 'county')?.value.split(',').map(c => c.trim()) || []
-    ))].sort(), []);
+    const allCounties = useMemo(() => supportedCounties, []);
 
-    const allServices = useMemo(() => [...new Set(servicesData.flatMap(service =>
-        service.category.split(',').map(s => s.trim()) || []
-    ))].sort(), []);
+    const allServices = useMemo(() => typeOfHelpOptions, []);
 
     const allAccessibility = useMemo(() => [...new Set(servicesData
         .map(service => service.accessibility)
@@ -164,7 +185,10 @@ const DirectoryPage = () => {
         const serviceCounties = service.details.find(d => d.key === 'county')?.value.toLowerCase() || '';
         const matchesCounty = countyFilter === 'all' || serviceCounties.includes(countyFilter.toLowerCase());
 
-        const serviceTypes = service.category.toLowerCase();
+        const serviceTypes = (service.category || '')
+            .split(',')
+            .map((s) => s.trim().toLowerCase())
+            .filter(Boolean);
         const matchesService = serviceFilter === 'all' || serviceTypes.includes(serviceFilter.toLowerCase());
 
         const matchesAccessibility = accessibilityFilter === 'all' || (service.accessibility || '').toLowerCase().includes(accessibilityFilter.toLowerCase());

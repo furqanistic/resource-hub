@@ -40,6 +40,22 @@ const AboutPage = () => {
                         >
                             {t('about.p2')}
                         </motion.p>
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+                            className="text-base sm:text-lg leading-relaxed text-black/80"
+                        >
+                            {t('about.p3')}
+                        </motion.p>
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.65, ease: "easeOut" }}
+                            className="text-base sm:text-lg leading-relaxed text-black/80"
+                        >
+                            {t('about.p4')}
+                        </motion.p>
                     </div>
                 </div>
             </main>
