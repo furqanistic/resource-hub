@@ -6,7 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 const FieldGroup = ({ id, label, children, hint }) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+      <Label
+        htmlFor={id}
+        className="text-xs font-semibold uppercase tracking-wide text-slate-600"
+      >
         {label}
       </Label>
       {children}
@@ -18,7 +21,7 @@ const FieldGroup = ({ id, label, children, hint }) => {
 const EditorPanel = ({ activeSectionId }) => {
   if (activeSectionId !== 'home.hero') {
     return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:h-full lg:overflow-y-auto">
         <p className="text-sm font-semibold text-slate-900">Section Editor</p>
         <p className="mt-2 text-sm text-slate-600">
           This section is planned for next phase. Hero editor is live in Phase 1.
@@ -28,7 +31,7 @@ const EditorPanel = ({ activeSectionId }) => {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:h-full lg:overflow-y-auto">
       <div className="mb-4">
         <p className="text-sm font-semibold text-slate-900">Home Hero Editor</p>
         <p className="text-xs text-slate-500">

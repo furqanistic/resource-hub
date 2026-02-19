@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import DashboardSidebar from '@/pages/DashboardPage/components/DashboardSidebar';
-import EditorPanel from '@/pages/DashboardPage/components/EditorPanel';
+import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import EditorPanel from '@/components/dashboard/EditorPanel';
 
 const dashboardSections = [
   {
@@ -38,6 +38,7 @@ const dashboardSections = [
 
 const DashboardPage = () => {
   const [activeSectionId, setActiveSectionId] = useState('home.hero');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -53,50 +54,54 @@ const DashboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Content Dashboard
-            </p>
-            <h1 className="text-base font-semibold text-slate-900">
-              Demo Editor · {pageTitle}
-            </h1>
+    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
+      {/* Sidebar - Full Height */}
+      <DashboardSidebar
+        sections={dashboardSections}
+        activeSectionId={activeSectionId}
+        onSelectSection={setActiveSectionId}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Header */}
+        <header className="z-20 border-b border-slate-200 bg-white shadow-sm">
+          <div className="flex h-16 items-center justify-between gap-4 px-8">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                Content Management
+              </p>
+              <h1 className="text-sm font-semibold text-slate-900">
+                {pageTitle}
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 rounded-lg border-slate-300 px-4 text-xs font-medium"
+              >
+                Reset
+              </Button>
+              <Button
+                type="button"
+                className="h-9 rounded-lg bg-slate-900 px-5 text-xs font-medium text-white hover:bg-slate-800"
+              >
+                Save Changes
+              </Button>
+            </div>
           </div>
+        </header>
 
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 rounded-lg border-slate-300 px-3 text-xs"
-            >
-              Reset
-            </Button>
-            <Button
-              type="button"
-              className="h-8 rounded-lg bg-slate-900 px-3 text-xs text-white hover:bg-slate-800"
-            >
-              Save
-            </Button>
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto bg-slate-50/50 p-8">
+          <div className="mx-auto max-w-6xl">
+            <EditorPanel activeSectionId={activeSectionId} />
           </div>
-        </div>
-      </header>
-
-      <main className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[250px_1fr] lg:px-8">
-        <DashboardSidebar
-          sections={dashboardSections}
-          activeSectionId={activeSectionId}
-          onSelectSection={setActiveSectionId}
-        />
-
-        <EditorPanel activeSectionId={activeSectionId} />
-      </main>
-
-      <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
-        <p className="text-xs text-slate-500">
-          Frontend-only UI demo. No backend or data integration.
-        </p>
+        </main>
       </div>
     </div>
   );
