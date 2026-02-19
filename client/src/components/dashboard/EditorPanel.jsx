@@ -192,7 +192,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
     }
   };
 
-  if (activeSectionId !== 'home.hero') {
+  if (!['home.hero', 'home.regional'].includes(activeSectionId)) {
     return (
       <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="mb-10 border-b border-slate-200 pb-6 uppercase tracking-widest text-slate-400">
@@ -209,7 +209,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
           </div>
           <p className="text-base font-medium text-slate-900">Section Editor Coming Soon</p>
           <p className="text-sm text-slate-500 mt-1 max-w-sm">
-            This editor is currently under development. Please check back later or start editing the Home section.
+            This editor is currently under development. Please check back later or start editing the Home sections.
           </p>
         </div>
       </section>
@@ -232,53 +232,97 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-12 gap-y-10">
-        <div className="space-y-10">
-          <EditableField
-            id="hero-title"
-            label="Hero Title"
-            defaultValue="CHOICE Regional Transportation Hub"
-          />
-
-          <EditableField
-            id="hero-description1"
-            label="Description Line 1"
-            type="textarea"
-            defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
-          />
-
-          <EditableField
-            id="hero-description2"
-            label="Description Line 2"
-            type="textarea"
-            defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
-          />
-
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+      {activeSectionId === 'home.hero' ? (
+        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+          <div className="space-y-10">
             <EditableField
-              id="hero-cta"
-              label="CTA Label"
-              defaultValue="Start My Search"
+              id="hero-title"
+              label="Hero Title"
+              defaultValue="CHOICE Regional Transportation Hub"
             />
 
             <EditableField
-              id="hero-link"
-              label="CTA Link"
-              defaultValue="/directory"
+              id="hero-description1"
+              label="Description Line 1"
+              type="textarea"
+              defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
+            />
+
+            <EditableField
+              id="hero-description2"
+              label="Description Line 2"
+              type="textarea"
+              defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
+            />
+
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+              <EditableField
+                id="hero-cta"
+                label="CTA Label"
+                defaultValue="Start My Search"
+              />
+
+              <EditableField
+                id="hero-link"
+                label="CTA Link"
+                defaultValue="/directory"
+              />
+            </div>
+
+            <FieldGroup id="hero-image" label="Hero Banner Image">
+              <ImageUpload defaultValue={null} />
+            </FieldGroup>
+
+            <EditableField
+              id="hero-partner-label"
+              label="Partners Label"
+              defaultValue="Supporting Partners"
             />
           </div>
-
-          <FieldGroup id="hero-image" label="Hero Banner Image">
-            <ImageUpload defaultValue={null} />
-          </FieldGroup>
-
-          <EditableField
-            id="hero-partner-label"
-            label="Partners Label"
-            defaultValue="Supporting Partners"
-          />
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+          <div className="space-y-10">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+              <EditableField
+                id="regional-title-1"
+                label="Title Line 1"
+                defaultValue="Regional Partners"
+              />
+              <EditableField
+                id="regional-title-2"
+                label="Title Line 2"
+                defaultValue="Collaborating for Care"
+              />
+            </div>
+
+            <EditableField
+              id="regional-p1"
+              label="Paragraph 1"
+              type="textarea"
+              defaultValue="Our regional partners work together to ensure that every community member has access to the transportation they need."
+            />
+
+            <EditableField
+              id="regional-p2"
+              label="Paragraph 2"
+              type="textarea"
+              defaultValue="By coordinating resources and sharing information, we can better serve our region and improve health outcomes."
+            />
+
+            <EditableField
+              id="regional-p3"
+              label="Paragraph 3"
+              type="textarea"
+              defaultValue="Join us in our mission to create a more connected and accessible transportation network."
+            />
+
+            <FieldGroup id="regional-map" label="Regional Map Image">
+              <ImageUpload defaultValue={null} />
+            </FieldGroup>
+          </div>
+        </div>
+      )}
 
       <div className="mt-16 flex items-center justify-end border-t border-slate-200 pt-8 pb-12">
         {nextSection && (
