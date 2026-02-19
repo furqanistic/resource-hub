@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import EditorPanel from '@/components/dashboard/EditorPanel';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const dashboardSections = [
   {
@@ -39,6 +45,7 @@ const dashboardSections = [
 const DashboardPage = () => {
   const [activeSectionId, setActiveSectionId] = useState('home.hero');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -68,14 +75,53 @@ const DashboardPage = () => {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
         <header className="z-20 border-b border-slate-200 bg-white shadow-sm">
-          <div className="flex h-16 items-center justify-between gap-4 px-8">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                Content Management
-              </p>
-              <h1 className="text-sm font-semibold text-slate-900">
-                {pageTitle}
-              </h1>
+          <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-8">
+            <div className="flex items-center gap-4">
+              {/* Mobile Menu Trigger */}
+              <div className="lg:hidden">
+                <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 rounded-sm border border-slate-200 text-slate-500 hover:bg-slate-50"
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-75 p-0 border-r-0">
+                    <div className="flex h-full flex-col bg-white">
+                      <div className="flex h-16 items-center border-b border-slate-200 px-6">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                          Navigation Menu
+                        </p>
+                      </div>
+                      <div className="flex-1 overflow-y-auto pt-4">
+                        <DashboardSidebar
+                          sections={dashboardSections}
+                          activeSectionId={activeSectionId}
+                          onSelectSection={(id) => {
+                            setActiveSectionId(id);
+                            setIsMobileMenuOpen(false);
+                          }}
+                          isCollapsed={false}
+                          onToggleCollapse={() => { }}
+                          className="flex! w-full! h-full border-r-0! lg:hidden"
+                        />
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  Content Management
+                </p>
+                <h1 className="text-sm font-semibold text-slate-900">
+                  {pageTitle}
+                </h1>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

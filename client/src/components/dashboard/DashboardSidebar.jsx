@@ -1,3 +1,4 @@
+// File: client/src/components/dashboard/DashboardSidebar.jsx
 import React from 'react';
 import {
   BookOpenText,
@@ -25,16 +26,18 @@ const DashboardSidebar = ({
   onSelectSection,
   isCollapsed,
   onToggleCollapse,
+  className,
 }) => {
   return (
     <aside
       className={cn(
         'hidden border-r border-slate-200 bg-white lg:flex lg:h-screen lg:flex-col sticky top-0',
         'transition-[width] duration-300',
-        isCollapsed ? 'lg:w-[80px]' : 'lg:w-[280px]'
+        isCollapsed ? 'lg:w-[80px]' : 'lg:w-[280px]',
+        className
       )}
     >
-      <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
+      <div className={cn("flex h-16 items-center justify-between border-b border-slate-200 px-6", className?.includes('lg:hidden') ? 'hidden lg:flex' : '')}>
         <div
           className={cn(
             'flex flex-1 items-center gap-3 overflow-hidden',
@@ -87,7 +90,7 @@ const DashboardSidebar = ({
                 <Icon className="h-4 w-4 shrink-0" />
               </div>
 
-              <div className={cn('min-w-0', isCollapsed ? 'hidden' : 'block')}>
+              <div className={cn('flex-1 min-w-0', isCollapsed ? 'hidden' : 'block')}>
                 <p className="truncate text-sm font-medium">{section.label}</p>
               </div>
             </button>
