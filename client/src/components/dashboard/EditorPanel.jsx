@@ -47,10 +47,10 @@ const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
         </Label>
         {!isEditing && (
           <Button
-            variant="ghost"
+            type="button"
             size="sm"
             onClick={() => setIsEditing(true)}
-            className="h-7 rounded-sm px-2 text-[10px] font-bold uppercase tracking-wider text-[#03385e] hover:bg-[#b1ccdf]/30 hover:text-[#03385e]"
+            className="h-7 rounded-sm bg-[#03385e] px-3 text-[10px] font-bold uppercase tracking-wider text-white transition-all hover:bg-[#03385e]/90 active:scale-95"
           >
             Edit
           </Button>
