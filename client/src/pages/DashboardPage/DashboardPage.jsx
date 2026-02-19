@@ -99,7 +99,11 @@ const DashboardPage = () => {
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto bg-slate-50/50 p-8">
           <div className="mx-auto max-w-6xl">
-            <EditorPanel activeSectionId={activeSectionId} />
+            <EditorPanel
+              activeSectionId={activeSectionId}
+              sections={dashboardSections}
+              onSelectSection={setActiveSectionId}
+            />
           </div>
         </main>
       </div>
