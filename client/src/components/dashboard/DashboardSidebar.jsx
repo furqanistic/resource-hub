@@ -41,7 +41,7 @@ const DashboardSidebar = ({
             isCollapsed ? 'lg:justify-center' : ''
           )}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-[#03385e] text-white">
             <LayoutDashboard className="h-4 w-4" />
           </div>
           <div className={cn(isCollapsed ? 'hidden' : 'block')}>
@@ -55,7 +55,7 @@ const DashboardSidebar = ({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="hidden h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-600 transition hover:bg-slate-50 lg:inline-flex"
+          className="hidden h-8 w-8 items-center justify-center rounded-sm border border-[#03385e]/20 text-[#03385e] transition hover:bg-[#03385e]/5 lg:inline-flex"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -79,10 +79,10 @@ const DashboardSidebar = ({
               title={section.label}
               onClick={() => onSelectSection(section.id)}
               className={cn(
-                'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition',
+                'group flex w-full items-center gap-3 rounded-sm px-3 py-2 text-left transition',
                 isActive
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                  ? 'bg-[#03385e] text-white'
+                  : 'text-[#03385e]/70 hover:bg-[#03385e]/5 hover:text-[#03385e]',
                 isCollapsed ? 'justify-center px-0' : ''
               )}
             >

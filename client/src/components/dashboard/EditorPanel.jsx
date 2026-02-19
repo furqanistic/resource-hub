@@ -43,7 +43,7 @@ const ImageUpload = ({ defaultValue, onChange }) => {
   return (
     <div className="space-y-4">
       {preview ? (
-        <div className="group relative aspect-square w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 lg:aspect-4/1">
+        <div className="group relative aspect-square w-full overflow-hidden rounded-sm border border-slate-200 bg-slate-50 lg:aspect-4/1">
           <img
             src={preview}
             alt="Preview"
@@ -55,7 +55,7 @@ const ImageUpload = ({ defaultValue, onChange }) => {
               variant="destructive"
               size="sm"
               onClick={handleRemove}
-              className="h-8 rounded-lg px-3 text-[10px] font-semibold shadow-xl"
+              className="h-8 rounded-sm px-3 text-[10px] font-semibold"
             >
               <X className="mr-2 h-3.5 w-3.5" />
               Remove Image
@@ -65,10 +65,10 @@ const ImageUpload = ({ defaultValue, onChange }) => {
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="group flex aspect-3/1 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-white transition-all hover:border-slate-900/20 hover:bg-slate-50/50 lg:aspect-4/1"
+          className="group flex aspect-3/1 w-full cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed border-[#03385e]/10 bg-white transition-all hover:border-[#03385e]/30 hover:bg-[#b1ccdf]/5 lg:aspect-4/1"
         >
           <div className="flex flex-row items-center gap-4 px-6 py-4 text-left">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-900 group-hover:text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-[#b1ccdf]/40 text-[#03385e] transition-colors group-hover:bg-[#03385e] group-hover:text-white">
               <UploadCloud className="h-5 w-5" />
             </div>
             <div>
@@ -119,8 +119,8 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center p-20 text-center">
-          <div className="rounded-full bg-slate-100 p-4 mb-4">
-            <ImagePlus className="h-8 w-8 text-slate-400" />
+          <div className="rounded-sm bg-[#b1ccdf]/40 p-4 mb-4">
+            <ImagePlus className="h-8 w-8 text-[#03385e]" />
           </div>
           <p className="text-base font-medium text-slate-900">Section Editor Coming Soon</p>
           <p className="text-sm text-slate-500 mt-1 max-w-sm">
@@ -153,7 +153,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             <Input
               id="hero-title"
               defaultValue="CHOICE Regional Transportation Hub"
-              className="h-12 border-slate-200 bg-white px-4 text-base font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+              className="h-12 rounded-sm border-slate-200 bg-white px-4 text-base font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
             />
           </FieldGroup>
 
@@ -161,7 +161,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             <Textarea
               id="hero-description1"
               defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
-              className="min-h-24 border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+              className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
             />
           </FieldGroup>
 
@@ -169,7 +169,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             <Textarea
               id="hero-description2"
               defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
-              className="min-h-24 border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+              className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
             />
           </FieldGroup>
 
@@ -178,7 +178,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
               <Input
                 id="hero-cta"
                 defaultValue="Start My Search"
-                className="h-11 border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+                className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
               />
             </FieldGroup>
 
@@ -186,7 +186,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
               <Input
                 id="hero-link"
                 defaultValue="/directory"
-                className="h-11 border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5 font-mono"
+                className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5 font-mono"
               />
             </FieldGroup>
           </div>
@@ -199,7 +199,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             <Input
               id="hero-partner-label"
               defaultValue="Supporting Partners"
-              className="h-11 border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+              className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
             />
           </FieldGroup>
         </div>
@@ -211,13 +211,13 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
           <Button
             type="button"
             variant="outline"
-            className="h-10 rounded-lg border-[#03385e]/20 px-6 text-xs font-semibold text-[#03385e] hover:bg-[#03385e]/5"
+            className="h-10 rounded-sm px-6 text-xs font-semibold text-[#03385e] hover:bg-[#03385e]/5"
           >
             Reset Section
           </Button>
           <Button
             type="button"
-            className="h-10 rounded-lg bg-[#03385e] px-8 text-xs font-semibold text-white hover:bg-[#03385e]/90 shadow-md transition-all active:scale-95"
+            className="h-10 rounded-sm bg-[#03385e] px-8 text-xs font-semibold text-white hover:bg-[#03385e]/90 transition-all active:scale-95"
           >
             Save Changes
           </Button>
@@ -227,7 +227,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
           <Button
             type="button"
             onClick={handleNext}
-            className="group h-10 rounded-lg border border-[#03385e] px-6 text-xs font-bold text-[#03385e] transition-all hover:bg-[#03385e] hover:text-white"
+            className="group h-10 rounded-sm bg-[#b1ccdf] px-6 text-xs font-bold text-[#03385e] transition-all hover:bg-[#b1ccdf]/80"
           >
             Edit Next: {nextSection.label}
           </Button>

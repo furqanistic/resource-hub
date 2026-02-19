@@ -82,13 +82,13 @@ const DashboardPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="h-9 rounded-lg border-slate-300 px-4 text-xs font-medium"
+                className="h-9 rounded-sm border-[#03385e]/20 px-4 text-xs font-medium text-[#03385e] hover:bg-[#03385e]/5"
               >
                 Reset
               </Button>
               <Button
                 type="button"
-                className="h-9 rounded-lg bg-slate-900 px-5 text-xs font-medium text-white hover:bg-slate-800"
+                className="h-9 rounded-sm bg-[#03385e] px-5 text-xs font-medium text-white hover:bg-[#03385e]/90"
               >
                 Save Changes
               </Button>
