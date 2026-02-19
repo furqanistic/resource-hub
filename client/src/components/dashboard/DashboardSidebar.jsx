@@ -33,7 +33,7 @@ const DashboardSidebar = ({
       className={cn(
         'hidden border-r border-slate-200 bg-white lg:flex lg:h-screen lg:flex-col sticky top-0',
         'transition-[width] duration-300',
-        isCollapsed ? 'lg:w-[80px]' : 'lg:w-[280px]',
+        isCollapsed ? 'lg:w-20' : 'lg:w-70',
         className
       )}
     >
