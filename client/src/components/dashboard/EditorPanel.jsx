@@ -192,7 +192,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
     }
   };
 
-  if (!['home.hero', 'home.regional', 'about.page'].includes(activeSectionId)) {
+  if (!['home.hero', 'home.regional', 'about.page', 'resources.page', 'partners.page'].includes(activeSectionId)) {
     return (
       <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="mb-10 border-b border-slate-200 pb-6 uppercase tracking-widest text-slate-400">
@@ -322,7 +322,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             </FieldGroup>
           </div>
         </div>
-      ) : (
+      ) : activeSectionId === 'about.page' ? (
         <div className="grid grid-cols-1 gap-x-12 gap-y-10">
           <div className="space-y-10">
             <EditableField
@@ -335,29 +335,149 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
               id="about-p1"
               label="Paragraph 1"
               type="textarea"
-              defaultValue="This project was funded by regional partners and developed by the Olympic Community of Health (Olympic Community of Health Olympics) through Olympic Health (Olympic Health Olympics) with support from the Olympic Community of Health (Olympic Community of Health Olympics)."
+              defaultValue="The CHOICE Regional Transportation Hub was developed and is maintained by CHOICE Regional Health Network to improve access to transportation for community members across the region. CHOICE created this hub to make it easier for individuals, providers, and care coordinators to find and use transportation services that support access to medical care and essential needs."
             />
 
             <EditableField
               id="about-p2"
               label="Paragraph 2"
               type="textarea"
-              defaultValue="The Choice Regional Transportation Hub is a comprehensive database of transportation resources tailored to the Olympic region of Washington state. It was developed in response to regional needs identified through community feedback and collaboration."
+              defaultValue="This work builds on regional collaboration through the Great Rivers BH-ASO Transportation Collaborative, where partners identified transportation as a major barrier to accessing care. Community surveys and partner feedback showed that many people were unaware of available transportation resources or unsure how to access them."
             />
 
             <EditableField
               id="about-p3"
               label="Paragraph 3"
               type="textarea"
-              defaultValue="The hub is designed to help community members, healthcare providers, and social service organizations find and access transportation services. It includes information on public transit, non-emergency medical transportation, community shuttles, and more."
+              defaultValue="In response, CHOICE Regional Health Network took the lead in creating this centralized hub to bring transportation information together in one place. This hub reflects CHOICE's ongoing commitment to improving access to care and strengthening connections between community members and essential services."
             />
 
             <EditableField
               id="about-p4"
               label="Paragraph 4"
               type="textarea"
-              defaultValue="By providing easy access to transportation information, we aim to improve health equity and ensure that all residents can access the care and services they need to thrive."
+              defaultValue="Supporting partners in this effort include Great Rivers BH-ASO, UnitedHealthcare and the Cowlitz-Wahkiakum Council of Governments Mobility Management program, whose collaboration and input helped inform the development of this resource."
             />
+          </div>
+        </div>
+      ) : activeSectionId === 'resources.page' ? (
+        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+          <div className="space-y-10">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+              <EditableField
+                id="resources-title"
+                label="Page Title"
+                defaultValue="Regional Transportation Resources"
+              />
+              <EditableField
+                id="resources-subtitle"
+                label="Page Subtitle"
+                defaultValue="Key tools and partners helping people access care, food, and essential services."
+              />
+            </div>
+
+            <div className="border-t border-slate-100 pt-10">
+              <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                Resource Card: CWCOG
+              </h3>
+              <div className="space-y-6">
+                <EditableField
+                  id="res-cwcog-title"
+                  label="Card Title"
+                  defaultValue="CWCOG Mobility Management"
+                />
+                <EditableField
+                  id="res-cwcog-desc"
+                  label="Card Description"
+                  type="textarea"
+                  defaultValue="Mobility management tools, travel training, and regional coordination to connect people with transportation options."
+                />
+                <div className="grid grid-cols-2 gap-6">
+                  <EditableField
+                    id="res-cwcog-cta"
+                    label="CTA Label"
+                    defaultValue="Visit CWCOG Mobility Management"
+                  />
+                  <EditableField
+                    id="res-cwcog-link"
+                    label="CTA Link"
+                    defaultValue="https://www.cwcog.org/mobility-management/"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 pt-10">
+              <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                Resource Card: Great Rivers
+              </h3>
+              <div className="space-y-6">
+                <EditableField
+                  id="res-gr-title"
+                  label="Card Title"
+                  defaultValue="Great Rivers BH-ASO Transportation Efforts"
+                />
+                <EditableField
+                  id="res-gr-desc"
+                  label="Card Description"
+                  type="textarea"
+                  defaultValue="Regional coordination focused on improving access to transportation for behavioral health and other essential services."
+                />
+                <div className="grid grid-cols-2 gap-6">
+                  <EditableField
+                    id="res-gr-cta"
+                    label="CTA Label"
+                    defaultValue="Learn more about Great Rivers BH-ASO"
+                  />
+                  <EditableField
+                    id="res-gr-link"
+                    label="CTA Link"
+                    defaultValue="https://www.grbhaso.org"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+          <div className="space-y-12">
+            {[
+              { name: 'RiverCities Transit', url: 'https://www.rctransit.org', desc: 'RiverCities Transit – We are here, to get you there.' },
+              { name: 'Washington State Health Care Authority (HCA)', url: 'https://www.hca.wa.gov', desc: 'Home | Washington State Health Care Authority' },
+              { name: 'Arbor Health', url: 'https://www.myarborhealth.org', desc: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.' },
+              { name: 'Olympic Ambulance', url: 'https://www.olympicambulance.com', desc: 'Providing professional medical transportation services with a focus on patient care and safety.' }
+            ].map((partner, idx) => (
+              <div key={idx} className={idx > 0 ? "border-t border-slate-100 pt-10" : ""}>
+                <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  Partner Entry: {partner.name.split('(')[0]}
+                </h3>
+                <div className="space-y-6">
+                  <EditableField
+                    id={`partner-name-${idx}`}
+                    label="Partner Name"
+                    defaultValue={partner.name}
+                  />
+                  <EditableField
+                    id={`partner-desc-${idx}`}
+                    label="Description"
+                    type="textarea"
+                    defaultValue={partner.desc}
+                  />
+                  <EditableField
+                    id={`partner-url-${idx}`}
+                    label="Website URL"
+                    defaultValue={partner.url}
+                  />
+                </div>
+              </div>
+            ))}
+
+            <div className="flex justify-center border-t border-dashed border-slate-200 py-10">
+              <p className="text-xs italic text-slate-400">
+                +12 more partners available in the full directory management
+              </p>
+            </div>
           </div>
         </div>
       )}
