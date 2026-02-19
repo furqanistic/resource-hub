@@ -192,7 +192,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
     }
   };
 
-  if (!['home.hero', 'home.regional'].includes(activeSectionId)) {
+  if (!['home.hero', 'home.regional', 'about.page'].includes(activeSectionId)) {
     return (
       <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="mb-10 border-b border-slate-200 pb-6 uppercase tracking-widest text-slate-400">
@@ -280,7 +280,7 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             />
           </div>
         </div>
-      ) : (
+      ) : activeSectionId === 'home.regional' ? (
         <div className="grid grid-cols-1 gap-x-12 gap-y-10">
           <div className="space-y-10">
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
@@ -320,6 +320,44 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
             <FieldGroup id="regional-map" label="Regional Map Image">
               <ImageUpload defaultValue={null} />
             </FieldGroup>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+          <div className="space-y-10">
+            <EditableField
+              id="about-title"
+              label="Main Title"
+              defaultValue="About Our Hub"
+            />
+
+            <EditableField
+              id="about-p1"
+              label="Paragraph 1"
+              type="textarea"
+              defaultValue="This project was funded by regional partners and developed by the Olympic Community of Health (Olympic Community of Health Olympics) through Olympic Health (Olympic Health Olympics) with support from the Olympic Community of Health (Olympic Community of Health Olympics)."
+            />
+
+            <EditableField
+              id="about-p2"
+              label="Paragraph 2"
+              type="textarea"
+              defaultValue="The Choice Regional Transportation Hub is a comprehensive database of transportation resources tailored to the Olympic region of Washington state. It was developed in response to regional needs identified through community feedback and collaboration."
+            />
+
+            <EditableField
+              id="about-p3"
+              label="Paragraph 3"
+              type="textarea"
+              defaultValue="The hub is designed to help community members, healthcare providers, and social service organizations find and access transportation services. It includes information on public transit, non-emergency medical transportation, community shuttles, and more."
+            />
+
+            <EditableField
+              id="about-p4"
+              label="Paragraph 4"
+              type="textarea"
+              defaultValue="By providing easy access to transportation information, we aim to improve health equity and ensure that all residents can access the care and services they need to thrive."
+            />
           </div>
         </div>
       )}
