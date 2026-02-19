@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '@/assets/logo.avif';
 import {
   BookOpenText,
   ChevronLeft,
@@ -41,8 +42,8 @@ const DashboardSidebar = ({
             isCollapsed ? 'lg:justify-center' : ''
           )}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-[#03385e] text-white">
-            <LayoutDashboard className="h-4 w-4" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-transparent">
+            <img src={logo} alt="Logo" className="h-full w-full object-contain" />
           </div>
           <div className={cn(isCollapsed ? 'hidden' : 'block')}>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -88,26 +89,10 @@ const DashboardSidebar = ({
             >
               <div className="relative">
                 <Icon className="h-4 w-4 shrink-0" />
-                <span
-                  className={cn(
-                    'absolute -right-1 -top-1 h-2 w-2 rounded-full border border-white/80',
-                    section.status === 'ready'
-                      ? 'bg-emerald-400'
-                      : 'bg-amber-400'
-                  )}
-                />
               </div>
 
               <div className={cn('min-w-0', isCollapsed ? 'hidden' : 'block')}>
                 <p className="truncate text-sm font-medium">{section.label}</p>
-                <p
-                  className={cn(
-                    'truncate text-xs',
-                    isActive ? 'text-slate-300' : 'text-slate-500'
-                  )}
-                >
-                  {section.description}
-                </p>
               </div>
             </button>
           );

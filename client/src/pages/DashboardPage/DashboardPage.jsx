@@ -13,25 +13,25 @@ const dashboardSections = [
   {
     id: 'home.regional',
     label: 'Home Regional',
-    status: 'planned',
+    status: 'ready',
     description: 'Regional partners text and map block',
   },
   {
     id: 'about.page',
     label: 'About Page',
-    status: 'planned',
+    status: 'ready',
     description: 'Headings and paragraphs',
   },
   {
     id: 'resources.page',
     label: 'Resources Page',
-    status: 'planned',
+    status: 'ready',
     description: 'Resource cards and links',
   },
   {
     id: 'partners.page',
     label: 'Partners Page',
-    status: 'planned',
+    status: 'ready',
     description: 'Partner cards, logo and descriptions',
   },
 ];
