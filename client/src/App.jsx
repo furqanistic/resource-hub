@@ -8,6 +8,7 @@ import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import DashboardPage from '@/pages/DashboardPage/DashboardPage'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -32,6 +33,7 @@ const App = () => {
               <Route path='/resources' element={<ResourcesPage />} />
               <Route path='/about' element={<AboutPage />} />
               <Route path='/partners' element={<PartnersPage />} />
+              <Route path='/dashboard' element={<DashboardPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
