@@ -79,19 +79,10 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 rounded-sm border-[#03385e]/20 px-4 text-xs font-medium text-[#03385e] hover:bg-[#03385e]/5"
-              >
-                Reset
-              </Button>
-              <Button
-                type="button"
-                className="h-9 rounded-sm bg-[#03385e] px-5 text-xs font-medium text-white hover:bg-[#03385e]/90"
-              >
-                Save Changes
-              </Button>
+              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Auto-saving enabled
+              </span>
             </div>
           </div>
         </header>

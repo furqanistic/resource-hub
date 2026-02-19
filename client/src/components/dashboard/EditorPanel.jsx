@@ -11,11 +11,96 @@ const FieldGroup = ({ id, label, children, hint }) => {
     <div className="group space-y-2">
       <Label
         htmlFor={id}
-        className="text-[11px] font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-slate-900"
+        className="text-[11px] font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-[#03385e]"
       >
         {label}
       </Label>
       <div className="relative">{children}</div>
+      {hint ? <p className="text-xs text-slate-400/80">{hint}</p> : null}
+    </div>
+  );
+};
+
+const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [value, setValue] = React.useState(defaultValue);
+  const [tempValue, setTempValue] = React.useState(defaultValue);
+
+  const handleSave = () => {
+    setValue(tempValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempValue(value);
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="group space-y-2 rounded-sm border border-transparent p-1 transition-all hover:bg-slate-50/50">
+      <div className="flex items-center justify-between">
+        <Label
+          htmlFor={id}
+          className="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+        >
+          {label}
+        </Label>
+        {!isEditing && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditing(true)}
+            className="h-7 rounded-sm px-2 text-[10px] font-bold uppercase tracking-wider text-[#03385e] hover:bg-[#b1ccdf]/30 hover:text-[#03385e]"
+          >
+            Edit
+          </Button>
+        )}
+      </div>
+
+      <div className="relative">
+        {isEditing ? (
+          <div className="space-y-3">
+            {type === 'textarea' ? (
+              <Textarea
+                id={id}
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
+                className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+                autoFocus
+              />
+            ) : (
+              <Input
+                id={id}
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
+                className="h-12 rounded-sm border-slate-200 bg-white px-4 text-base font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+                autoFocus
+              />
+            )}
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={handleSave}
+                className="h-8 rounded-sm bg-[#03385e] px-4 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
+              >
+                Save
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                className="h-8 rounded-sm px-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-100"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-sm border border-transparent bg-transparent py-2 text-base font-medium text-slate-900">
+            {value}
+          </div>
+        )}
+      </div>
       {hint ? <p className="text-xs text-slate-400/80">{hint}</p> : null}
     </div>
   );
@@ -147,89 +232,62 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-12 gap-y-8">
-        <div className="space-y-8">
-          <FieldGroup id="hero-title" label="Hero Title">
-            <Input
-              id="hero-title"
-              defaultValue="CHOICE Regional Transportation Hub"
-              className="h-12 rounded-sm border-slate-200 bg-white px-4 text-base font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+      <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+        <div className="space-y-10">
+          <EditableField
+            id="hero-title"
+            label="Hero Title"
+            defaultValue="CHOICE Regional Transportation Hub"
+          />
+
+          <EditableField
+            id="hero-description1"
+            label="Description Line 1"
+            type="textarea"
+            defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
+          />
+
+          <EditableField
+            id="hero-description2"
+            label="Description Line 2"
+            type="textarea"
+            defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
+          />
+
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+            <EditableField
+              id="hero-cta"
+              label="CTA Label"
+              defaultValue="Start My Search"
             />
-          </FieldGroup>
 
-          <FieldGroup id="hero-description1" label="Description Line 1">
-            <Textarea
-              id="hero-description1"
-              defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
-              className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+            <EditableField
+              id="hero-link"
+              label="CTA Link"
+              defaultValue="/directory"
             />
-          </FieldGroup>
-
-          <FieldGroup id="hero-description2" label="Description Line 2">
-            <Textarea
-              id="hero-description2"
-              defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
-              className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
-            />
-          </FieldGroup>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <FieldGroup id="hero-cta" label="CTA Label">
-              <Input
-                id="hero-cta"
-                defaultValue="Start My Search"
-                className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
-              />
-            </FieldGroup>
-
-            <FieldGroup id="hero-link" label="CTA Link">
-              <Input
-                id="hero-link"
-                defaultValue="/directory"
-                className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5 font-mono"
-              />
-            </FieldGroup>
           </div>
 
           <FieldGroup id="hero-image" label="Hero Banner Image">
             <ImageUpload defaultValue={null} />
           </FieldGroup>
 
-          <FieldGroup id="hero-partner-label" label="Partners Label">
-            <Input
-              id="hero-partner-label"
-              defaultValue="Supporting Partners"
-              className="h-11 rounded-sm border-slate-200 bg-white px-4 text-sm font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
-            />
-          </FieldGroup>
+          <EditableField
+            id="hero-partner-label"
+            label="Partners Label"
+            defaultValue="Supporting Partners"
+          />
         </div>
       </div>
 
-      {/* Footer Actions */}
-      <div className="mt-16 flex items-center justify-between border-t border-slate-200 pt-8 pb-12">
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 rounded-sm px-6 text-xs font-semibold text-[#03385e] hover:bg-[#03385e]/5"
-          >
-            Reset Section
-          </Button>
-          <Button
-            type="button"
-            className="h-10 rounded-sm bg-[#03385e] px-8 text-xs font-semibold text-white hover:bg-[#03385e]/90 transition-all active:scale-95"
-          >
-            Save Changes
-          </Button>
-        </div>
-
+      <div className="mt-16 flex items-center justify-end border-t border-slate-200 pt-8 pb-12">
         {nextSection && (
           <Button
             type="button"
             onClick={handleNext}
             className="group h-10 rounded-sm bg-[#b1ccdf] px-6 text-xs font-bold text-[#03385e] transition-all hover:bg-[#b1ccdf]/80"
           >
-            Edit Next: {nextSection.label}
+            Edit Next Component: {nextSection.label}
           </Button>
         )}
       </div>
