@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '@/assets/logo.avif';
 import {
   BookOpenText,
   ChevronLeft,
@@ -35,28 +34,25 @@ const DashboardSidebar = ({
         isCollapsed ? 'lg:w-[80px]' : 'lg:w-[280px]'
       )}
     >
-      <div className="flex h-16 items-center border-b border-slate-200 px-6">
+      <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
         <div
           className={cn(
-            'flex items-center gap-2 overflow-hidden',
+            'flex flex-1 items-center gap-3 overflow-hidden',
             isCollapsed ? 'lg:justify-center' : ''
           )}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-transparent">
-            <img src={logo} alt="Logo" className="h-full w-full object-contain" />
-          </div>
           <div className={cn(isCollapsed ? 'hidden' : 'block')}>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
               Dashboard
             </p>
-            <p className="text-sm font-semibold text-slate-900">Content CMS</p>
+            <h2 className="text-sm font-bold text-[#03385e] leading-tight">Content CMS</h2>
           </div>
         </div>
 
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="hidden h-8 w-8 items-center justify-center rounded-sm border border-[#03385e]/20 text-[#03385e] transition hover:bg-[#03385e]/5 lg:inline-flex"
+          className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-[#03385e]/10 text-[#03385e]/60 transition-all hover:bg-[#03385e]/5 hover:text-[#03385e] lg:inline-flex"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
