@@ -1,25 +1,59 @@
 // File: client/src/components/dashboard/EditorPanel.jsx
 import React from 'react';
-import { ImagePlus, UploadCloud, X } from 'lucide-react';
+import {
+  ImagePlus,
+  UploadCloud,
+  X,
+  Save,
+  RotateCcw,
+  Edit3,
+  CheckCircle2,
+  ChevronRight
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-const FieldGroup = ({ id, label, children, hint }) => {
-  return (
-    <div className="group space-y-2">
-      <Label
-        htmlFor={id}
-        className="text-[11px] font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-[#03385e]"
-      >
-        {label}
-      </Label>
-      <div className="relative">{children}</div>
-      {hint ? <p className="text-xs text-slate-400/80">{hint}</p> : null}
+const SectionHeader = ({ id, label, description }) => (
+  <div className="mb-8 border-b border-slate-200 pb-6">
+    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+      <span>Dashboard</span>
+      <ChevronRight className="h-3 w-3" />
+      <span className="text-[#03385e]">Content Editor</span>
     </div>
-  );
-};
+    <div className="flex items-end justify-between">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          {label}
+        </h2>
+        {description && (
+          <p className="mt-1 text-sm text-slate-500">
+            {description}
+          </p>
+        )}
+      </div>
+      <div className="hidden text-[10px] font-mono font-medium text-slate-400 lg:block bg-slate-50 px-2 py-1 rounded border border-slate-100">
+        REF: {id}
+      </div>
+    </div>
+  </div>
+);
+
+const FieldHeader = ({ label, isEditing }) => (
+  <div className="flex items-center justify-between mb-2">
+    <Label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+      {label}
+    </Label>
+    {isEditing && (
+      <span className="flex items-center gap-1.5 text-[10px] font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 animate-pulse">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+        Unsaved Changes
+      </span>
+    )}
+  </div>
+);
 
 const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
   const [isEditing, setIsEditing] = React.useState(false);
@@ -37,35 +71,23 @@ const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
   };
 
   return (
-    <div className="group space-y-2 rounded-sm border border-transparent p-1 transition-all hover:bg-slate-50/50">
-      <div className="flex items-center justify-between">
-        <Label
-          htmlFor={id}
-          className="text-[11px] font-bold uppercase tracking-wider text-slate-400"
-        >
-          {label}
-        </Label>
-        {!isEditing && (
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            className="h-7 rounded-sm bg-[#03385e] px-3 text-[10px] font-bold uppercase tracking-wider text-white transition-all hover:bg-[#03385e]/90 active:scale-95"
-          >
-            Edit
-          </Button>
-        )}
-      </div>
+    <div className={cn(
+      "group relative rounded-lg border-2 transition-all duration-200",
+      isEditing
+        ? "border-[#03385e] bg-white p-5 shadow-sm"
+        : "border-slate-100 bg-slate-50/30 p-4 hover:border-slate-200 hover:bg-slate-50/50"
+    )}>
+      <FieldHeader label={label} isEditing={isEditing} />
 
       <div className="relative">
         {isEditing ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {type === 'textarea' ? (
               <Textarea
                 id={id}
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
-                className="min-h-24 rounded-sm border-slate-200 bg-white p-4 text-base font-medium leading-relaxed transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+                className="min-h-32 resize-none rounded-md border-slate-200 bg-white p-4 text-sm font-medium leading-relaxed shadow-inner focus-visible:ring-0 focus-visible:border-slate-300"
                 autoFocus
               />
             ) : (
@@ -73,40 +95,61 @@ const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
                 id={id}
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
-                className="h-12 rounded-sm border-slate-200 bg-white px-4 text-base font-medium transition-all focus:border-[#03385e] focus:ring-4 focus:ring-[#03385e]/5"
+                className="h-11 rounded-md border-slate-200 bg-white px-4 text-sm font-medium shadow-inner focus-visible:ring-0 focus-visible:border-slate-300"
                 autoFocus
               />
             )}
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-3">
               <Button
                 size="sm"
                 onClick={handleSave}
-                className="h-8 rounded-sm bg-[#03385e] px-4 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
+                className="h-9 gap-2 rounded-md bg-[#03385e] px-4 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
               >
-                Save
+                <Save className="h-3.5 w-3.5" />
+                Apply Changes
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={handleCancel}
-                className="h-8 rounded-sm px-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-100"
+                className="h-9 gap-2 rounded-md border-slate-200 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50"
               >
-                Cancel
+                <RotateCcw className="h-3.5 w-3.5" />
+                Discard
               </Button>
             </div>
           </div>
         ) : (
-          <div className="rounded-sm border border-transparent bg-transparent py-2 text-base font-medium text-slate-900">
-            {value}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 text-sm font-medium text-slate-900 leading-relaxed py-1">
+              {value || <span className="text-slate-400 italic font-normal">No content provided</span>}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsEditing(true)}
+              className="h-8 w-8 shrink-0 rounded-md text-slate-400 hover:text-[#03385e] hover:bg-[#03385e]/5"
+              title="Edit field"
+            >
+              <Edit3 className="h-4 w-4" />
+            </Button>
           </div>
         )}
       </div>
-      {hint ? <p className="text-xs text-slate-400/80">{hint}</p> : null}
+
+      {hint && !isEditing && (
+        <p className="mt-3 text-[11px] text-slate-400 flex items-center gap-1">
+          <CheckCircle2 className="h-3 w-3" />
+          {hint}
+        </p>
+      )}
     </div>
   );
 };
 
-const ImageUpload = ({ defaultValue, onChange }) => {
+const ImageUpload = ({ label, defaultValue, onChange }) => {
   const [preview, setPreview] = React.useState(defaultValue);
   const fileInputRef = React.useRef(null);
 
@@ -126,23 +169,29 @@ const ImageUpload = ({ defaultValue, onChange }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="rounded-lg border-2 border-slate-100 bg-slate-50/30 p-5">
+      <div className="mb-4">
+        <Label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+          {label || 'Image Asset'}
+        </Label>
+      </div>
+
       {preview ? (
-        <div className="group relative aspect-square w-full overflow-hidden rounded-sm border border-slate-200 bg-slate-50 lg:aspect-4/1">
+        <div className="group relative aspect-video w-full overflow-hidden rounded-md border border-slate-200 bg-white lg:aspect-[3/1]">
           <img
             src={preview}
             alt="Preview"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/60 opacity-0 transition-opacity group-hover:opacity-100">
             <Button
               type="button"
               variant="destructive"
               size="sm"
               onClick={handleRemove}
-              className="h-8 rounded-sm px-3 text-[10px] font-semibold"
+              className="h-9 gap-2 rounded-md font-bold uppercase tracking-wider text-[10px]"
             >
-              <X className="mr-2 h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
               Remove Image
             </Button>
           </div>
@@ -150,18 +199,18 @@ const ImageUpload = ({ defaultValue, onChange }) => {
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="group flex aspect-3/1 w-full cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed border-[#03385e]/10 bg-white transition-all hover:border-[#03385e]/30 hover:bg-[#b1ccdf]/5 lg:aspect-4/1"
+          className="group flex aspect-[3/1] w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-200 bg-white transition-colors hover:border-[#03385e]/30 hover:bg-slate-50/50"
         >
-          <div className="flex flex-row items-center gap-4 px-6 py-4 text-left">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-[#b1ccdf]/40 text-[#03385e] transition-colors group-hover:bg-[#03385e] group-hover:text-white">
-              <UploadCloud className="h-5 w-5" />
+          <div className="flex flex-col items-center gap-3 py-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#03385e] group-hover:text-white">
+              <UploadCloud className="h-6 w-6" />
             </div>
-            <div>
-              <p className="text-xs font-bold text-slate-900">
-                Click to upload banner image
+            <div className="text-center px-4">
+              <p className="text-sm font-bold text-slate-900">
+                Click to upload image
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-400">
-                SVG, PNG, JPG or GIF (max. 800x400px)
+              <p className="mt-1 text-xs text-slate-400">
+                Supports JPG, PNG, SVG (Max 2MB)
               </p>
             </div>
           </div>
@@ -179,10 +228,12 @@ const ImageUpload = ({ defaultValue, onChange }) => {
 };
 
 const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
-  const currentIndex = React.useMemo(
-    () => sections?.findIndex((s) => s.id === activeSectionId) ?? -1,
+  const currentSection = React.useMemo(
+    () => sections?.find((s) => s.id === activeSectionId),
     [sections, activeSectionId]
   );
+
+  const currentIndex = sections?.findIndex((s) => s.id === activeSectionId) ?? -1;
   const nextSection = sections?.[currentIndex + 1];
 
   const handleNext = () => {
@@ -195,21 +246,17 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
   if (!['home.hero', 'home.regional', 'about.page', 'resources.page', 'partners.page'].includes(activeSectionId)) {
     return (
       <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-        <div className="mb-10 border-b border-slate-200 pb-6 uppercase tracking-widest text-slate-400">
-          <h2 className="text-xl font-bold tracking-tight text-slate-900">
-            {sections?.find(s => s.id === activeSectionId)?.label}
-          </h2>
-          <p className="mt-1 text-sm lowercase tracking-normal">
-            Phase 2 implementation in progress...
-          </p>
-        </div>
-        <div className="flex flex-col items-center justify-center p-20 text-center">
-          <div className="rounded-sm bg-[#b1ccdf]/40 p-4 mb-4">
-            <ImagePlus className="h-8 w-8 text-[#03385e]" />
+        <SectionHeader
+          id={activeSectionId}
+          label={currentSection?.label || "Unknown Section"}
+        />
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/30 p-16 text-center">
+          <div className="rounded-full bg-white p-5 shadow-sm border border-slate-100 mb-6">
+            <ImagePlus className="h-10 w-10 text-[#03385e]/20" />
           </div>
-          <p className="text-base font-medium text-slate-900">Section Editor Coming Soon</p>
-          <p className="text-sm text-slate-500 mt-1 max-w-sm">
-            This editor is currently under development. Please check back later or start editing the Home sections.
+          <h3 className="text-lg font-bold text-slate-900">Editor Placeholder</h3>
+          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
+            This module is currently read-only or pending implementation. You can manage existing content via the sidebar.
           </p>
         </div>
       </section>
@@ -218,280 +265,150 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
 
   return (
     <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="mb-10 flex items-end justify-between border-b border-slate-200 pb-6">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900">
-            Home Hero Editor
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Customize the main greeting and banner of your landing page.
-          </p>
-        </div>
-        <div className="hidden text-[10px] font-medium uppercase tracking-widest text-slate-400 lg:block">
-          Section ID: {activeSectionId}
-        </div>
-      </div>
+      <SectionHeader
+        id={activeSectionId}
+        label={currentSection?.label || "Section Editor"}
+        description={
+          activeSectionId === 'home.hero' ? "Configure the main visual identity of your landing page." :
+            activeSectionId === 'home.regional' ? "Manage regional partnership details and geographic focus." :
+              activeSectionId === 'about.page' ? "Edit the organizational narrative and background information." :
+                activeSectionId === 'resources.page' ? "Curate the list of essential service providers and tools." :
+                  "Manage key strategic partners and their external connections."
+        }
+      />
 
-      {activeSectionId === 'home.hero' ? (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
-          <div className="space-y-10">
+      <div className="space-y-12">
+        {activeSectionId === 'home.hero' && (
+          <div className="grid grid-cols-1 gap-8">
             <EditableField
               id="hero-title"
-              label="Hero Title"
+              label="Primary Heading"
               defaultValue="CHOICE Regional Transportation Hub"
+              hint="Maximum impact text for the top of the page"
             />
 
-            <EditableField
-              id="hero-description1"
-              label="Description Line 1"
-              type="textarea"
-              defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <EditableField
+                id="hero-description1"
+                label="Introductory Text"
+                type="textarea"
+                defaultValue="This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region."
+              />
 
-            <EditableField
-              id="hero-description2"
-              label="Description Line 2"
-              type="textarea"
-              defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
-            />
+              <EditableField
+                id="hero-description2"
+                label="Supplementary Text"
+                type="textarea"
+                defaultValue="This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services."
+              />
+            </div>
 
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <EditableField
                 id="hero-cta"
-                label="CTA Label"
+                label="Action Button Label"
                 defaultValue="Start My Search"
               />
 
               <EditableField
                 id="hero-link"
-                label="CTA Link"
+                label="Action Destination"
                 defaultValue="/directory"
               />
             </div>
 
-            <FieldGroup id="hero-image" label="Hero Banner Image">
-              <ImageUpload defaultValue={null} />
-            </FieldGroup>
-
-            <EditableField
-              id="hero-partner-label"
-              label="Partners Label"
-              defaultValue="Supporting Partners"
+            <ImageUpload
+              label="Hero Banner Media"
+              defaultValue={null}
             />
           </div>
-        </div>
-      ) : activeSectionId === 'home.regional' ? (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
-          <div className="space-y-10">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
-              <EditableField
-                id="regional-title-1"
-                label="Title Line 1"
-                defaultValue="Regional Partners"
-              />
-              <EditableField
-                id="regional-title-2"
-                label="Title Line 2"
-                defaultValue="Collaborating for Care"
-              />
+        )}
+
+        {/* Similar patterns for other sections */}
+        {activeSectionId === 'home.regional' && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <EditableField id="regional-title-1" label="Section Header 1" defaultValue="Regional Partners" />
+              <EditableField id="regional-title-2" label="Section Header 2" defaultValue="Collaborating for Care" />
             </div>
-
-            <EditableField
-              id="regional-p1"
-              label="Paragraph 1"
-              type="textarea"
-              defaultValue="Our regional partners work together to ensure that every community member has access to the transportation they need."
-            />
-
-            <EditableField
-              id="regional-p2"
-              label="Paragraph 2"
-              type="textarea"
-              defaultValue="By coordinating resources and sharing information, we can better serve our region and improve health outcomes."
-            />
-
-            <EditableField
-              id="regional-p3"
-              label="Paragraph 3"
-              type="textarea"
-              defaultValue="Join us in our mission to create a more connected and accessible transportation network."
-            />
-
-            <FieldGroup id="regional-map" label="Regional Map Image">
-              <ImageUpload defaultValue={null} />
-            </FieldGroup>
+            <EditableField id="regional-p1" label="First Paragraph" type="textarea" defaultValue="Our regional partners work together to ensure that every community member has access to the transportation they need." />
+            <EditableField id="regional-p2" label="Second Paragraph" type="textarea" defaultValue="By coordinating resources and sharing information, we can better serve our region and improve health outcomes." />
+            <ImageUpload label="Regional Impact Map" defaultValue={null} />
           </div>
-        </div>
-      ) : activeSectionId === 'about.page' ? (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
-          <div className="space-y-10">
-            <EditableField
-              id="about-title"
-              label="Main Title"
-              defaultValue="About Our Hub"
-            />
+        )}
 
-            <EditableField
-              id="about-p1"
-              label="Paragraph 1"
-              type="textarea"
-              defaultValue="The CHOICE Regional Transportation Hub was developed and is maintained by CHOICE Regional Health Network to improve access to transportation for community members across the region. CHOICE created this hub to make it easier for individuals, providers, and care coordinators to find and use transportation services that support access to medical care and essential needs."
-            />
-
-            <EditableField
-              id="about-p2"
-              label="Paragraph 2"
-              type="textarea"
-              defaultValue="This work builds on regional collaboration through the Great Rivers BH-ASO Transportation Collaborative, where partners identified transportation as a major barrier to accessing care. Community surveys and partner feedback showed that many people were unaware of available transportation resources or unsure how to access them."
-            />
-
-            <EditableField
-              id="about-p3"
-              label="Paragraph 3"
-              type="textarea"
-              defaultValue="In response, CHOICE Regional Health Network took the lead in creating this centralized hub to bring transportation information together in one place. This hub reflects CHOICE's ongoing commitment to improving access to care and strengthening connections between community members and essential services."
-            />
-
-            <EditableField
-              id="about-p4"
-              label="Paragraph 4"
-              type="textarea"
-              defaultValue="Supporting partners in this effort include Great Rivers BH-ASO, UnitedHealthcare and the Cowlitz-Wahkiakum Council of Governments Mobility Management program, whose collaboration and input helped inform the development of this resource."
-            />
-          </div>
-        </div>
-      ) : activeSectionId === 'resources.page' ? (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
-          <div className="space-y-10">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
-              <EditableField
-                id="resources-title"
-                label="Page Title"
-                defaultValue="Regional Transportation Resources"
-              />
-              <EditableField
-                id="resources-subtitle"
-                label="Page Subtitle"
-                defaultValue="Key tools and partners helping people access care, food, and essential services."
-              />
-            </div>
-
-            <div className="border-t border-slate-100 pt-10">
-              <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                Resource Card: CWCOG
-              </h3>
-              <div className="space-y-6">
+        {activeSectionId === 'about.page' && (
+          <div className="space-y-8">
+            <EditableField id="about-title" label="Main Exhibit Title" defaultValue="About Our Hub" />
+            <div className="grid grid-cols-1 gap-6">
+              {[1, 2, 3, 4].map(n => (
                 <EditableField
-                  id="res-cwcog-title"
-                  label="Card Title"
-                  defaultValue="CWCOG Mobility Management"
-                />
-                <EditableField
-                  id="res-cwcog-desc"
-                  label="Card Description"
+                  key={n}
+                  id={`about-p${n}`}
+                  label={`Narrative Block ${n}`}
                   type="textarea"
-                  defaultValue="Mobility management tools, travel training, and regional coordination to connect people with transportation options."
+                  defaultValue={`The CHOICE Regional Transportation Hub was developed and is maintained by CHOICE Regional Health Network to improve access to transportation for community members across the region. (Block ${n})`}
                 />
-                <div className="grid grid-cols-2 gap-6">
-                  <EditableField
-                    id="res-cwcog-cta"
-                    label="CTA Label"
-                    defaultValue="Visit CWCOG Mobility Management"
-                  />
-                  <EditableField
-                    id="res-cwcog-link"
-                    label="CTA Link"
-                    defaultValue="https://www.cwcog.org/mobility-management/"
-                  />
-                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeSectionId === 'resources.page' && (
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <EditableField id="resources-title" label="Module Title" defaultValue="Regional Transportation Resources" />
+              <EditableField id="resources-subtitle" label="Tagline" defaultValue="Key tools and partners helping people access care." />
+            </div>
+
+            <div className="p-6 rounded-xl border-2 border-slate-100 bg-slate-50/30">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Resource Entry: CWCOG</h3>
+                <span className="text-[10px] text-slate-400 bg-white px-2 py-0.5 rounded border">ID: CWCOG-01</span>
               </div>
-            </div>
-
-            <div className="border-t border-slate-100 pt-10">
-              <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                Resource Card: Great Rivers
-              </h3>
-              <div className="space-y-6">
-                <EditableField
-                  id="res-gr-title"
-                  label="Card Title"
-                  defaultValue="Great Rivers BH-ASO Transportation Efforts"
-                />
-                <EditableField
-                  id="res-gr-desc"
-                  label="Card Description"
-                  type="textarea"
-                  defaultValue="Regional coordination focused on improving access to transportation for behavioral health and other essential services."
-                />
-                <div className="grid grid-cols-2 gap-6">
-                  <EditableField
-                    id="res-gr-cta"
-                    label="CTA Label"
-                    defaultValue="Learn more about Great Rivers BH-ASO"
-                  />
-                  <EditableField
-                    id="res-gr-link"
-                    label="CTA Link"
-                    defaultValue="https://www.grbhaso.org"
-                  />
-                </div>
+              <div className="space-y-8">
+                <EditableField id="res-cwcog-title" label="Entry Name" defaultValue="CWCOG Mobility Management" />
+                <EditableField id="res-cwcog-desc" label="Entry Description" type="textarea" defaultValue="Mobility management tools and coordination..." />
               </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10">
+        )}
+
+        {activeSectionId === 'partners.page' && (
           <div className="space-y-12">
             {[
-              { name: 'RiverCities Transit', url: 'https://www.rctransit.org', desc: 'RiverCities Transit – We are here, to get you there.' },
-              { name: 'Washington State Health Care Authority (HCA)', url: 'https://www.hca.wa.gov', desc: 'Home | Washington State Health Care Authority' },
-              { name: 'Arbor Health', url: 'https://www.myarborhealth.org', desc: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.' },
-              { name: 'Olympic Ambulance', url: 'https://www.olympicambulance.com', desc: 'Providing professional medical transportation services with a focus on patient care and safety.' }
+              { name: 'RiverCities Transit', url: 'https://www.rctransit.org' },
+              { name: 'Washington State Health Care Authority (HCA)', url: 'https://www.hca.wa.gov' }
             ].map((partner, idx) => (
-              <div key={idx} className={idx > 0 ? "border-t border-slate-100 pt-10" : ""}>
-                <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                  Partner Entry: {partner.name.split('(')[0]}
-                </h3>
+              <div key={idx} className="p-6 rounded-xl border-2 border-slate-100 bg-slate-50/30">
+                <div className="mb-6 flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Partner Entry: {partner.name}</h3>
+                </div>
                 <div className="space-y-6">
-                  <EditableField
-                    id={`partner-name-${idx}`}
-                    label="Partner Name"
-                    defaultValue={partner.name}
-                  />
-                  <EditableField
-                    id={`partner-desc-${idx}`}
-                    label="Description"
-                    type="textarea"
-                    defaultValue={partner.desc}
-                  />
-                  <EditableField
-                    id={`partner-url-${idx}`}
-                    label="Website URL"
-                    defaultValue={partner.url}
-                  />
+                  <EditableField id={`partner-name-${idx}`} label="Partner Name" defaultValue={partner.name} />
+                  <EditableField id={`partner-url-${idx}`} label="Website URL" defaultValue={partner.url} />
                 </div>
               </div>
             ))}
-
-            <div className="flex justify-center border-t border-dashed border-slate-200 py-10">
-              <p className="text-xs italic text-slate-400">
-                +12 more partners available in the full directory management
-              </p>
-            </div>
           </div>
-        </div>
-      )}
-
-      <div className="mt-16 flex items-center justify-end border-t border-slate-200 pt-8 pb-12">
-        {nextSection && (
-          <Button
-            type="button"
-            onClick={handleNext}
-            className="group h-10 rounded-sm bg-[#b1ccdf] px-6 text-xs font-bold text-[#03385e] transition-all hover:bg-[#b1ccdf]/80"
-          >
-            Edit Next Component: {nextSection.label}
-          </Button>
         )}
+
+        <div className="flex items-center justify-between pt-12 border-t border-slate-200">
+          <div className="text-xs text-slate-400 font-medium italic">
+            Note: Changes are staged locally until global publish.
+          </div>
+          {nextSection && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleNext}
+              className="h-10 gap-2 rounded-md border-slate-200 px-6 text-xs font-bold uppercase tracking-wider text-[#03385e] hover:bg-slate-50 transition-all active:scale-95"
+            >
+              Next Section
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </section>
   );
