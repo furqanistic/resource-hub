@@ -398,9 +398,8 @@ const EditorPanel = ({ activeSectionId, sections, onSelectSection }) => {
           {nextSection && (
             <Button
               type="button"
-              variant="outline"
               onClick={handleNext}
-              className="h-10 gap-2 rounded-md border-slate-200 px-6 text-xs font-bold uppercase tracking-wider text-[#03385e] hover:bg-slate-50 transition-all active:scale-95"
+              className="h-10 gap-2 rounded-md bg-[#03385e] px-6 text-xs font-bold uppercase tracking-wider text-white shadow-sm hover:bg-[#022e4c] hover:shadow-md transition-all active:scale-95"
             >
               Next Section
               <ChevronRight className="h-4 w-4" />
