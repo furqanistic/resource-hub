@@ -6,7 +6,6 @@ import {
   X,
   Save,
   RotateCcw,
-  Edit3,
   CheckCircle2,
   ChevronRight
 } from 'lucide-react';
@@ -127,13 +126,12 @@ const EditableField = ({ id, label, defaultValue, type = 'input', hint }) => {
             </div>
             <Button
               type="button"
-              variant="ghost"
-              size="icon"
+              size="sm"
               onClick={() => setIsEditing(true)}
-              className="h-8 w-8 shrink-0 rounded-md text-slate-400 hover:text-[#03385e] hover:bg-[#03385e]/5"
+              className="h-8 shrink-0 rounded-md bg-[#03385e] px-3 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
               title="Edit field"
             >
-              <Edit3 className="h-4 w-4" />
+              Edit
             </Button>
           </div>
         )}
@@ -199,7 +197,7 @@ const ImageUpload = ({ label, defaultValue, onChange }) => {
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="group flex aspect-[3/1] w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-200 bg-white transition-colors hover:border-[#03385e]/30 hover:bg-slate-50/50"
+          className="group flex aspect-3/1 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-white transition-colors border-[#03385e]/50 hover:border-[#03385e] hover:bg-slate-50/50"
         >
           <div className="flex flex-col items-center gap-3 py-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#03385e] group-hover:text-white">
