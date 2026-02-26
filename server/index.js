@@ -8,6 +8,7 @@ import dns from 'dns'
 import authRoute from './routes/auth.js'
 import cmsRoute from './routes/cms.js'
 import mediaRoute from './routes/media.js'
+import resourcesRoute from './routes/resources.js'
 
 const app = express()
 dotenv.config({ quiet: true })
@@ -30,6 +31,7 @@ app.use(
 app.use('/api/auth/', authRoute)
 app.use('/api/cms', cmsRoute)
 app.use('/api/media', mediaRoute)
+app.use('/api/resources', resourcesRoute)
 
 // Static: serve uploaded images directly
 app.use('/uploads', express.static('uploads'))
