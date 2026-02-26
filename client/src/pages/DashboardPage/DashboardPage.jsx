@@ -33,6 +33,16 @@ const DashboardPage = () => {
     publishAllSections,
     revertSection,
     uploadImage,
+    resourceEntries,
+    partnerEntries,
+    resourceFetchStatusByType,
+    resourceMutationStatus,
+    resourceError,
+    fetchEntriesByType,
+    createEntry,
+    updateEntry,
+    deleteEntry,
+    reorderEntries,
   } = useCmsDashboard();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -222,6 +232,16 @@ const DashboardPage = () => {
                 mediaUploadStatus={mediaUploadStatus}
                 error={error}
                 lastActionMessage={lastActionMessage}
+                resourceEntries={resourceEntries}
+                partnerEntries={partnerEntries}
+                resourceFetchStatusByType={resourceFetchStatusByType}
+                resourceMutationStatus={resourceMutationStatus}
+                resourceError={resourceError}
+                onFetchEntriesByType={fetchEntriesByType}
+                onCreateEntry={createEntry}
+                onUpdateEntry={updateEntry}
+                onDeleteEntry={deleteEntry}
+                onReorderEntries={reorderEntries}
               />
             )}
           </div>
