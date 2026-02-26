@@ -1,17 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   AlertTriangle,
-  ArrowDown,
-  ArrowUp,
   CheckCircle2,
   ChevronRight,
   ImagePlus,
   LoaderCircle,
-  RefreshCcw,
   RotateCcw,
   Save,
   Send,
-  Trash2,
   UploadCloud,
   X,
 } from 'lucide-react'
@@ -259,301 +255,6 @@ const ImageField = ({ field, value, sourceValue, onChange, onUpload, isUploading
   )
 }
 
-const blankEntry = {
-  name: '',
-  description: '',
-  url: '',
-  logoUrl: '',
-  isPublished: true,
-}
-
-const ResourceEntriesEditor = ({
-  type,
-  title,
-  entries,
-  fetchStatus,
-  mutationStatus,
-  error,
-  onRefresh,
-  onCreate,
-  onUpdate,
-  onDelete,
-  onReorder,
-}) => {
-  const [newEntry, setNewEntry] = useState(blankEntry)
-  const [draftById, setDraftById] = useState({})
-  const [localError, setLocalError] = useState('')
-
-  useEffect(() => {
-    const nextDraftMap = {}
-    for (const entry of entries) {
-      nextDraftMap[entry._id] = {
-        name: entry.name || '',
-        description: entry.description || '',
-        url: entry.url || '',
-        logoUrl: entry.logoUrl || '',
-        isPublished: Boolean(entry.isPublished),
-      }
-    }
-    setDraftById(nextDraftMap)
-  }, [entries])
-
-  const setDraft = (id, key, value) => {
-    setDraftById((prev) => ({
-      ...prev,
-      [id]: {
-        ...(prev[id] || blankEntry),
-        [key]: value,
-      },
-    }))
-  }
-
-  const handleCreate = async () => {
-    setLocalError('')
-    try {
-      await onCreate(type, newEntry)
-      setNewEntry(blankEntry)
-    } catch (err) {
-      setLocalError(toMessage(err, `Failed to add ${type}`))
-    }
-  }
-
-  const handleUpdate = async (entryId) => {
-    setLocalError('')
-    try {
-      await onUpdate(entryId, draftById[entryId])
-    } catch (err) {
-      setLocalError(toMessage(err, `Failed to update ${type}`))
-    }
-  }
-
-  const handleDelete = async (entryId) => {
-    setLocalError('')
-    try {
-      await onDelete(entryId, type)
-    } catch (err) {
-      setLocalError(toMessage(err, `Failed to delete ${type}`))
-    }
-  }
-
-  const handleMove = async (entryId, direction) => {
-    const list = [...entries]
-    const currentIndex = list.findIndex((entry) => entry._id === entryId)
-    const targetIndex = currentIndex + direction
-
-    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= list.length) {
-      return
-    }
-
-    const swapped = [...list]
-    ;[swapped[currentIndex], swapped[targetIndex]] = [
-      swapped[targetIndex],
-      swapped[currentIndex],
-    ]
-
-    const items = swapped.map((entry, index) => ({ id: entry._id, order: index }))
-
-    setLocalError('')
-    try {
-      await onReorder(type, items)
-    } catch (err) {
-      setLocalError(toMessage(err, `Failed to reorder ${type} entries`))
-    }
-  }
-
-  return (
-    <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-          {title}
-        </h3>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => onRefresh(type)}
-          className="h-8 gap-2 rounded-md text-[10px] font-bold uppercase tracking-wider"
-        >
-          <RefreshCcw className="h-3.5 w-3.5" />
-          Refresh List
-        </Button>
-      </div>
-
-      {(localError || error) ? (
-        <div className="mb-4 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-          {localError || error}
-        </div>
-      ) : null}
-
-      <div className="mb-5 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
-        <Input
-          value={newEntry.name}
-          onChange={(event) =>
-            setNewEntry((prev) => ({ ...prev, name: event.target.value }))
-          }
-          placeholder="Name"
-          className="h-10 bg-white"
-        />
-        <Input
-          value={newEntry.url}
-          onChange={(event) =>
-            setNewEntry((prev) => ({ ...prev, url: event.target.value }))
-          }
-          placeholder="Website URL"
-          className="h-10 bg-white"
-        />
-        <Textarea
-          value={newEntry.description}
-          onChange={(event) =>
-            setNewEntry((prev) => ({ ...prev, description: event.target.value }))
-          }
-          placeholder="Description"
-          className="min-h-24 bg-white md:col-span-2"
-        />
-        <Input
-          value={newEntry.logoUrl}
-          onChange={(event) =>
-            setNewEntry((prev) => ({ ...prev, logoUrl: event.target.value }))
-          }
-          placeholder="Logo/Image URL"
-          className="h-10 bg-white"
-        />
-        <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-          <input
-            type="checkbox"
-            checked={newEntry.isPublished}
-            onChange={(event) =>
-              setNewEntry((prev) => ({ ...prev, isPublished: event.target.checked }))
-            }
-          />
-          Published
-        </label>
-
-        <Button
-          type="button"
-          onClick={handleCreate}
-          disabled={mutationStatus === 'loading' || !newEntry.name.trim()}
-          className="h-10 rounded-md bg-[#03385e] text-xs font-bold uppercase tracking-wider text-white hover:bg-[#022e4c] md:col-span-2"
-        >
-          Add {type}
-        </Button>
-      </div>
-
-      {fetchStatus === 'loading' ? (
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <LoaderCircle className="h-4 w-4 animate-spin" />
-          Loading {type} entries...
-        </div>
-      ) : entries.length === 0 ? (
-        <p className="text-sm text-slate-500">No {type} entries found.</p>
-      ) : (
-        <div className="space-y-4">
-          {entries.map((entry, index) => {
-            const draft = draftById[entry._id] || blankEntry
-
-            return (
-              <div key={entry._id} className="rounded-lg border border-slate-200 p-4">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    {type} #{index + 1}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleMove(entry._id, -1)}
-                      disabled={index === 0 || mutationStatus === 'loading'}
-                      className="h-8 w-8"
-                    >
-                      <ArrowUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleMove(entry._id, 1)}
-                      disabled={index === entries.length - 1 || mutationStatus === 'loading'}
-                      className="h-8 w-8"
-                    >
-                      <ArrowDown className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <Input
-                    value={draft.name}
-                    onChange={(event) => setDraft(entry._id, 'name', event.target.value)}
-                    placeholder="Name"
-                    className="h-10"
-                  />
-                  <Input
-                    value={draft.url}
-                    onChange={(event) => setDraft(entry._id, 'url', event.target.value)}
-                    placeholder="Website URL"
-                    className="h-10"
-                  />
-                  <Textarea
-                    value={draft.description}
-                    onChange={(event) =>
-                      setDraft(entry._id, 'description', event.target.value)
-                    }
-                    placeholder="Description"
-                    className="min-h-24 md:col-span-2"
-                  />
-                  <Input
-                    value={draft.logoUrl}
-                    onChange={(event) =>
-                      setDraft(entry._id, 'logoUrl', event.target.value)
-                    }
-                    placeholder="Logo/Image URL"
-                    className="h-10"
-                  />
-                  <label className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-600">
-                    <input
-                      type="checkbox"
-                      checked={draft.isPublished}
-                      onChange={(event) =>
-                        setDraft(entry._id, 'isPublished', event.target.checked)
-                      }
-                    />
-                    Published
-                  </label>
-                </div>
-
-                <div className="mt-3 flex items-center gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => handleUpdate(entry._id)}
-                    disabled={mutationStatus === 'loading'}
-                    className="h-8 gap-1 rounded-md bg-[#03385e] px-3 text-[10px] font-bold uppercase tracking-wider text-white"
-                  >
-                    <Save className="h-3.5 w-3.5" />
-                    Save
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(entry._id)}
-                    disabled={mutationStatus === 'loading'}
-                    className="h-8 gap-1 rounded-md px-3 text-[10px] font-bold uppercase tracking-wider"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
-
 const EditorPanel = ({
   activeSectionId,
   sections,
@@ -570,15 +271,6 @@ const EditorPanel = ({
   mediaUploadStatus,
   error,
   lastActionMessage,
-  partnerEntries,
-  resourceFetchStatusByType,
-  resourceMutationStatus,
-  resourceError,
-  onFetchEntriesByType,
-  onCreateEntry,
-  onUpdateEntry,
-  onDeleteEntry,
-  onReorderEntries,
 }) => {
   const currentSection = useMemo(
     () => sections?.find((section) => section.id === activeSectionId),
@@ -601,16 +293,6 @@ const EditorPanel = ({
     setDraftValues(sourceFields)
     setLocalError('')
   }, [activeSectionId, sourceFields])
-
-  useEffect(() => {
-    if (activeSectionId === 'partners.page' && resourceFetchStatusByType.partner === 'idle') {
-      onFetchEntriesByType('partner').catch(() => {})
-    }
-  }, [
-    activeSectionId,
-    onFetchEntriesByType,
-    resourceFetchStatusByType.partner,
-  ])
 
   const currentIndex = sections?.findIndex((section) => section.id === activeSectionId) ?? -1
   const nextSection = sections?.[currentIndex + 1]
@@ -768,10 +450,10 @@ const EditorPanel = ({
         publishedAt={currentSection.publishedAt || null}
       />
 
-      {(localError || error || resourceError) ? (
+      {(localError || error) ? (
         <div className="mb-6 flex items-start gap-3 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{localError || error || resourceError}</span>
+          <span>{localError || error}</span>
         </div>
       ) : null}
 
@@ -820,22 +502,6 @@ const EditorPanel = ({
             )
           })}
         </div>
-      ) : null}
-
-      {activeSectionId === 'partners.page' ? (
-        <ResourceEntriesEditor
-          type="partner"
-          title="Partner Entries"
-          entries={partnerEntries}
-          fetchStatus={resourceFetchStatusByType.partner}
-          mutationStatus={resourceMutationStatus}
-          error={resourceError}
-          onRefresh={onFetchEntriesByType}
-          onCreate={onCreateEntry}
-          onUpdate={onUpdateEntry}
-          onDelete={onDeleteEntry}
-          onReorder={onReorderEntries}
-        />
       ) : null}
 
       <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-8">
