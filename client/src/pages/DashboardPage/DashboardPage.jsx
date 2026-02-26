@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LoaderCircle, Menu, RefreshCw } from 'lucide-react';
+import { LoaderCircle, LogOut, Menu, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import EditorPanel from '@/components/dashboard/EditorPanel';
 import { useCmsDashboard } from '@/hooks/useCmsDashboard';
+import { clearAuthSession } from '@/lib/auth';
+import { axiosClient } from '@/lib/api/axiosClient';
 import {
   Sheet,
   SheetContent,
@@ -11,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
   const {
     sections,
     activeSectionId,
@@ -56,6 +60,17 @@ const DashboardPage = () => {
     refreshSections().catch(() => {
       // error state is handled in redux slice
     });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axiosClient.post('/api/auth/logout');
+    } catch {
+      // local session cleanup still runs even if backend logout fails
+    } finally {
+      clearAuthSession();
+      navigate('/login', { replace: true });
+    }
   };
 
   const pageTitle = useMemo(
@@ -147,6 +162,16 @@ const DashboardPage = () => {
                 ) : (
                   <RefreshCw className="h-4 w-4" />
                 )}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                className="h-8 w-8 rounded-sm border border-slate-200 text-slate-500 hover:bg-slate-50"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
