@@ -33,6 +33,7 @@ const DashboardPage = () => {
     publishAllSections,
     revertSection,
     uploadImage,
+    clearMessage,
     resourceEntries,
     partnerEntries,
     resourceFetchStatusByType,
@@ -232,6 +233,7 @@ const DashboardPage = () => {
                 mediaUploadStatus={mediaUploadStatus}
                 error={error}
                 lastActionMessage={lastActionMessage}
+                onClearMessage={clearMessage}
                 resourceEntries={resourceEntries}
                 partnerEntries={partnerEntries}
                 resourceFetchStatusByType={resourceFetchStatusByType}

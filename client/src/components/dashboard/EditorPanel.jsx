@@ -20,6 +20,8 @@ import { resolveAssetUrl } from '@/lib/api/cmsApi'
 
 const toMessage = (error, fallback) => {
   if (!error) return fallback
+  const apiMessage = error?.response?.data?.message || error?.response?.data?.error
+  if (typeof apiMessage === 'string' && apiMessage.trim()) return apiMessage
   if (typeof error === 'string') return error
   if (typeof error?.message === 'string') return error.message
   return fallback
@@ -271,6 +273,7 @@ const EditorPanel = ({
   mediaUploadStatus,
   error,
   lastActionMessage,
+  onClearMessage,
 }) => {
   const currentSection = useMemo(
     () => sections?.find((section) => section.id === activeSectionId),
@@ -291,8 +294,13 @@ const EditorPanel = ({
 
   useEffect(() => {
     setDraftValues(sourceFields)
+  }, [sourceFields])
+
+  useEffect(() => {
     setLocalError('')
-  }, [activeSectionId, sourceFields])
+    setLocalMessage('')
+    onClearMessage?.()
+  }, [activeSectionId, onClearMessage])
 
   const currentIndex = sections?.findIndex((section) => section.id === activeSectionId) ?? -1
   const nextSection = sections?.[currentIndex + 1]

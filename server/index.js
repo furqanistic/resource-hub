@@ -45,6 +45,23 @@ app.get('/health', (req, res) => {
   })
 })
 
+// Global error handler (always return JSON)
+app.use((err, _req, res, _next) => {
+  const statusCode =
+    err?.statusCode || (err?.code === 'LIMIT_FILE_SIZE' ? 413 : 500)
+  const status = err?.status || (String(statusCode).startsWith('4') ? 'fail' : 'error')
+  const message =
+    err?.message ||
+    (statusCode === 413
+      ? 'Image too large. Maximum allowed size is 2MB.'
+      : 'Something went wrong')
+
+  res.status(statusCode).json({
+    status,
+    message,
+  })
+})
+
 // Database connection
 const connect = () => {
   mongoose
