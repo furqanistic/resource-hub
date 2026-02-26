@@ -56,6 +56,24 @@ const DashboardPage = () => {
   const activePublishStatus = publishStatusById[activeSectionId] || 'idle';
   const activeRevertStatus = revertStatusById[activeSectionId] || 'idle';
   const isInitialLoading = fetchStatus === 'loading' && sections.length === 0;
+  const connectionState =
+    fetchStatus === 'succeeded'
+      ? 'connected'
+      : fetchStatus === 'failed'
+        ? 'disconnected'
+        : 'connecting';
+  const connectionLabel =
+    connectionState === 'connected'
+      ? 'Connected'
+      : connectionState === 'disconnected'
+        ? 'Disconnected'
+        : 'Connecting...';
+  const connectionDotClass =
+    connectionState === 'connected'
+      ? 'bg-emerald-500'
+      : connectionState === 'disconnected'
+        ? 'bg-rose-500'
+        : 'bg-amber-500 animate-pulse';
   const handleRefresh = () => {
     refreshSections().catch(() => {
       // error state is handled in redux slice
@@ -145,9 +163,9 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className={`h-2 w-2 rounded-full ${fetchStatus === 'loading' ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+              <div className={`h-2 w-2 rounded-full ${connectionDotClass}`} />
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {fetchStatus === 'loading' ? 'Syncing...' : 'Connected'}
+                {connectionLabel}
               </span>
               <Button
                 type="button"

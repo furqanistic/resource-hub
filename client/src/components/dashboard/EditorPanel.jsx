@@ -367,7 +367,7 @@ const EditorPanel = ({
         <SectionHeader
           id={activeSectionId}
           label={currentSection?.label || 'Unknown Section'}
-          description="This module is currently read-only or pending implementation."
+          description="This section is not configured in the current editor schema."
           isDraft={false}
           publishedAt={null}
         />
@@ -499,9 +499,6 @@ const EditorPanel = ({
         </Button>
 
         <div className="ml-auto flex items-center gap-3">
-          <span className="hidden text-xs font-medium italic text-slate-400 md:block">
-            Changes are staged locally until global publish.
-          </span>
           {nextSection ? (
             <Button
               type="button"
