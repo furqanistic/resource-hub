@@ -7,36 +7,31 @@ import {
   updateSection,
   uploadImage,
 } from '@/lib/api/cmsApi'
-import {
-  CMS_SECTION_DEFINITIONS,
-  CMS_SECTION_ORDER,
-  mergeSectionFields,
-} from '@/constants/cmsSections'
 
 const getErrorMessage = (error) =>
   error?.response?.data?.message || error?.message || 'Request failed'
+
+const normalizeMap = (value) => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  return Object.fromEntries(Object.entries(value).map(([key, val]) => [key, val ?? '']))
+}
 
 const normalizeSection = (section) => {
   const sectionId = section?.sectionId || section?.id
   if (!sectionId) return null
 
-  const fallback = CMS_SECTION_DEFINITIONS[sectionId]
-  const fields = mergeSectionFields(
-    sectionId,
-    section?.fields || section?.draftFields || {}
-  )
+  const fields = normalizeMap(section?.fields || section?.draftFields)
+  const draftFields = normalizeMap(section?.draftFields || section?.fields)
+  const publishedFields = normalizeMap(section?.publishedFields || section?.fields)
 
   return {
     id: sectionId,
     sectionId,
-    label: section?.label || fallback?.label || sectionId,
-    description: fallback?.description || '',
+    label: section?.label || sectionId,
+    description: section?.description || '',
     fields,
-    draftFields: mergeSectionFields(sectionId, section?.draftFields || fields),
-    publishedFields: mergeSectionFields(
-      sectionId,
-      section?.publishedFields || section?.fields || {}
-    ),
+    draftFields,
+    publishedFields,
     isDraft: Boolean(section?.isDraft),
     publishedAt: section?.publishedAt || null,
     updatedAt: section?.updatedAt || null,
@@ -119,8 +114,8 @@ export const uploadCmsImage = createAsyncThunk(
 
 const initialState = {
   sectionsById: {},
-  sectionOrder: CMS_SECTION_ORDER,
-  activeSectionId: CMS_SECTION_ORDER[0],
+  sectionOrder: [],
+  activeSectionId: '',
   fetchStatus: 'idle',
   saveStatusById: {},
   publishStatusById: {},
@@ -151,7 +146,15 @@ const cmsSlice = createSlice({
       })
       .addCase(fetchCmsSections.fulfilled, (state, action) => {
         state.fetchStatus = 'succeeded'
-        upsertSections(state, action.payload)
+        const sections = action.payload || []
+        upsertSections(state, sections)
+        state.sectionOrder = sections
+          .map((section) => section?.sectionId || section?.id)
+          .filter(Boolean)
+
+        if (!state.activeSectionId && state.sectionOrder.length > 0) {
+          state.activeSectionId = state.sectionOrder[0]
+        }
       })
       .addCase(fetchCmsSections.rejected, (state, action) => {
         state.fetchStatus = 'failed'
@@ -244,38 +247,16 @@ export const selectCmsState = (state) => state.cms
 
 export const selectCmsSections = (state) => {
   const cmsState = selectCmsState(state)
-  const ordered = cmsState.sectionOrder.map((sectionId) => {
-    const existing = cmsState.sectionsById[sectionId]
-    if (existing) return existing
 
-    const fallback = CMS_SECTION_DEFINITIONS[sectionId]
-    return {
-      id: sectionId,
-      sectionId,
-      label: fallback?.label || sectionId,
-      description: fallback?.description || '',
-      fields: mergeSectionFields(sectionId, {}),
-      draftFields: mergeSectionFields(sectionId, {}),
-      publishedFields: mergeSectionFields(sectionId, {}),
-      isDraft: false,
-      publishedAt: null,
-      updatedAt: null,
-    }
-  })
+  const ordered = cmsState.sectionOrder
+    .map((sectionId) => cmsState.sectionsById[sectionId])
+    .filter(Boolean)
 
   const remaining = Object.values(cmsState.sectionsById).filter(
     (section) => !cmsState.sectionOrder.includes(section.id)
   )
 
   return [...ordered, ...remaining]
-}
-
-export const selectActiveSection = (state) => {
-  const cmsState = selectCmsState(state)
-  const sections = selectCmsSections(state)
-  return (
-    sections.find((section) => section.id === cmsState.activeSectionId) || null
-  )
 }
 
 export default cmsSlice.reducer
