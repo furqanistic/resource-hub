@@ -20,6 +20,12 @@ const DashboardLayout = ({ children }) => {
     { name: t('nav.adminLogin'), path: '/admin/login' },
   ]
 
+  const dashboardLinks = [
+    { name: 'Home Editor', path: '/dashboard' },
+    { name: 'Resources Editor', path: '/dashboard/resources' },
+    { name: 'About Editor', path: '/dashboard/about' },
+  ]
+
   const isActive = (path) => location.pathname === path
 
   const handleLogout = () => {
@@ -38,21 +44,46 @@ const DashboardLayout = ({ children }) => {
             <h2 className="mt-2 text-lg font-semibold text-slate-900">Dashboard</h2>
           </div>
 
-          <nav className="flex-1 space-y-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={cn(
-                  'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
-                  isActive(link.path)
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
+          <nav className="flex-1 space-y-6">
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Dashboard
+              </p>
+              {dashboardLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={cn(
+                    'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
+                    isActive(link.path)
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Site
+              </p>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={cn(
+                    'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
+                    isActive(link.path)
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
           </nav>
 
           <button

@@ -16,8 +16,15 @@ const logos = [
 ];
 
 
-const Hero = () => {
+const Hero = ({ content }) => {
     const { t } = useLanguage();
+    const heroTitle = content?.heroTitle || t('home.heroTitle');
+    const heroDescription1 = content?.heroDescription1 || t('home.heroDescription1');
+    const heroDescription2 = content?.heroDescription2 || t('home.heroDescription2');
+    const heroCta = content?.heroCta || t('home.heroCta');
+    const heroImageAlt = content?.heroImageAlt || t('home.heroImageAlt');
+    const supportingPartnersLabel = content?.supportingPartnersLabel || t('home.supportingPartners');
+    const heroImageSrc = content?.heroImageUrl?.trim() ? content.heroImageUrl : heroImg;
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
@@ -48,15 +55,15 @@ const Hero = () => {
                             variants={fadeInUp}
                             className="max-w-xl text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-[-0.01em] text-[#03385e] mb-4 leading-[1.08]"
                         >
-                            {t('home.heroTitle')}
+                            {heroTitle}
                         </motion.h1>
 
                         <motion.div variants={fadeInUp} className="mb-6 sm:mb-8 space-y-3">
                             <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
-                                {t('home.heroDescription1')}
+                                {heroDescription1}
                             </p>
                             <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
-                                {t('home.heroDescription2')}
+                                {heroDescription2}
                             </p>
                         </motion.div>
 
@@ -68,7 +75,7 @@ const Hero = () => {
                                 size="default"
                                 className="group w-full sm:w-auto px-6 sm:px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
                             >
-                                {t('home.heroCta')}
+                                {heroCta}
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </motion.div>
@@ -87,8 +94,8 @@ const Hero = () => {
                             className="relative z-10 rounded-xl overflow-hidden shadow-xl border border-black/5"
                         >
                             <img
-                                src={heroImg}
-                                alt={t('home.heroImageAlt')}
+                                src={heroImageSrc}
+                                alt={heroImageAlt}
                                 className="w-full aspect-4/3 object-cover"
                             />
                         </motion.div>
@@ -97,7 +104,7 @@ const Hero = () => {
                 </div>
                 <div className="mt-12">
                     <p className="mb-4 text-center text-xs sm:text-sm font-semibold tracking-wide uppercase text-[#03385e]/70">
-                        {t('home.supportingPartners')}
+                        {supportingPartnersLabel}
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
                         {logos.map((logo, index) => (

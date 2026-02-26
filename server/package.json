@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "seed:admin": "node scripts/seedAdmin.js"
+    "seed:admin": "node scripts/seedAdmin.js",
+    "seed:home": "node scripts/seedHomeContent.js",
+    "seed:resources": "node scripts/seedResourcesContent.js",
+    "seed:about": "node scripts/seedAboutContent.js"
   },
   "keywords": [],
   "author": "",
