@@ -23,3 +23,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Uploaded media files (keep the folder via .gitkeep)
+uploads/*
+!uploads/.gitkeep
