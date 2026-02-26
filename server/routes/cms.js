@@ -6,6 +6,12 @@ import {
   updateSection,
   publishSection,
 } from '../controllers/cms.js'
+import {
+  getSectionHistory,
+  publishAllSections,
+  publishSectionById,
+  revertSection,
+} from '../controllers/publish.js'
 import { verifyToken, restrictTo } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
@@ -19,5 +25,9 @@ router.use(verifyToken, restrictTo('admin'))
 
 router.put('/sections/:id', updateSection)
 router.post('/sections/:id/publish', publishSection)
+router.post('/publish/all', publishAllSections)
+router.post('/publish/:sectionId', publishSectionById)
+router.post('/revert/:sectionId', revertSection)
+router.get('/history/:sectionId', getSectionHistory)
 
 export default router

@@ -1,17 +1,26 @@
 // File: server/controllers/cms.js
 import { createError } from '../error.js'
 import Section from '../models/Section.js'
+import {
+  formatEditorSection,
+  formatPublicSection,
+  getDraftFields,
+  getPublishedFields,
+  mapToObject,
+  stampPublishedSnapshot,
+} from '../utils/sectionState.js'
 
 // ─── GET /api/cms/sections ────────────────────────────────────────────────────
-// Public: returns all sections (published fields only for non-admins)
+// Public: returns published fields only.
 export const getAllSections = async (req, res, next) => {
   try {
     const sections = await Section.find({}).lean()
+    const formattedSections = sections.map(formatPublicSection)
 
     res.status(200).json({
       status: 'success',
-      results: sections.length,
-      data: { sections },
+      results: formattedSections.length,
+      data: { sections: formattedSections },
     })
   } catch (err) {
     console.error('Error in getAllSections:', err)
@@ -35,7 +44,7 @@ export const getSectionById = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      data: { section },
+      data: { section: formatPublicSection(section) },
     })
   } catch (err) {
     console.error('Error in getSectionById:', err)
@@ -44,34 +53,24 @@ export const getSectionById = async (req, res, next) => {
 }
 
 // ─── PUT /api/cms/sections/:id ────────────────────────────────────────────────
-// Admin only: upsert fields for a section
+// Admin only: saves to draftFields and marks section dirty.
 export const updateSection = async (req, res, next) => {
   try {
     const { fields, label } = req.body
 
-    if (!fields || typeof fields !== 'object') {
-      return next(createError(400, 'A "fields" object is required'))
+    const hasFieldsPayload = fields !== undefined
+    if (
+      hasFieldsPayload &&
+      (typeof fields !== 'object' || Array.isArray(fields) || fields === null)
+    ) {
+      return next(createError(400, '"fields" must be an object when provided'))
     }
 
-    const updateData = {
-      isDraft: true,
-      updatedBy: req.user._id,
+    if (!hasFieldsPayload && !label) {
+      return next(createError(400, 'Provide at least one of: "fields", "label"'))
     }
 
-    if (label) updateData.label = label
-
-    // Build a $set patch for each field key so we do a partial merge,
-    // not a full overwrite of the entire Map.
-    const fieldPatch = {}
-    for (const [key, val] of Object.entries(fields)) {
-      fieldPatch[`fields.${key}`] = val
-    }
-
-    const section = await Section.findOneAndUpdate(
-      { sectionId: req.params.id },
-      { $set: { ...updateData, ...fieldPatch } },
-      { new: true, runValidators: true, upsert: false }
-    )
+    const section = await Section.findOne({ sectionId: req.params.id })
 
     if (!section) {
       return next(
@@ -79,9 +78,40 @@ export const updateSection = async (req, res, next) => {
       )
     }
 
+    if (label) section.label = label.trim()
+
+    if (hasFieldsPayload) {
+      // Preserve legacy live content before first draft edit on migrated docs.
+      if (
+        Object.keys(mapToObject(section.publishedFields)).length === 0 &&
+        !section.publishedAt
+      ) {
+        section.publishedFields = getPublishedFields(section)
+      }
+
+      const currentDraft = getDraftFields(section)
+      const normalizedPatch = {}
+
+      for (const [key, val] of Object.entries(fields)) {
+        normalizedPatch[key] = val == null ? '' : String(val)
+      }
+
+      section.draftFields = {
+        ...currentDraft,
+        ...normalizedPatch,
+      }
+      // Keep Phase 1 compatibility for consumers that still read section.fields.
+      section.fields = section.draftFields
+    }
+
+    section.isDraft = true
+    section.updatedBy = req.user._id
+
+    await section.save()
+
     res.status(200).json({
       status: 'success',
-      data: { section },
+      data: { section: formatEditorSection(section) },
     })
   } catch (err) {
     console.error('Error in updateSection:', err)
@@ -90,20 +120,10 @@ export const updateSection = async (req, res, next) => {
 }
 
 // ─── POST /api/cms/sections/:id/publish ───────────────────────────────────────
-// Admin only: mark a section as published (clears draft flag, stamps publishedAt)
+// Admin only legacy endpoint for publishing a single section.
 export const publishSection = async (req, res, next) => {
   try {
-    const section = await Section.findOneAndUpdate(
-      { sectionId: req.params.id },
-      {
-        $set: {
-          isDraft: false,
-          publishedAt: new Date(),
-          updatedBy: req.user._id,
-        },
-      },
-      { new: true }
-    )
+    const section = await Section.findOne({ sectionId: req.params.id })
 
     if (!section) {
       return next(
@@ -111,10 +131,13 @@ export const publishSection = async (req, res, next) => {
       )
     }
 
+    stampPublishedSnapshot(section, req.user._id)
+    await section.save()
+
     res.status(200).json({
       status: 'success',
       message: `Section '${req.params.id}' published successfully`,
-      data: { section },
+      data: { section: formatEditorSection(section) },
     })
   } catch (err) {
     console.error('Error in publishSection:', err)
