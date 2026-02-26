@@ -170,6 +170,7 @@ const ImageField = ({ field, value, sourceValue, onChange, onUpload, isUploading
   const preview = resolveAssetUrl(value)
 
   const handleFileChange = async (event) => {
+    if (isUploading) return
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -195,42 +196,66 @@ const ImageField = ({ field, value, sourceValue, onChange, onUpload, isUploading
             alt={field.label || 'Uploaded asset'}
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/60 opacity-0 transition-opacity group-hover:opacity-100">
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => onChange(field.id, '')}
-                className="h-9 gap-2 rounded-md text-[10px] font-bold uppercase tracking-wider"
-              >
-                <X className="h-4 w-4" />
-                Remove
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="h-9 gap-2 rounded-md bg-[#03385e] px-4 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
-              >
-                <UploadCloud className="h-4 w-4" />
-                Replace
-              </Button>
-            </div>
+          <div
+            className={cn(
+              'absolute inset-0 flex items-center justify-center bg-slate-900/60 transition-opacity',
+              isUploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            )}
+          >
+            {isUploading ? (
+              <div className="flex items-center gap-2 rounded-md bg-black/30 px-3 py-2 text-xs font-medium text-white">
+                <LoaderCircle className="h-4 w-4 animate-spin" />
+                Uploading image...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onChange(field.id, '')}
+                  className="h-9 gap-2 rounded-md text-[10px] font-bold uppercase tracking-wider"
+                  disabled={isUploading}
+                >
+                  <X className="h-4 w-4" />
+                  Remove
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-9 gap-2 rounded-md bg-[#03385e] px-4 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[#03385e]/90"
+                  disabled={isUploading}
+                >
+                  <UploadCloud className="h-4 w-4" />
+                  Replace
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="group flex aspect-3/1 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-[#03385e]/50 bg-white transition-colors hover:border-[#03385e] hover:bg-slate-50/50"
+          disabled={isUploading}
+          className={cn(
+            'group flex aspect-3/1 w-full flex-col items-center justify-center rounded-md border-2 border-dashed border-[#03385e]/50 bg-white transition-colors hover:border-[#03385e] hover:bg-slate-50/50',
+            isUploading ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'
+          )}
         >
           <div className="flex flex-col items-center gap-3 py-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#03385e] group-hover:text-white">
-              <ImagePlus className="h-6 w-6" />
+              {isUploading ? (
+                <LoaderCircle className="h-6 w-6 animate-spin text-[#03385e]" />
+              ) : (
+                <ImagePlus className="h-6 w-6" />
+              )}
             </div>
             <div className="text-center px-4">
-              <p className="text-sm font-bold text-slate-900">Click to upload image</p>
+              <p className="text-sm font-bold text-slate-900">
+                {isUploading ? 'Uploading image...' : 'Click to upload image'}
+              </p>
               <p className="mt-1 text-xs text-slate-400">
                 Supports JPG, PNG, GIF, WEBP, SVG (Max 2MB)
               </p>
@@ -245,6 +270,7 @@ const ImageField = ({ field, value, sourceValue, onChange, onUpload, isUploading
         onChange={handleFileChange}
         accept="image/*"
         className="hidden"
+        disabled={isUploading}
       />
 
       {isUploading ? (
