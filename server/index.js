@@ -6,6 +6,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import dns from 'dns'
 import authRoute from './routes/auth.js'
+import cmsRoute from './routes/cms.js'
 
 const app = express()
 dotenv.config({ quiet: true })
@@ -26,6 +27,7 @@ app.use(
 
 // Routes
 app.use('/api/auth/', authRoute)
+app.use('/api/cms', cmsRoute)
 
 // Health check endpoint
 app.get('/health', (req, res) => {
