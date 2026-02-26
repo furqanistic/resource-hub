@@ -3,9 +3,10 @@ import Navbar from '@/components/Navbar';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Building2, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { ArrowUpRight, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getSections } from '@/lib/api/cmsApi';
 
 import arborHealthLogo from '@/assets/Brand/Arbon Health.png';
 import bhrLogo from '@/assets/Brand/Behavioral Health Resources BHR.png';
@@ -26,7 +27,7 @@ import wahLogo from '@/assets/Brand/Wahkiakum County.png';
 import dohLogo from '@/assets/Brand/Washington State Department of Health (DOH).png';
 import hcaLogo from '@/assets/Brand/Washington State Health Care Authority (HCA).png';
 
-const partners = [
+const basePartners = [
     { name: 'RiverCities Transit', logo: rctLogo, url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.', descriptionEs: 'RiverCities Transit – Estamos aquí para llevarte allí.' },
     { name: 'Washington State Health Care Authority (HCA)', logo: hcaLogo, url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority', descriptionEs: 'Inicio | Autoridad de Atención Médica del Estado de Washington' },
     {
@@ -172,6 +173,37 @@ const PartnersPage = () => {
     const { t, language } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null);
+    const [partnerFields, setPartnerFields] = useState({});
+
+    useEffect(() => {
+        let active = true;
+
+        getSections()
+            .then((sections) => {
+                if (!active || !Array.isArray(sections)) return;
+                const partnersSection = sections.find(
+                    (section) => (section?.sectionId || section?.id) === 'partners.page'
+                );
+                setPartnerFields(partnersSection?.fields || {});
+            })
+            .catch(() => {});
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const partners = useMemo(() => {
+        return basePartners.map((partner, index) => ({
+            ...partner,
+            name: partnerFields[`partner-name-${index}`] || partner.name,
+            url: partnerFields[`partner-url-${index}`] || partner.url,
+            logo: partnerFields[`partner-logo-${index}`] || partner.logo,
+            description: partnerFields[`partner-description-${index}`] || partner.description,
+            descriptionEs:
+                partnerFields[`partner-description-es-${index}`] || partner.descriptionEs,
+        }));
+    }, [partnerFields]);
 
     const toggleExpanded = (e, index) => {
         e.preventDefault();
@@ -187,7 +219,7 @@ const PartnersPage = () => {
             return p.name.toLowerCase().includes(query) ||
                 (description && description.toLowerCase().includes(query));
         });
-    }, [language, searchQuery]);
+    }, [language, searchQuery, partners]);
 
     return (
         <div className="min-h-screen bg-[#fcfdfe] text-[#03385e] flex flex-col font-sans selection:bg-[#b1ccdf]/30">
