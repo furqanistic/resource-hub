@@ -1,49 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Menu } from 'lucide-react';
+import { LoaderCircle, Menu, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import EditorPanel from '@/components/dashboard/EditorPanel';
+import { useCmsDashboard } from '@/hooks/useCmsDashboard';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const dashboardSections = [
-  {
-    id: 'home.hero',
-    label: 'Home Hero',
-    status: 'ready',
-    description: 'Title, description, CTA and hero image',
-  },
-  {
-    id: 'home.regional',
-    label: 'Home Regional',
-    status: 'ready',
-    description: 'Regional partners text and map block',
-  },
-  {
-    id: 'about.page',
-    label: 'About Page',
-    status: 'ready',
-    description: 'Headings and paragraphs',
-  },
-  {
-    id: 'resources.page',
-    label: 'Resources Page',
-    status: 'ready',
-    description: 'Resource cards and links',
-  },
-  {
-    id: 'partners.page',
-    label: 'Partners Page',
-    status: 'ready',
-    description: 'Partner cards, logo and descriptions',
-  },
-];
-
 const DashboardPage = () => {
-  const [activeSectionId, setActiveSectionId] = useState('home.hero');
+  const {
+    sections,
+    activeSectionId,
+    fetchStatus,
+    saveStatusById,
+    publishStatusById,
+    revertStatusById,
+    publishAllStatus,
+    mediaUploadStatus,
+    error,
+    lastActionMessage,
+    selectSection,
+    refreshSections,
+    saveDraft,
+    publishSection,
+    publishAllSections,
+    revertSection,
+    uploadImage,
+  } = useCmsDashboard();
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -53,20 +40,38 @@ const DashboardPage = () => {
     root.classList.add('light');
   }, []);
 
+  useEffect(() => {
+    if (!sections.length) return;
+    const isActiveValid = sections.some((section) => section.id === activeSectionId);
+    if (!isActiveValid) {
+      selectSection(sections[0].id);
+    }
+  }, [sections, activeSectionId, selectSection]);
+
+  const activeSaveStatus = saveStatusById[activeSectionId] || 'idle';
+  const activePublishStatus = publishStatusById[activeSectionId] || 'idle';
+  const activeRevertStatus = revertStatusById[activeSectionId] || 'idle';
+  const isInitialLoading = fetchStatus === 'loading' && sections.length === 0;
+  const handleRefresh = () => {
+    refreshSections().catch(() => {
+      // error state is handled in redux slice
+    });
+  };
+
   const pageTitle = useMemo(
     () =>
-      dashboardSections.find((item) => item.id === activeSectionId)?.label ??
+      sections.find((item) => item.id === activeSectionId)?.label ??
       'Dashboard',
-    [activeSectionId]
+    [sections, activeSectionId]
   );
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
       {/* Sidebar - Full Height */}
       <DashboardSidebar
-        sections={dashboardSections}
+        sections={sections}
         activeSectionId={activeSectionId}
-        onSelectSection={setActiveSectionId}
+        onSelectSection={selectSection}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
       />
@@ -98,10 +103,10 @@ const DashboardPage = () => {
                       </div>
                       <div className="flex-1 overflow-y-auto pt-4">
                         <DashboardSidebar
-                          sections={dashboardSections}
+                          sections={sections}
                           activeSectionId={activeSectionId}
                           onSelectSection={(id) => {
-                            setActiveSectionId(id);
+                            selectSection(id);
                             setIsMobileMenuOpen(false);
                           }}
                           isCollapsed={false}
@@ -125,10 +130,24 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <div className={`h-2 w-2 rounded-full ${fetchStatus === 'loading' ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Auto-saving enabled
+                {fetchStatus === 'loading' ? 'Syncing...' : 'Connected'}
               </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleRefresh}
+                className="h-8 w-8 rounded-sm border border-slate-200 text-slate-500 hover:bg-slate-50"
+                title="Refresh CMS content"
+              >
+                {fetchStatus === 'loading' ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
             </div>
           </div>
         </header>
@@ -136,11 +155,32 @@ const DashboardPage = () => {
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto bg-slate-50/50 p-8">
           <div className="mx-auto max-w-6xl">
-            <EditorPanel
-              activeSectionId={activeSectionId}
-              sections={dashboardSections}
-              onSelectSection={setActiveSectionId}
-            />
+            {isInitialLoading ? (
+              <div className="flex min-h-[45vh] items-center justify-center rounded-xl border border-slate-200 bg-white p-8">
+                <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
+                  <LoaderCircle className="h-5 w-5 animate-spin text-[#03385e]" />
+                  Loading CMS sections...
+                </div>
+              </div>
+            ) : (
+              <EditorPanel
+                activeSectionId={activeSectionId}
+                sections={sections}
+                onSelectSection={selectSection}
+                onSaveDraft={saveDraft}
+                onPublishSection={publishSection}
+                onPublishAll={publishAllSections}
+                onRevertSection={revertSection}
+                onUploadImage={uploadImage}
+                saveStatus={activeSaveStatus}
+                publishStatus={activePublishStatus}
+                revertStatus={activeRevertStatus}
+                publishAllStatus={publishAllStatus}
+                mediaUploadStatus={mediaUploadStatus}
+                error={error}
+                lastActionMessage={lastActionMessage}
+              />
+            )}
           </div>
         </main>
       </div>
