@@ -10,6 +10,7 @@ node_modules/
 /build
 /dist
 client/dist/
+server/uploads/
 # Misc
 .DS_Store
 *.pem

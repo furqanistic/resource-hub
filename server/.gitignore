@@ -24,6 +24,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Uploaded media files (keep the folder via .gitkeep)
-uploads/*
-!uploads/.gitkeep
+# Uploaded media files
+uploads/

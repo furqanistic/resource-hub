@@ -5,6 +5,7 @@
 // Swappable to Cloudinary / S3 by replacing the storage engine later.
 
 import multer from 'multer'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createError } from '../error.js'
@@ -14,6 +15,7 @@ const __dirname = path.dirname(__filename)
 
 // Ensure uploads land in server/uploads/ regardless of cwd
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads')
+fs.mkdirSync(UPLOADS_DIR, { recursive: true })
 
 // ── Storage engine ────────────────────────────────────────────────────────────
 const storage = multer.diskStorage({
