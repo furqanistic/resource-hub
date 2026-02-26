@@ -9,6 +9,7 @@ import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import DashboardPage from '@/pages/DashboardPage/DashboardPage'
+import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -33,6 +34,7 @@ const App = () => {
               <Route path='/resources' element={<ResourcesPage />} />
               <Route path='/about' element={<AboutPage />} />
               <Route path='/partners' element={<PartnersPage />} />
+              <Route path='/admin/login' element={<AdminLoginPage />} />
               <Route path='/dashboard' element={<DashboardPage />} />
             </Route>
           </Routes>

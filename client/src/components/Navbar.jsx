@@ -15,6 +15,7 @@ const Navbar = () => {
         { name: t('nav.resources'), path: '/resources' },
         { name: t('nav.about'), path: '/about' },
         { name: t('nav.partners'), path: '/partners' },
+        { name: t('nav.adminLogin'), path: '/admin/login' },
     ];
 
     const isActive = (path) => location.pathname === path;
