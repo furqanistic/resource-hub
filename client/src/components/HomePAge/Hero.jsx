@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveAssetUrl } from '@/lib/api/cmsApi';
 
 import gcrLogo from '@/assets/Brand/Greater Columbia River Behavioral Health Administrative Services Organization (GCRBHASO).png';
 import cwcogLogo from '@/assets/Brand/Coastal Washington Council of Governments (CWCOG).png';
@@ -16,8 +17,15 @@ const logos = [
 ];
 
 
-const Hero = () => {
+const Hero = ({ fields = {} }) => {
     const { t } = useLanguage();
+
+    const heroTitle = fields['hero-title'] || t('home.heroTitle');
+    const heroDescription1 = fields['hero-description1'] || t('home.heroDescription1');
+    const heroDescription2 = fields['hero-description2'] || t('home.heroDescription2');
+    const heroCta = fields['hero-cta'] || t('home.heroCta');
+    const heroImage = resolveAssetUrl(fields['hero-image']) || heroImg;
+
     const fadeInUp = {
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
@@ -48,15 +56,15 @@ const Hero = () => {
                             variants={fadeInUp}
                             className="max-w-xl text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-[-0.01em] text-[#03385e] mb-4 leading-[1.08]"
                         >
-                            {t('home.heroTitle')}
+                            {heroTitle}
                         </motion.h1>
 
                         <motion.div variants={fadeInUp} className="mb-6 sm:mb-8 space-y-3">
                             <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
-                                {t('home.heroDescription1')}
+                                {heroDescription1}
                             </p>
                             <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
-                                {t('home.heroDescription2')}
+                                {heroDescription2}
                             </p>
                         </motion.div>
 
@@ -68,7 +76,7 @@ const Hero = () => {
                                 size="default"
                                 className="group w-full sm:w-auto px-6 sm:px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
                             >
-                                {t('home.heroCta')}
+                                {heroCta}
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </motion.div>
@@ -87,7 +95,7 @@ const Hero = () => {
                             className="relative z-10 rounded-xl overflow-hidden shadow-xl border border-black/5"
                         >
                             <img
-                                src={heroImg}
+                                src={heroImage}
                                 alt={t('home.heroImageAlt')}
                                 className="w-full aspect-4/3 object-cover"
                             />

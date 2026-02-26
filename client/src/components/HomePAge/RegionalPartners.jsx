@@ -3,9 +3,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import waMap from '@/assets/wa-map.avif';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveAssetUrl } from '@/lib/api/cmsApi';
 
-const RegionalPartners = () => {
+const RegionalPartners = ({ fields = {} }) => {
     const { t } = useLanguage();
+    const regionalTitleLine1 = fields['regional-title-1'] || t('home.regionalTitleLine1');
+    const regionalTitleLine2 = fields['regional-title-2'] || t('home.regionalTitleLine2');
+    const regionalP1 = fields['regional-p1'] || t('home.regionalP1');
+    const regionalP2 = fields['regional-p2'] || t('home.regionalP2');
+    const regionalImage = resolveAssetUrl(fields['regional-image']) || waMap;
+
     return (
         <section className="py-20 bg-white overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,17 +27,17 @@ const RegionalPartners = () => {
                         className="flex flex-col gap-6"
                     >
                         <h2 className="text-4xl sm:text-5xl font-semibold text-black leading-tight">
-                            {t('home.regionalTitleLine1')}
+                            {regionalTitleLine1}
                             <br />
-                            {t('home.regionalTitleLine2')}
+                            {regionalTitleLine2}
                         </h2>
 
                         <div className="text-black text-base sm:text-lg leading-relaxed max-w-xl space-y-4">
                             <p>
-                                {t('home.regionalP1')}
+                                {regionalP1}
                             </p>
                             <p>
-                                {t('home.regionalP2')}
+                                {regionalP2}
                             </p>
                             <p>
                                 {t('home.regionalP3')}
@@ -48,7 +55,7 @@ const RegionalPartners = () => {
                     >
                         <div className="relative">
                             <img
-                                src={waMap}
+                                src={regionalImage}
                                 alt={t('home.regionalMapAlt')}
                                 className="w-full h-auto object-contain"
                             />
