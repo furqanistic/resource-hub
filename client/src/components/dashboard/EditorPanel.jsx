@@ -570,7 +570,6 @@ const EditorPanel = ({
   mediaUploadStatus,
   error,
   lastActionMessage,
-  resourceEntries,
   partnerEntries,
   resourceFetchStatusByType,
   resourceMutationStatus,
@@ -604,17 +603,12 @@ const EditorPanel = ({
   }, [activeSectionId, sourceFields])
 
   useEffect(() => {
-    if (activeSectionId === 'resources.page' && resourceFetchStatusByType.resource === 'idle') {
-      onFetchEntriesByType('resource').catch(() => {})
-    }
-
     if (activeSectionId === 'partners.page' && resourceFetchStatusByType.partner === 'idle') {
       onFetchEntriesByType('partner').catch(() => {})
     }
   }, [
     activeSectionId,
     onFetchEntriesByType,
-    resourceFetchStatusByType.resource,
     resourceFetchStatusByType.partner,
   ])
 
@@ -826,22 +820,6 @@ const EditorPanel = ({
             )
           })}
         </div>
-      ) : null}
-
-      {activeSectionId === 'resources.page' ? (
-        <ResourceEntriesEditor
-          type="resource"
-          title="Resource Entries"
-          entries={resourceEntries}
-          fetchStatus={resourceFetchStatusByType.resource}
-          mutationStatus={resourceMutationStatus}
-          error={resourceError}
-          onRefresh={onFetchEntriesByType}
-          onCreate={onCreateEntry}
-          onUpdate={onUpdateEntry}
-          onDelete={onDeleteEntry}
-          onReorder={onReorderEntries}
-        />
       ) : null}
 
       {activeSectionId === 'partners.page' ? (
