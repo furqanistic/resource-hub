@@ -1,14 +1,15 @@
+// File: server/index.js
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
-
+import dns from 'dns'
 import authRoute from './routes/auth.js'
 
 const app = express()
 dotenv.config({ quiet: true })
-
+dns.setServers(['8.8.8.8', '1.1.1.1'])
 app.use(cookieParser())
 app.use(express.json())
 app.use(
