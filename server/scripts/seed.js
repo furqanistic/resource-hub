@@ -96,7 +96,15 @@ const seed = async () => {
         console.log(`⏭  Skipped '${data.sectionId}' — already exists`)
         skipped++
       } else {
-        await Section.create(data)
+        const now = new Date()
+        await Section.create({
+          ...data,
+          draftFields: data.fields,
+          publishedFields: data.fields,
+          isDraft: false,
+          publishedAt: now,
+          history: [{ fields: data.fields, savedAt: now, savedBy: null }],
+        })
         console.log(`✅ Seeded  '${data.sectionId}'`)
         created++
       }
