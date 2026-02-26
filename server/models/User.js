@@ -48,7 +48,7 @@ const UserSchema = new mongoose.Schema(
 )
 
 // Indexes for better performance
-UserSchema.index({ email: 1 })
+// Note: email index is already created by `unique: true` on the field definition
 UserSchema.index({ isDeleted: 1, isActive: 1 })
 
 // Pre-save middleware to hash password

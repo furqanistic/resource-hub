@@ -1,18 +1,18 @@
-import React, { useMemo, useState } from 'react'
-import { Eye, EyeOff, LoaderCircle, Lock, Mail } from 'lucide-react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { axiosClient } from '@/lib/api/axiosClient'
 import { isAuthenticated, setAuthSession } from '@/lib/auth'
+import { Eye, EyeOff, LoaderCircle, Lock, Mail } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const [email, setEmail] = useState('admin@resourcehub.local')
-  const [password, setPassword] = useState('Admin@12345')
+  const [email, setEmail] = useState('admin@cwcog.org')
+  const [password, setPassword] = useState('password123')
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -145,8 +145,8 @@ const LoginPage = () => {
 
         <div className="mt-6 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
           <p className="font-bold uppercase tracking-wider text-slate-500">Dev Credentials</p>
-          <p className="mt-1">Email: admin@resourcehub.local</p>
-          <p>Password: Admin@12345</p>
+          <p className="mt-1">Email: admin@cwcog.org</p>
+          <p>Password: password123</p>
         </div>
       </div>
     </div>

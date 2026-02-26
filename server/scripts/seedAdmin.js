@@ -9,10 +9,10 @@ dotenv.config({ quiet: true })
 dns.setServers(['8.8.8.8', '1.1.1.1'])
 
 const ADMIN_NAME = process.env.SEED_ADMIN_NAME || 'Resource Hub Admin'
-const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL || 'admin@resourcehub.local')
+const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL || 'admin@cwcog.org')
   .toLowerCase()
   .trim()
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'Admin@12345'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'password123'
 
 const run = async () => {
   try {

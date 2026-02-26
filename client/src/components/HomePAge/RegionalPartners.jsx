@@ -11,6 +11,7 @@ const RegionalPartners = ({ fields = {} }) => {
     const regionalTitleLine2 = fields['regional-title-2'] || t('home.regionalTitleLine2');
     const regionalP1 = fields['regional-p1'] || t('home.regionalP1');
     const regionalP2 = fields['regional-p2'] || t('home.regionalP2');
+    const regionalP3 = fields['regional-p3'] || t('home.regionalP3');
     const regionalImage = resolveAssetUrl(fields['regional-image']) || waMap;
 
     return (
@@ -40,7 +41,7 @@ const RegionalPartners = ({ fields = {} }) => {
                                 {regionalP2}
                             </p>
                             <p>
-                                {t('home.regionalP3')}
+                                {regionalP3}
                             </p>
                         </div>
                     </motion.div>

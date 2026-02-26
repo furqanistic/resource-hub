@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "seed:admin": "node scripts/seedAdmin.js"
+    "seed:admin": "node scripts/seedAdmin.js",
+    "seed:cms-static": "node scripts/seedStaticCms.js"
   },
   "keywords": [],
   "author": "",

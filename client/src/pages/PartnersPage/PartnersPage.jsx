@@ -27,7 +27,7 @@ import wahLogo from '@/assets/Brand/Wahkiakum County.png';
 import dohLogo from '@/assets/Brand/Washington State Department of Health (DOH).png';
 import hcaLogo from '@/assets/Brand/Washington State Health Care Authority (HCA).png';
 
-const basePartners = [
+export const basePartners = [
     { name: 'RiverCities Transit', logo: rctLogo, url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.', descriptionEs: 'RiverCities Transit – Estamos aquí para llevarte allí.' },
     { name: 'Washington State Health Care Authority (HCA)', logo: hcaLogo, url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority', descriptionEs: 'Inicio | Autoridad de Atención Médica del Estado de Washington' },
     {

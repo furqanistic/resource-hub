@@ -2,7 +2,9 @@
 import express from 'express'
 import {
   getAllSections,
+  getAllSectionsForAdmin,
   getSectionById,
+  getSectionByIdForAdmin,
   updateSection,
   publishSection,
 } from '../controllers/cms.js'
@@ -23,6 +25,8 @@ router.get('/sections/:id', getSectionById)
 // ── Admin-only routes ─────────────────────────────────────────────────────────
 router.use(verifyToken, restrictTo('admin'))
 
+router.get('/admin/sections', getAllSectionsForAdmin)
+router.get('/admin/sections/:id', getSectionByIdForAdmin)
 router.put('/sections/:id', updateSection)
 router.post('/sections/:id/publish', publishSection)
 router.post('/publish/all', publishAllSections)

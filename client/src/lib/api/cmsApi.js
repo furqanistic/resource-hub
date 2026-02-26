@@ -6,12 +6,19 @@ const getData = (response) => response?.data?.data || {}
 export const resolveAssetUrl = (value) => {
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) return value
-  if (value.startsWith('/')) return `${API_BASE_URL}${value}`
+  if (value.startsWith('/assets/')) return value
+  if (value.startsWith('/uploads/')) return `${API_BASE_URL}${value}`
+  if (value.startsWith('/')) return value
   return `${API_BASE_URL}/${value}`
 }
 
 export const getSections = async () => {
   const response = await axiosClient.get('/api/cms/sections')
+  return getData(response).sections || []
+}
+
+export const getAdminSections = async () => {
+  const response = await axiosClient.get('/api/cms/admin/sections')
   return getData(response).sections || []
 }
 

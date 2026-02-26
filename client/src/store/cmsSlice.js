@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
-  getSections,
+  getAdminSections,
   publishAll,
   publishSection,
   revertSection,
@@ -50,7 +50,7 @@ export const fetchCmsSections = createAsyncThunk(
   'cms/fetchCmsSections',
   async (_, { rejectWithValue }) => {
     try {
-      return await getSections()
+      return await getAdminSections()
     } catch (error) {
       return rejectWithValue(getErrorMessage(error))
     }

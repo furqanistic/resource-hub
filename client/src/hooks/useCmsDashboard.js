@@ -12,27 +12,11 @@ import {
   setActiveSectionId,
   uploadCmsImage,
 } from '@/store/cmsSlice'
-import {
-  createResource,
-  deleteResource,
-  fetchResourceEntries,
-  reorderResources,
-  selectEntriesByType,
-  selectResourcesState,
-  updateResource,
-} from '@/store/resourcesSlice'
 
 export const useCmsDashboard = () => {
   const dispatch = useDispatch()
   const cmsState = useSelector(selectCmsState)
   const sections = useSelector(selectCmsSections)
-  const resourcesState = useSelector(selectResourcesState)
-  const resourceEntries = useSelector((state) =>
-    selectEntriesByType(state, 'resource')
-  )
-  const partnerEntries = useSelector((state) =>
-    selectEntriesByType(state, 'partner')
-  )
 
   useEffect(() => {
     if (cmsState.fetchStatus === 'idle') {
@@ -83,31 +67,6 @@ export const useCmsDashboard = () => {
     [dispatch]
   )
 
-  const fetchEntriesByType = useCallback(
-    (type) => dispatch(fetchResourceEntries(type)).unwrap(),
-    [dispatch]
-  )
-
-  const createEntry = useCallback(
-    (type, payload) => dispatch(createResource({ type, payload })).unwrap(),
-    [dispatch]
-  )
-
-  const updateEntry = useCallback(
-    (id, payload) => dispatch(updateResource({ id, payload })).unwrap(),
-    [dispatch]
-  )
-
-  const deleteEntry = useCallback(
-    (id, type) => dispatch(deleteResource({ id, type })).unwrap(),
-    [dispatch]
-  )
-
-  const reorderEntries = useCallback(
-    (type, items) => dispatch(reorderResources({ type, items })).unwrap(),
-    [dispatch]
-  )
-
   return {
     sections,
     activeSectionId: cmsState.activeSectionId,
@@ -119,11 +78,6 @@ export const useCmsDashboard = () => {
     mediaUploadStatus: cmsState.mediaUploadStatus,
     error: cmsState.error,
     lastActionMessage: cmsState.lastActionMessage,
-    resourceEntries,
-    partnerEntries,
-    resourceFetchStatusByType: resourcesState.fetchStatusByType,
-    resourceMutationStatus: resourcesState.mutationStatus,
-    resourceError: resourcesState.error,
     selectSection,
     refreshSections,
     saveDraft,
@@ -132,10 +86,5 @@ export const useCmsDashboard = () => {
     revertSection,
     uploadImage,
     clearMessage,
-    fetchEntriesByType,
-    createEntry,
-    updateEntry,
-    deleteEntry,
-    reorderEntries,
   }
 }

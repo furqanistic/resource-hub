@@ -28,6 +28,24 @@ export const getAllSections = async (req, res, next) => {
   }
 }
 
+// ─── GET /api/cms/admin/sections ─────────────────────────────────────────────
+// Admin only: returns editor payload (draft + published snapshots).
+export const getAllSectionsForAdmin = async (req, res, next) => {
+  try {
+    const sections = await Section.find({}).lean()
+    const formattedSections = sections.map(formatEditorSection)
+
+    res.status(200).json({
+      status: 'success',
+      results: formattedSections.length,
+      data: { sections: formattedSections },
+    })
+  } catch (err) {
+    console.error('Error in getAllSectionsForAdmin:', err)
+    next(createError(500, 'Failed to fetch admin sections'))
+  }
+}
+
 // ─── GET /api/cms/sections/:id ────────────────────────────────────────────────
 // Public: returns a single section by its sectionId (e.g. 'home.hero')
 export const getSectionById = async (req, res, next) => {
@@ -49,6 +67,30 @@ export const getSectionById = async (req, res, next) => {
   } catch (err) {
     console.error('Error in getSectionById:', err)
     next(createError(500, 'Failed to fetch section'))
+  }
+}
+
+// ─── GET /api/cms/admin/sections/:id ─────────────────────────────────────────
+// Admin only: returns a single section with editor payload.
+export const getSectionByIdForAdmin = async (req, res, next) => {
+  try {
+    const section = await Section.findOne({
+      sectionId: req.params.id,
+    }).lean()
+
+    if (!section) {
+      return next(
+        createError(404, `Section '${req.params.id}' not found`)
+      )
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: { section: formatEditorSection(section) },
+    })
+  } catch (err) {
+    console.error('Error in getSectionByIdForAdmin:', err)
+    next(createError(500, 'Failed to fetch admin section'))
   }
 }
 
