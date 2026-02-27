@@ -1,6 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800'
+const resolveApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL
+  if (envUrl) {
+    return envUrl
+  }
+
+  if (import.meta.env.DEV) {
+    return 'http://localhost:8800'
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin
+  }
+
+  return 'http://localhost:8800'
+}
+
+const API_BASE_URL = resolveApiBaseUrl()
 
 export const loginAdmin = createAsyncThunk(
   'auth/loginAdmin',
@@ -31,7 +48,11 @@ export const loginAdmin = createAsyncThunk(
         token: data?.token || null,
       }
     } catch (error) {
-      return rejectWithValue(error?.message || 'Login failed')
+      const message =
+        error?.message === 'Failed to fetch'
+          ? 'Unable to reach server. Check your connection or API URL.'
+          : error?.message || 'Login failed'
+      return rejectWithValue(message)
     }
   }
 )
