@@ -24,6 +24,7 @@ const DashboardLayout = ({ children }) => {
     { name: 'Home Editor', path: '/dashboard' },
     { name: 'Resources Editor', path: '/dashboard/resources' },
     { name: 'About Editor', path: '/dashboard/about' },
+    { name: 'Partners Editor', path: '/dashboard/partners' },
   ]
 
   const isActive = (path) => location.pathname === path

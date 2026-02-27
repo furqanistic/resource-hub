@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Building2, ChevronDown, ChevronUp, ExternalLink, Search } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import axiosInstance from '@/lib/axiosInstance';
 
 import arborHealthLogo from '@/assets/Brand/Arbon Health.png';
 import bhrLogo from '@/assets/Brand/Behavioral Health Resources BHR.png';
@@ -26,12 +27,33 @@ import wahLogo from '@/assets/Brand/Wahkiakum County.png';
 import dohLogo from '@/assets/Brand/Washington State Department of Health (DOH).png';
 import hcaLogo from '@/assets/Brand/Washington State Health Care Authority (HCA).png';
 
-const partners = [
-    { name: 'RiverCities Transit', logo: rctLogo, url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.', descriptionEs: 'RiverCities Transit – Estamos aquí para llevarte allí.' },
-    { name: 'Washington State Health Care Authority (HCA)', logo: hcaLogo, url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority', descriptionEs: 'Inicio | Autoridad de Atención Médica del Estado de Washington' },
+const partnerLogos = {
+    rct: { src: rctLogo },
+    hca: { src: hcaLogo },
+    gcr: { src: gcrLogo },
+    chpw: { src: chpwLogo },
+    bhr: { src: bhrLogo },
+    para: { src: paraLogo },
+    wah: { src: wahLogo },
+    doh: { src: dohLogo },
+    ght: { src: ghtLogo },
+    dhr: { src: dhrLogo },
+    crhn: { src: crhnLogo },
+    arbor: { src: arborHealthLogo, className: 'invert' },
+    dhrw: { src: dhrwLogo },
+    ctanw: { src: ctanwLogo },
+    cim: { src: cimLogo },
+    coastalcap: { src: coastalCapLogo },
+    oa: { src: oaLogo },
+    cwcog: { src: cwcogLogo },
+};
+
+const defaultPartners = [
+    { name: 'RiverCities Transit', logoKey: 'rct', url: 'https://www.rctransit.org', description: 'RiverCities Transit – We are here, to get you there.', descriptionEs: 'RiverCities Transit – Estamos aquí para llevarte allí.' },
+    { name: 'Washington State Health Care Authority (HCA)', logoKey: 'hca', url: 'https://www.hca.wa.gov', description: 'Home | Washington State Health Care Authority', descriptionEs: 'Inicio | Autoridad de Atención Médica del Estado de Washington' },
     {
         name: 'Greater Columbia River Behavioral Health Administrative Services Organization (GCRBHASO)',
-        logo: gcrLogo,
+        logoKey: 'gcr',
         url: 'https://www.grbhaso.org',
         description: [
             'Great Rivers Behavioral Health Administrative Services Organization',
@@ -46,7 +68,7 @@ const partners = [
     },
     {
         name: 'Community Health Plan of Washington (CHPW)',
-        logo: chpwLogo,
+        logoKey: 'chpw',
         url: 'https://www.chpw.org',
         description: [
             'Home',
@@ -61,7 +83,7 @@ const partners = [
     },
     {
         name: 'Behavioral Health Resources (BHR)',
-        logo: bhrLogo,
+        logoKey: 'bhr',
         url: 'https://www.bhr.org',
         description: [
             'Home - Behavioral Health Resources',
@@ -74,13 +96,13 @@ const partners = [
             'Behavioral Health Resources - Ayudando a las personas a vivir vidas saludables',
         ].join('\n'),
     },
-    { name: 'Paratransit Services', logo: paraLogo, url: 'https://www.paratransit.net', description: ['Paratransit Services', 'Paratransit Services'].join('\n'), descriptionEs: ['Paratransit Services', 'Paratransit Services'].join('\n') },
-    { name: 'Wahkiakum County', logo: wahLogo, url: 'https://www.co.wahkiakum.wa.us', description: 'Wahkiakum County, WA | Official Website', descriptionEs: 'Condado de Wahkiakum, WA | Sitio web oficial' },
-    { name: 'Washington State Department of Health (DOH)', logo: dohLogo, url: 'https://doh.wa.gov', description: 'Washington State Department of Health', descriptionEs: 'Departamento de Salud del Estado de Washington' },
-    { name: 'Grays Harbor Transit', logo: ghtLogo, url: 'https://www.ghtransit.com', description: ['Grays Harbor Transit', 'Grays Harbor Transit Home Page'].join('\n'), descriptionEs: ['Grays Harbor Transit', 'Página de inicio de Grays Harbor Transit'].join('\n') },
+    { name: 'Paratransit Services', logoKey: 'para', url: 'https://www.paratransit.net', description: ['Paratransit Services', 'Paratransit Services'].join('\n'), descriptionEs: ['Paratransit Services', 'Paratransit Services'].join('\n') },
+    { name: 'Wahkiakum County', logoKey: 'wah', url: 'https://www.co.wahkiakum.wa.us', description: 'Wahkiakum County, WA | Official Website', descriptionEs: 'Condado de Wahkiakum, WA | Sitio web oficial' },
+    { name: 'Washington State Department of Health (DOH)', logoKey: 'doh', url: 'https://doh.wa.gov', description: 'Washington State Department of Health', descriptionEs: 'Departamento de Salud del Estado de Washington' },
+    { name: 'Grays Harbor Transit', logoKey: 'ght', url: 'https://www.ghtransit.com', description: ['Grays Harbor Transit', 'Grays Harbor Transit Home Page'].join('\n'), descriptionEs: ['Grays Harbor Transit', 'Página de inicio de Grays Harbor Transit'].join('\n') },
     {
         name: 'Destination Hope & Recovery',
-        logo: dhrLogo,
+        logoKey: 'dhr',
         url: 'https://www.destinationhopeandrecovery.com',
         description: [
             'Case Management Specialists | Destination Hope & Recovery | Washington',
@@ -95,7 +117,7 @@ const partners = [
     },
     {
         name: 'Cascade Regional Health Network (CRHN)',
-        logo: crhnLogo,
+        logoKey: 'crhn',
         url: 'https://www.crhn.org',
         description: [
             'CHOICE Regional Health Network | health equity | 724 Columbia Street Northwest, Olympia, WA, USA',
@@ -110,11 +132,11 @@ const partners = [
             'Inicio',
         ].join('\n'),
     },
-    { name: 'Arbor Health', logo: arborHealthLogo, url: 'https://www.myarborhealth.org', logoClass: 'invert', description: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.', descriptionEs: 'Arbor Health es su proveedor de atención médica comunitaria y ofrece una amplia gama de servicios médicos para apoyar su salud y bienestar.' },
-    { name: 'Disability Rights Washington (Disability Mobility Initiative)', logo: dhrwLogo, url: 'https://www.dr-wa.org', description: 'Advocating for the rights of people with disabilities and improving transportation accessibility across Washington state.', descriptionEs: 'Defendiendo los derechos de las personas con discapacidades y mejorando la accesibilidad del transporte en todo el estado de Washington.' },
+    { name: 'Arbor Health', logoKey: 'arbor', logoClass: 'invert', url: 'https://www.myarborhealth.org', description: 'Arbor Health is your community healthcare provider, offering a wide range of medical services to support your health and well-being.', descriptionEs: 'Arbor Health es su proveedor de atención médica comunitaria y ofrece una amplia gama de servicios médicos para apoyar su salud y bienestar.' },
+    { name: 'Disability Rights Washington (Disability Mobility Initiative)', logoKey: 'dhrw', url: 'https://www.dr-wa.org', description: 'Advocating for the rights of people with disabilities and improving transportation accessibility across Washington state.', descriptionEs: 'Defendiendo los derechos de las personas con discapacidades y mejorando la accesibilidad del transporte en todo el estado de Washington.' },
     {
         name: 'Community Transportation Association of the Northwest (CTANW)',
-        logo: ctanwLogo,
+        logoKey: 'ctanw',
         url: 'https://www.ctanw.org',
         description: [
             'Community Transportation Association of the Northwest',
@@ -125,12 +147,12 @@ const partners = [
             'CTANW brinda a nuestros miembros, socios y comunidades herramientas, recursos e información, y aboga por políticas y prácticas favorables para que puedan ofrecer igualdad de oportunidades y opciones de movilidad y transporte para todas las personas, en especial aquellas con necesidades de transporte especializado.',
         ].join('\n'),
     },
-    { name: 'Community in Motion', logo: cimLogo, url: 'https://www.communityinmotion.org', description: 'Welcome | Community in Motion: The means to stay mobile', descriptionEs: 'Bienvenido | Community in Motion: Los medios para mantenerse en movimiento' },
-    { name: 'Coastal Community Action Program (Coastal CAP)', logo: coastalCapLogo, url: 'https://www.coastalcap.org', description: 'Coastal Community Action Program | Part of the Community Action Network fighting to eliminate Poverty', descriptionEs: 'Coastal Community Action Program | Parte de la Community Action Network que lucha para eliminar la pobreza' },
-    { name: 'Olympic Ambulance', logo: oaLogo, url: 'https://www.olympicambulance.com', description: 'Providing professional medical transportation services with a focus on patient care and safety.', descriptionEs: 'Ofrece servicios profesionales de transporte médico con enfoque en la atención del paciente y la seguridad.' },
+    { name: 'Community in Motion', logoKey: 'cim', url: 'https://www.communityinmotion.org', description: 'Welcome | Community in Motion: The means to stay mobile', descriptionEs: 'Bienvenido | Community in Motion: Los medios para mantenerse en movimiento' },
+    { name: 'Coastal Community Action Program (Coastal CAP)', logoKey: 'coastalcap', url: 'https://www.coastalcap.org', description: 'Coastal Community Action Program | Part of the Community Action Network fighting to eliminate Poverty', descriptionEs: 'Coastal Community Action Program | Parte de la Community Action Network que lucha para eliminar la pobreza' },
+    { name: 'Olympic Ambulance', logoKey: 'oa', url: 'https://www.olympicambulance.com', description: 'Providing professional medical transportation services with a focus on patient care and safety.', descriptionEs: 'Ofrece servicios profesionales de transporte médico con enfoque en la atención del paciente y la seguridad.' },
     {
         name: 'Coastal Washington Council of Governments (CWCOG)',
-        logo: cwcogLogo,
+        logoKey: 'cwcog',
         url: 'https://www.cwcog.org',
         description: [
             'Cowlitz-Wahkiakum Council of Governments • CWCOG • Home',
@@ -172,6 +194,30 @@ const PartnersPage = () => {
     const { t, language } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null);
+    const [content, setContent] = useState(null);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchContent = async () => {
+            try {
+                const { data } = await axiosInstance.get('/content/partners');
+                if (isMounted) {
+                    setContent(data?.data?.content || null);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setContent(null);
+                }
+            }
+        };
+
+        fetchContent();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const toggleExpanded = (e, index) => {
         e.preventDefault();
@@ -180,14 +226,15 @@ const PartnersPage = () => {
     };
 
     const filteredPartners = useMemo(() => {
+        const partnerList = content?.partners?.length ? content.partners : defaultPartners;
         const query = searchQuery.trim().toLowerCase();
-        if (!query) return partners;
-        return partners.filter(p => {
+        if (!query) return partnerList;
+        return partnerList.filter(p => {
             const description = language === 'es' ? (p.descriptionEs || p.description) : p.description;
             return p.name.toLowerCase().includes(query) ||
                 (description && description.toLowerCase().includes(query));
         });
-    }, [language, searchQuery]);
+    }, [content, language, searchQuery]);
 
     return (
         <div className="min-h-screen bg-[#fcfdfe] text-[#03385e] flex flex-col font-sans selection:bg-[#b1ccdf]/30">
@@ -224,7 +271,11 @@ const PartnersPage = () => {
                                 exit={{ opacity: 0 }}
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                             >
-                                {filteredPartners.map((partner) => (
+                                {filteredPartners.map((partner, index) => {
+                                    const logoConfig = partner.logoKey ? partnerLogos[partner.logoKey] : null;
+                                    const logoSrc = partner.logoUrl?.trim() || logoConfig?.src || null;
+                                    const logoClassName = partner.logoClass || logoConfig?.className || '';
+                                    return (
                                     <motion.div
                                         key={partner.name}
                                         variants={itemVariants}
@@ -239,14 +290,23 @@ const PartnersPage = () => {
                                             <div className="p-5 flex flex-col h-full">
                                                 <div className="flex items-start justify-between gap-4 mb-4">
                                                     <div className="h-24 w-full flex items-center justify-center bg-[#f8fafc]/50 border border-black/[0.02] rounded-xl p-4 overflow-hidden">
-                                                        <img
-                                                            src={partner.logo}
-                                                            alt={partner.name}
-                                                            className={cn(
-                                                                "h-full w-full object-contain filter transition-transform duration-500 group-hover:scale-110",
-                                                                partner.logoClass || ''
-                                                            )}
-                                                        />
+                                                        {logoSrc ? (
+                                                            <img
+                                                                src={logoSrc}
+                                                                alt={partner.name}
+                                                                className={cn(
+                                                                    "h-full w-full object-contain filter transition-transform duration-500 group-hover:scale-110",
+                                                                    logoClassName
+                                                                )}
+                                                            />
+                                                        ) : (
+                                                            <div className="flex flex-col items-center gap-2 text-black/40">
+                                                                <Building2 className="h-8 w-8" />
+                                                                <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">
+                                                                    {partner.name}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -274,10 +334,10 @@ const PartnersPage = () => {
                                                             <div className="relative">
                                                                 <motion.p 
                                                                     initial={false}
-                                                                    animate={{ height: expandedIndex === partners.indexOf(partner) ? "auto" : "2.5rem" }}
+                                                                    animate={{ height: expandedIndex === index ? "auto" : "2.5rem" }}
                                                                     className={cn(
                                                                         "text-[13px] text-black/50 leading-relaxed overflow-hidden",
-                                                                        expandedIndex === partners.indexOf(partner) ? "" : "line-clamp-2"
+                                                                        expandedIndex === index ? "" : "line-clamp-2"
                                                                     )}
                                                                 >
                                                                     {description}
@@ -285,10 +345,10 @@ const PartnersPage = () => {
                                                                 
                                                                 {description.length > 80 && (
                                                                     <button
-                                                                        onClick={(e) => toggleExpanded(e, partners.indexOf(partner))}
+                                                                        onClick={(e) => toggleExpanded(e, index)}
                                                                         className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#03385e]/60 hover:text-[#03385e] transition-colors"
                                                                     >
-                                                                        {expandedIndex === partners.indexOf(partner) ? (
+                                                                        {expandedIndex === index ? (
                                                                             <>{t('partners.showLess')} <ChevronUp className="w-3 h-3" /></>
                                                                         ) : (
                                                                             <>{t('partners.readMore')} <ChevronDown className="w-3 h-3" /></>
@@ -313,7 +373,8 @@ const PartnersPage = () => {
                                             </div>
                                         </div>
                                     </motion.div>
-                                ))}
+                                );
+                                })}
                             </motion.div>
                         ) : (
                             <motion.div 

@@ -1,6 +1,7 @@
 import { createError } from '../error.js'
 import AboutPageContent from '../models/AboutPageContent.js'
 import HomePageContent from '../models/HomePageContent.js'
+import PartnersPageContent from '../models/PartnersPageContent.js'
 import ResourcesPageContent from '../models/ResourcesPageContent.js'
 
 export const getHomeContent = async (req, res, next) => {
@@ -219,5 +220,79 @@ export const updateAboutContent = async (req, res, next) => {
   } catch (error) {
     console.error('Error in updateAboutContent:', error)
     next(createError(500, 'Failed to update about page content'))
+  }
+}
+
+export const getPartnersContent = async (req, res, next) => {
+  try {
+    const content = await PartnersPageContent.findOne().sort({ updatedAt: -1 })
+
+    if (!content) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          content: null,
+        },
+      })
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        content,
+      },
+    })
+  } catch (error) {
+    console.error('Error in getPartnersContent:', error)
+    next(createError(500, 'Failed to load partners page content'))
+  }
+}
+
+export const updatePartnersContent = async (req, res, next) => {
+  try {
+    const { partners } = req.body
+
+    if (!Array.isArray(partners) || partners.length === 0) {
+      return next(createError(400, 'Please provide at least one partner'))
+    }
+
+    const normalizedPartners = partners.map((partner) => ({
+      name: partner?.name?.trim(),
+      url: partner?.url?.trim(),
+      description: partner?.description?.trim(),
+      descriptionEs: partner?.descriptionEs?.trim() || '',
+      logoKey: partner?.logoKey?.trim() || '',
+      logoUrl: partner?.logoUrl?.trim() || '',
+      logoClass: partner?.logoClass?.trim() || '',
+    }))
+
+    const hasInvalidPartner = normalizedPartners.some(
+      (partner) => !partner.name || !partner.url || !partner.description
+    )
+
+    if (hasInvalidPartner) {
+      return next(createError(400, 'Please complete all required partner fields'))
+    }
+
+    const updatedContent = await PartnersPageContent.findOneAndUpdate(
+      {},
+      { partners: normalizedPartners },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      }
+    )
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        content: updatedContent,
+      },
+    })
+  } catch (error) {
+    console.error('Error in updatePartnersContent:', error)
+    next(createError(500, 'Failed to update partners page content'))
   }
 }

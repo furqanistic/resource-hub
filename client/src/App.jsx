@@ -11,6 +11,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext'
 import DashboardPage from '@/pages/DashboardPage/DashboardPage'
 import DashboardResourcesPage from '@/pages/DashboardResourcesPage/DashboardResourcesPage'
 import DashboardAboutPage from '@/pages/DashboardAboutPage/DashboardAboutPage'
+import DashboardPartnersPage from '@/pages/DashboardPartnersPage/DashboardPartnersPage'
 import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
 
 const ScrollToTop = () => {
@@ -40,6 +41,7 @@ const App = () => {
               <Route path='/dashboard' element={<DashboardPage />} />
               <Route path='/dashboard/resources' element={<DashboardResourcesPage />} />
               <Route path='/dashboard/about' element={<DashboardAboutPage />} />
+              <Route path='/dashboard/partners' element={<DashboardPartnersPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

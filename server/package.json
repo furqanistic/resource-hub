@@ -9,7 +9,8 @@
     "seed:admin": "node scripts/seedAdmin.js",
     "seed:home": "node scripts/seedHomeContent.js",
     "seed:resources": "node scripts/seedResourcesContent.js",
-    "seed:about": "node scripts/seedAboutContent.js"
+    "seed:about": "node scripts/seedAboutContent.js",
+    "seed:partners": "node scripts/seedPartnersContent.js"
   },
   "keywords": [],
   "author": "",
