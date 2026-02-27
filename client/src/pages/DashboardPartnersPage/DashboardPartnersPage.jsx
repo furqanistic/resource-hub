@@ -2,28 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import axiosInstance from '@/lib/axiosInstance'
-
-const logoOptions = [
-  { value: '', label: 'No logo key' },
-  { value: 'rct', label: 'RiverCities Transit' },
-  { value: 'hca', label: 'Washington State HCA' },
-  { value: 'gcr', label: 'Great Rivers BH-ASO' },
-  { value: 'chpw', label: 'CHPW' },
-  { value: 'bhr', label: 'BHR' },
-  { value: 'para', label: 'Paratransit Services' },
-  { value: 'wah', label: 'Wahkiakum County' },
-  { value: 'doh', label: 'WA Department of Health' },
-  { value: 'ght', label: 'Grays Harbor Transit' },
-  { value: 'dhr', label: 'Destination Hope & Recovery' },
-  { value: 'crhn', label: 'CRHN' },
-  { value: 'arbor', label: 'Arbor Health' },
-  { value: 'dhrw', label: 'Disability Rights WA' },
-  { value: 'ctanw', label: 'CTANW' },
-  { value: 'cim', label: 'Community in Motion' },
-  { value: 'coastalcap', label: 'Coastal CAP' },
-  { value: 'oa', label: 'Olympic Ambulance' },
-  { value: 'cwcog', label: 'CWCOG' },
-]
+import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   partners: [
@@ -51,12 +30,38 @@ const emptyPartner = {
 
 const DashboardPartnersPage = () => {
   const { user, token } = useSelector((state) => state.auth)
+  const { t } = useLanguage()
   const [formValues, setFormValues] = useState(defaultContent)
   const [initialValues, setInitialValues] = useState(defaultContent)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+
+  const logoOptions = useMemo(
+    () => [
+      { value: '', label: t('dashboard.partners.noLogoKey') },
+      { value: 'rct', label: 'RiverCities Transit' },
+      { value: 'hca', label: 'Washington State HCA' },
+      { value: 'gcr', label: 'Great Rivers BH-ASO' },
+      { value: 'chpw', label: 'CHPW' },
+      { value: 'bhr', label: 'BHR' },
+      { value: 'para', label: 'Paratransit Services' },
+      { value: 'wah', label: 'Wahkiakum County' },
+      { value: 'doh', label: 'WA Department of Health' },
+      { value: 'ght', label: 'Grays Harbor Transit' },
+      { value: 'dhr', label: 'Destination Hope & Recovery' },
+      { value: 'crhn', label: 'CRHN' },
+      { value: 'arbor', label: 'Arbor Health' },
+      { value: 'dhrw', label: 'Disability Rights WA' },
+      { value: 'ctanw', label: 'CTANW' },
+      { value: 'cim', label: 'Community in Motion' },
+      { value: 'coastalcap', label: 'Coastal CAP' },
+      { value: 'oa', label: 'Olympic Ambulance' },
+      { value: 'cwcog', label: 'CWCOG' },
+    ],
+    [t]
+  )
 
   const isDirty = useMemo(
     () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
@@ -94,7 +99,7 @@ const DashboardPartnersPage = () => {
 
     const fetchContent = async () => {
       setStatus('loading')
-      setMessage('Loading partners content...')
+      setMessage(t('dashboard.partners.loadingMessage'))
       try {
         const { data } = await axiosInstance.get('/content/partners')
         const content = data?.data?.content
@@ -110,7 +115,7 @@ const DashboardPartnersPage = () => {
       } catch (error) {
         if (isMounted) {
           setStatus('error')
-          setMessage('Unable to load partners content. Using defaults instead.')
+          setMessage(t('dashboard.partners.loadError'))
         }
       }
     }
@@ -148,17 +153,17 @@ const DashboardPartnersPage = () => {
       partners: [...prev.partners, { ...emptyPartner }],
     }))
     setStatus('idle')
-    setMessage('New partner added.')
+    setMessage(t('dashboard.partners.newPartner'))
   }
 
   const handleRemovePartner = (index) => {
     if (formValues.partners.length === 1) {
       setStatus('error')
-      setMessage('Keep at least one partner.')
+      setMessage(t('dashboard.partners.removeError'))
       return
     }
 
-    const confirmRemove = window.confirm('Remove this partner?')
+    const confirmRemove = window.confirm(t('dashboard.partners.removeConfirm'))
     if (!confirmRemove) return
 
     setFormValues((prev) => ({
@@ -166,12 +171,12 @@ const DashboardPartnersPage = () => {
       partners: prev.partners.filter((_, partnerIndex) => partnerIndex !== index),
     }))
     setStatus('idle')
-    setMessage('Partner removed.')
+    setMessage(t('dashboard.partners.removed'))
   }
 
   const handleReset = () => {
     setFormValues(initialValues)
-    setMessage('Changes reverted.')
+    setMessage(t('dashboard.common.changesReverted'))
     setStatus('idle')
   }
 
@@ -180,12 +185,12 @@ const DashboardPartnersPage = () => {
 
     if (isMissingRequired) {
       setStatus('error')
-      setMessage('Please fill in all required fields before saving.')
+      setMessage(t('dashboard.common.fillRequiredBeforeSave'))
       return
     }
 
     setStatus('saving')
-    setMessage('Saving changes...')
+    setMessage(t('dashboard.common.savingChanges'))
 
     try {
       const { data } = await axiosInstance.put(
@@ -201,10 +206,10 @@ const DashboardPartnersPage = () => {
       setFormValues(nextValues)
       setUpdatedAt(content?.updatedAt || null)
       setStatus('success')
-      setMessage('Changes saved successfully.')
+      setMessage(t('dashboard.partners.saveSuccess'))
     } catch (error) {
       setStatus('error')
-      setMessage(error.message || 'Unable to save changes.')
+      setMessage(error.message || t('dashboard.partners.saveError'))
     }
   }
 
@@ -214,26 +219,29 @@ const DashboardPartnersPage = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              Partners Page
+              {t('dashboard.partners.pill')}
             </span>
-            <h1 className="mt-4 text-3xl font-semibold text-slate-900">Edit partners content</h1>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-900">
+              {t('dashboard.partners.title')}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Update partner cards shown on the public partners page.
+              {t('dashboard.partners.description')}
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">Status</p>
+            <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
             <p className="mt-1">
-              {status === 'loading' && 'Loading content...'}
-              {status === 'saving' && 'Saving changes...'}
-              {status === 'success' && 'All changes saved'}
-              {status === 'error' && 'Action needed'}
-              {status === 'idle' && (isDirty ? 'Unsaved changes' : 'No pending changes')}
+              {status === 'loading' && t('dashboard.common.loadingContent')}
+              {status === 'saving' && t('dashboard.common.savingChanges')}
+              {status === 'success' && t('dashboard.common.allChangesSaved')}
+              {status === 'error' && t('dashboard.common.actionNeeded')}
+              {status === 'idle' &&
+                (isDirty ? t('dashboard.common.unsavedChanges') : t('dashboard.common.noPendingChanges'))}
             </p>
             {updatedAt && (
               <p className="mt-1 text-[11px] text-slate-500">
-                Last saved: {new Date(updatedAt).toLocaleString()}
+                {t('dashboard.common.lastSaved')} {new Date(updatedAt).toLocaleString()}
               </p>
             )}
           </div>
@@ -253,22 +261,23 @@ const DashboardPartnersPage = () => {
 
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Partner cards</h2>
-            <p className="mt-1 text-sm text-slate-500">Edit each partner card. English description is required.</p>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.partners.cardsTitle')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('dashboard.partners.cardsSubtitle')}</p>
 
             <div className="mt-6">
               <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="partnerSearch">
-                Search partners
+                {t('dashboard.partners.searchLabel')}
               </label>
               <input
                 id="partnerSearch"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                placeholder="Search by name, URL, or description"
+                placeholder={t('dashboard.partners.searchPlaceholder')}
               />
               <p className="mt-2 text-xs text-slate-500">
-                Showing {visiblePartners.length} of {formValues.partners.length}
+                {t('dashboard.common.showing')} {visiblePartners.length} {t('dashboard.common.of')}{' '}
+                {formValues.partners.length}
               </p>
             </div>
 
@@ -279,21 +288,21 @@ const DashboardPartnersPage = () => {
                 <div key={`${partner.name}-${index}`} className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      Partner {index + 1}
+                      {t('dashboard.partners.partnerLabel')} {index + 1}
                     </p>
                     <button
                       type="button"
                       onClick={() => handleRemovePartner(index)}
                       className="text-xs font-semibold text-rose-500 hover:text-rose-600"
                     >
-                      Delete
+                      {t('dashboard.common.delete')}
                     </button>
                   </div>
 
                   <div className="mt-4 grid gap-4 lg:grid-cols-2">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Name
+                        {t('dashboard.partners.nameLabel')}
                       </label>
                       <input
                         value={partner.name}
@@ -305,7 +314,7 @@ const DashboardPartnersPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Website URL
+                        {t('dashboard.partners.websiteLabel')}
                       </label>
                       <input
                         value={partner.url}
@@ -317,7 +326,7 @@ const DashboardPartnersPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Logo key (optional)
+                        {t('dashboard.partners.logoKeyLabel')}
                       </label>
                       <select
                         value={partner.logoKey}
@@ -334,20 +343,20 @@ const DashboardPartnersPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Logo URL (optional)
+                        {t('dashboard.partners.logoUrlLabel')}
                       </label>
                       <input
                         value={partner.logoUrl}
                         onChange={(event) => handlePartnerChange(index, 'logoUrl', event.target.value)}
                         className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                        placeholder="https://example.com/logo.png"
+                        placeholder={t('dashboard.partners.logoUrlPlaceholder')}
                       />
                     </div>
                   </div>
 
                   <div className="mt-4">
                     <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      Description (English)
+                      {t('dashboard.partners.descriptionEn')}
                     </label>
                     <textarea
                       rows={3}
@@ -360,7 +369,7 @@ const DashboardPartnersPage = () => {
 
                   <div className="mt-4">
                     <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      Description (Spanish)
+                      {t('dashboard.partners.descriptionEs')}
                     </label>
                     <textarea
                       rows={3}
@@ -379,7 +388,7 @@ const DashboardPartnersPage = () => {
                       className="h-4 w-4 rounded border-slate-300"
                     />
                     <label htmlFor={`invert-${index}`} className="text-sm text-slate-600">
-                      Invert logo colors
+                      {t('dashboard.partners.invertLogo')}
                     </label>
                   </div>
                 </div>
@@ -391,7 +400,7 @@ const DashboardPartnersPage = () => {
               onClick={handleAddPartner}
               className="mt-6 w-full rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
             >
-              Add partner
+              {t('dashboard.partners.addPartner')}
             </button>
           </div>
 
@@ -401,7 +410,7 @@ const DashboardPartnersPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty || isMissingRequired}
               className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {status === 'saving' ? 'Saving...' : 'Save changes'}
+              {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
             </button>
             <button
               type="button"
@@ -409,13 +418,16 @@ const DashboardPartnersPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty}
               className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Undo changes
+              {t('dashboard.common.undoChanges')}
             </button>
           </div>
         </form>
 
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
-          Logged in as <span className="font-semibold text-slate-700">{user?.email || 'Admin'}</span>
+          {t('dashboard.common.loggedInAs')}{' '}
+          <span className="font-semibold text-slate-700">
+            {user?.email || t('dashboard.common.adminFallback')}
+          </span>
         </div>
       </div>
     </DashboardLayout>

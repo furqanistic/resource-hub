@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import axiosInstance from '@/lib/axiosInstance'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   title: 'About & Partners',
@@ -17,6 +18,7 @@ const emptyParagraph = ''
 
 const DashboardAboutPage = () => {
   const { user, token } = useSelector((state) => state.auth)
+  const { t } = useLanguage()
   const [formValues, setFormValues] = useState(defaultContent)
   const [initialValues, setInitialValues] = useState(defaultContent)
   const [status, setStatus] = useState('idle')
@@ -38,7 +40,7 @@ const DashboardAboutPage = () => {
 
     const fetchContent = async () => {
       setStatus('loading')
-      setMessage('Loading about page content...')
+      setMessage(t('dashboard.about.loadingMessage'))
       try {
         const { data } = await axiosInstance.get('/content/about')
         const content = data?.data?.content
@@ -54,7 +56,7 @@ const DashboardAboutPage = () => {
       } catch (error) {
         if (isMounted) {
           setStatus('error')
-          setMessage('Unable to load about content. Using defaults instead.')
+          setMessage(t('dashboard.about.loadError'))
         }
       }
     }
@@ -86,17 +88,17 @@ const DashboardAboutPage = () => {
       paragraphs: [...prev.paragraphs, emptyParagraph],
     }))
     setStatus('idle')
-    setMessage('New paragraph added.')
+    setMessage(t('dashboard.about.newParagraph'))
   }
 
   const handleRemoveParagraph = (index) => {
     if (formValues.paragraphs.length === 1) {
       setStatus('error')
-      setMessage('Keep at least one paragraph.')
+      setMessage(t('dashboard.about.removeError'))
       return
     }
 
-    const confirmRemove = window.confirm('Remove this paragraph?')
+    const confirmRemove = window.confirm(t('dashboard.about.removeConfirm'))
     if (!confirmRemove) return
 
     setFormValues((prev) => ({
@@ -104,12 +106,12 @@ const DashboardAboutPage = () => {
       paragraphs: prev.paragraphs.filter((_, paragraphIndex) => paragraphIndex !== index),
     }))
     setStatus('idle')
-    setMessage('Paragraph removed.')
+    setMessage(t('dashboard.about.removed'))
   }
 
   const handleReset = () => {
     setFormValues(initialValues)
-    setMessage('Changes reverted.')
+    setMessage(t('dashboard.common.changesReverted'))
     setStatus('idle')
   }
 
@@ -118,12 +120,12 @@ const DashboardAboutPage = () => {
 
     if (isMissingRequired) {
       setStatus('error')
-      setMessage('Please fill in all required fields before saving.')
+      setMessage(t('dashboard.common.fillRequiredBeforeSave'))
       return
     }
 
     setStatus('saving')
-    setMessage('Saving changes...')
+    setMessage(t('dashboard.common.savingChanges'))
 
     try {
       const { data } = await axiosInstance.put(
@@ -139,10 +141,10 @@ const DashboardAboutPage = () => {
       setFormValues(nextValues)
       setUpdatedAt(content?.updatedAt || null)
       setStatus('success')
-      setMessage('Changes saved successfully.')
+      setMessage(t('dashboard.about.saveSuccess'))
     } catch (error) {
       setStatus('error')
-      setMessage(error.message || 'Unable to save changes.')
+      setMessage(error.message || t('dashboard.about.saveError'))
     }
   }
 
@@ -152,26 +154,29 @@ const DashboardAboutPage = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              About Page
+              {t('dashboard.about.pill')}
             </span>
-            <h1 className="mt-4 text-3xl font-semibold text-slate-900">Edit about content</h1>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-900">
+              {t('dashboard.about.title')}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Update the title and paragraph copy shown on the public about page.
+              {t('dashboard.about.description')}
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">Status</p>
+            <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
             <p className="mt-1">
-              {status === 'loading' && 'Loading content...'}
-              {status === 'saving' && 'Saving changes...'}
-              {status === 'success' && 'All changes saved'}
-              {status === 'error' && 'Action needed'}
-              {status === 'idle' && (isDirty ? 'Unsaved changes' : 'No pending changes')}
+              {status === 'loading' && t('dashboard.common.loadingContent')}
+              {status === 'saving' && t('dashboard.common.savingChanges')}
+              {status === 'success' && t('dashboard.common.allChangesSaved')}
+              {status === 'error' && t('dashboard.common.actionNeeded')}
+              {status === 'idle' &&
+                (isDirty ? t('dashboard.common.unsavedChanges') : t('dashboard.common.noPendingChanges'))}
             </p>
             {updatedAt && (
               <p className="mt-1 text-[11px] text-slate-500">
-                Last saved: {new Date(updatedAt).toLocaleString()}
+                {t('dashboard.common.lastSaved')} {new Date(updatedAt).toLocaleString()}
               </p>
             )}
           </div>
@@ -191,13 +196,13 @@ const DashboardAboutPage = () => {
 
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Page copy</h2>
-            <p className="mt-1 text-sm text-slate-500">These fields appear on the about page.</p>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.common.pageCopy')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('dashboard.about.pageCopySubtitle')}</p>
 
             <div className="mt-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="title">
-                  Page title
+                  {t('dashboard.common.pageTitle')}
                 </label>
                 <input
                   id="title"
@@ -214,14 +219,14 @@ const DashboardAboutPage = () => {
                   <div key={`paragraph-${index}`} className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex items-center justify-between gap-2">
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Paragraph {index + 1}
+                        {t('dashboard.about.paragraphLabel')} {index + 1}
                       </label>
                       <button
                         type="button"
                         onClick={() => handleRemoveParagraph(index)}
                         className="text-xs font-semibold text-rose-500 hover:text-rose-600"
                       >
-                        Delete
+                        {t('dashboard.common.delete')}
                       </button>
                     </div>
                     <textarea
@@ -239,7 +244,7 @@ const DashboardAboutPage = () => {
                 onClick={handleAddParagraph}
                 className="mt-6 w-full rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
               >
-                Add paragraph
+                {t('dashboard.common.add')} {t('dashboard.about.paragraphLabel').toLowerCase()}
               </button>
             </div>
           </div>
@@ -250,7 +255,7 @@ const DashboardAboutPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty || isMissingRequired}
               className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {status === 'saving' ? 'Saving...' : 'Save changes'}
+              {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
             </button>
             <button
               type="button"
@@ -258,13 +263,16 @@ const DashboardAboutPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty}
               className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Undo changes
+              {t('dashboard.common.undoChanges')}
             </button>
           </div>
         </form>
 
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
-          Logged in as <span className="font-semibold text-slate-700">{user?.email || 'Admin'}</span>
+          {t('dashboard.common.loggedInAs')}{' '}
+          <span className="font-semibold text-slate-700">
+            {user?.email || t('dashboard.common.adminFallback')}
+          </span>
         </div>
       </div>
     </DashboardLayout>

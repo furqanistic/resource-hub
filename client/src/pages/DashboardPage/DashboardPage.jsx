@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import heroImg from '@/assets/CloudLogos/hero-img.jpg'
 import axiosInstance from '@/lib/axiosInstance'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   heroTitle: 'CHOICE Regional Transportation Hub',
@@ -18,6 +19,7 @@ const defaultContent = {
 
 const DashboardPage = () => {
   const { user, token } = useSelector((state) => state.auth)
+  const { t } = useLanguage()
   const [formValues, setFormValues] = useState(defaultContent)
   const [initialValues, setInitialValues] = useState(defaultContent)
   const [status, setStatus] = useState('idle')
@@ -43,7 +45,7 @@ const DashboardPage = () => {
 
     const fetchContent = async () => {
       setStatus('loading')
-      setMessage('Loading home page content...')
+      setMessage(t('dashboard.home.loadingMessage'))
       try {
         const { data } = await axiosInstance.get('/content/home')
         const content = data?.data?.content
@@ -59,7 +61,7 @@ const DashboardPage = () => {
       } catch (error) {
         if (isMounted) {
           setStatus('error')
-          setMessage('Unable to load home page content. Using defaults instead.')
+          setMessage(t('dashboard.home.loadError'))
         }
       }
     }
@@ -78,7 +80,7 @@ const DashboardPage = () => {
 
   const handleReset = () => {
     setFormValues(initialValues)
-    setMessage('Changes reverted.')
+    setMessage(t('dashboard.common.changesReverted'))
     setStatus('idle')
   }
 
@@ -87,12 +89,12 @@ const DashboardPage = () => {
 
     if (isMissingRequired) {
       setStatus('error')
-      setMessage('Please fill in all required fields before saving.')
+      setMessage(t('dashboard.common.fillRequiredBeforeSave'))
       return
     }
 
     setStatus('saving')
-    setMessage('Saving changes...')
+    setMessage(t('dashboard.common.savingChanges'))
 
     try {
       const { data } = await axiosInstance.put(
@@ -108,10 +110,10 @@ const DashboardPage = () => {
       setFormValues(nextValues)
       setUpdatedAt(content?.updatedAt || null)
       setStatus('success')
-      setMessage('Changes saved successfully.')
+      setMessage(t('dashboard.home.saveSuccess'))
     } catch (error) {
       setStatus('error')
-      setMessage(error.message || 'Unable to save changes.')
+      setMessage(error.message || t('dashboard.home.saveError'))
     }
   }
 
@@ -123,26 +125,29 @@ const DashboardPage = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              Home Page
+              {t('dashboard.home.pill')}
             </span>
-            <h1 className="mt-4 text-3xl font-semibold text-slate-900">Edit home page content</h1>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-900">
+              {t('dashboard.home.title')}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Update the hero section text and image used on the public homepage.
+              {t('dashboard.home.description')}
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">Status</p>
+            <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
             <p className="mt-1">
-              {status === 'loading' && 'Loading content...'}
-              {status === 'saving' && 'Saving changes...'}
-              {status === 'success' && 'All changes saved'}
-              {status === 'error' && 'Action needed'}
-              {status === 'idle' && (isDirty ? 'Unsaved changes' : 'No pending changes')}
+              {status === 'loading' && t('dashboard.common.loadingContent')}
+              {status === 'saving' && t('dashboard.common.savingChanges')}
+              {status === 'success' && t('dashboard.common.allChangesSaved')}
+              {status === 'error' && t('dashboard.common.actionNeeded')}
+              {status === 'idle' &&
+                (isDirty ? t('dashboard.common.unsavedChanges') : t('dashboard.common.noPendingChanges'))}
             </p>
             {updatedAt && (
               <p className="mt-1 text-[11px] text-slate-500">
-                Last saved: {new Date(updatedAt).toLocaleString()}
+                {t('dashboard.common.lastSaved')} {new Date(updatedAt).toLocaleString()}
               </p>
             )}
           </div>
@@ -163,13 +168,13 @@ const DashboardPage = () => {
         <form className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]" onSubmit={handleSave}>
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Hero text</h2>
-              <p className="mt-1 text-sm text-slate-500">These fields appear at the top of the homepage.</p>
+              <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.home.heroTextTitle')}</h2>
+              <p className="mt-1 text-sm text-slate-500">{t('dashboard.home.heroTextSubtitle')}</p>
 
               <div className="mt-6 space-y-4">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroTitle">
-                    Hero title
+                    {t('dashboard.home.heroTitleLabel')}
                   </label>
                   <input
                     id="heroTitle"
@@ -186,7 +191,7 @@ const DashboardPage = () => {
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
                     htmlFor="heroDescription1"
                   >
-                    Hero description 1
+                    {t('dashboard.home.heroDescriptionLabel')} 1
                   </label>
                   <textarea
                     id="heroDescription1"
@@ -204,7 +209,7 @@ const DashboardPage = () => {
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
                     htmlFor="heroDescription2"
                   >
-                    Hero description 2
+                    {t('dashboard.home.heroDescriptionLabel')} 2
                   </label>
                   <textarea
                     id="heroDescription2"
@@ -219,7 +224,7 @@ const DashboardPage = () => {
 
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroCta">
-                    CTA button label
+                    {t('dashboard.home.ctaLabel')}
                   </label>
                   <input
                     id="heroCta"
@@ -236,7 +241,7 @@ const DashboardPage = () => {
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
                     htmlFor="supportingPartnersLabel"
                   >
-                    Supporting partners label
+                    {t('dashboard.home.supportingPartnersLabel')}
                   </label>
                   <input
                     id="supportingPartnersLabel"
@@ -252,15 +257,15 @@ const DashboardPage = () => {
 
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Hero image</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.home.heroImageTitle')}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Paste a public image URL or leave it blank to use the default image.
+                {t('dashboard.home.heroImageSubtitle')}
               </p>
 
               <div className="mt-6 space-y-4">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroImageUrl">
-                    Image URL
+                    {t('dashboard.home.imageUrlLabel')}
                   </label>
                   <input
                     id="heroImageUrl"
@@ -274,7 +279,7 @@ const DashboardPage = () => {
 
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroImageAlt">
-                    Image description (alt text)
+                    {t('dashboard.home.imageAltLabel')}
                   </label>
                   <input
                     id="heroImageAlt"
@@ -286,7 +291,7 @@ const DashboardPage = () => {
                 </div>
 
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                  <img src={heroPreview} alt="Hero preview" className="h-48 w-full object-cover" />
+                  <img src={heroPreview} alt={t('dashboard.home.heroPreviewAlt')} className="h-48 w-full object-cover" />
                 </div>
               </div>
             </div>
@@ -297,7 +302,7 @@ const DashboardPage = () => {
                 disabled={status === 'saving' || status === 'loading' || !isDirty || isMissingRequired}
                 className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {status === 'saving' ? 'Saving...' : 'Save changes'}
+                {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
               </button>
               <button
                 type="button"
@@ -305,14 +310,17 @@ const DashboardPage = () => {
                 disabled={status === 'saving' || status === 'loading' || !isDirty}
                 className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Undo changes
+                {t('dashboard.common.undoChanges')}
               </button>
             </div>
           </div>
         </form>
 
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
-          Logged in as <span className="font-semibold text-slate-700">{user?.email || 'Admin'}</span>
+          {t('dashboard.common.loggedInAs')}{' '}
+          <span className="font-semibold text-slate-700">
+            {user?.email || t('dashboard.common.adminFallback')}
+          </span>
         </div>
       </div>
     </DashboardLayout>

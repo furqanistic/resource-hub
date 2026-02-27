@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import axiosInstance from '@/lib/axiosInstance'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   title: 'Regional Transportation Resources',
@@ -33,6 +34,7 @@ const emptyResource = {
 
 const DashboardResourcesPage = () => {
   const { user, token } = useSelector((state) => state.auth)
+  const { t } = useLanguage()
   const [formValues, setFormValues] = useState(defaultContent)
   const [initialValues, setInitialValues] = useState(defaultContent)
   const [status, setStatus] = useState('idle')
@@ -60,7 +62,7 @@ const DashboardResourcesPage = () => {
 
     const fetchContent = async () => {
       setStatus('loading')
-      setMessage('Loading resources page content...')
+      setMessage(t('dashboard.resources.loadingMessage'))
       try {
         const { data } = await axiosInstance.get('/content/resources')
         const content = data?.data?.content
@@ -76,7 +78,7 @@ const DashboardResourcesPage = () => {
       } catch (error) {
         if (isMounted) {
           setStatus('error')
-          setMessage('Unable to load resources content. Using defaults instead.')
+          setMessage(t('dashboard.resources.loadError'))
         }
       }
     }
@@ -108,17 +110,17 @@ const DashboardResourcesPage = () => {
       resources: [...prev.resources, { ...emptyResource }],
     }))
     setStatus('idle')
-    setMessage('New card added.')
+    setMessage(t('dashboard.resources.newCard'))
   }
 
   const handleRemoveResource = (index) => {
     if (formValues.resources.length === 1) {
       setStatus('error')
-      setMessage('Keep at least one resource card.')
+      setMessage(t('dashboard.resources.removeError'))
       return
     }
 
-    const confirmRemove = window.confirm('Remove this resource card?')
+    const confirmRemove = window.confirm(t('dashboard.resources.removeConfirm'))
     if (!confirmRemove) return
 
     setFormValues((prev) => ({
@@ -126,12 +128,12 @@ const DashboardResourcesPage = () => {
       resources: prev.resources.filter((_, resourceIndex) => resourceIndex !== index),
     }))
     setStatus('idle')
-    setMessage('Resource card removed.')
+    setMessage(t('dashboard.resources.removed'))
   }
 
   const handleReset = () => {
     setFormValues(initialValues)
-    setMessage('Changes reverted.')
+    setMessage(t('dashboard.common.changesReverted'))
     setStatus('idle')
   }
 
@@ -140,12 +142,12 @@ const DashboardResourcesPage = () => {
 
     if (isMissingRequired) {
       setStatus('error')
-      setMessage('Please fill in all required fields before saving.')
+      setMessage(t('dashboard.common.fillRequiredBeforeSave'))
       return
     }
 
     setStatus('saving')
-    setMessage('Saving changes...')
+    setMessage(t('dashboard.common.savingChanges'))
 
     try {
       const { data } = await axiosInstance.put(
@@ -161,10 +163,10 @@ const DashboardResourcesPage = () => {
       setFormValues(nextValues)
       setUpdatedAt(content?.updatedAt || null)
       setStatus('success')
-      setMessage('Changes saved successfully.')
+      setMessage(t('dashboard.resources.saveSuccess'))
     } catch (error) {
       setStatus('error')
-      setMessage(error.message || 'Unable to save changes.')
+      setMessage(error.message || t('dashboard.resources.saveError'))
     }
   }
 
@@ -174,26 +176,29 @@ const DashboardResourcesPage = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              Resources Page
+              {t('dashboard.resources.pill')}
             </span>
-            <h1 className="mt-4 text-3xl font-semibold text-slate-900">Edit resources content</h1>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-900">
+              {t('dashboard.resources.title')}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Update the title, subtitle, and resource cards shown on the public resources page.
+              {t('dashboard.resources.description')}
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">Status</p>
+            <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
             <p className="mt-1">
-              {status === 'loading' && 'Loading content...'}
-              {status === 'saving' && 'Saving changes...'}
-              {status === 'success' && 'All changes saved'}
-              {status === 'error' && 'Action needed'}
-              {status === 'idle' && (isDirty ? 'Unsaved changes' : 'No pending changes')}
+              {status === 'loading' && t('dashboard.common.loadingContent')}
+              {status === 'saving' && t('dashboard.common.savingChanges')}
+              {status === 'success' && t('dashboard.common.allChangesSaved')}
+              {status === 'error' && t('dashboard.common.actionNeeded')}
+              {status === 'idle' &&
+                (isDirty ? t('dashboard.common.unsavedChanges') : t('dashboard.common.noPendingChanges'))}
             </p>
             {updatedAt && (
               <p className="mt-1 text-[11px] text-slate-500">
-                Last saved: {new Date(updatedAt).toLocaleString()}
+                {t('dashboard.common.lastSaved')} {new Date(updatedAt).toLocaleString()}
               </p>
             )}
           </div>
@@ -213,13 +218,13 @@ const DashboardResourcesPage = () => {
 
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Page copy</h2>
-            <p className="mt-1 text-sm text-slate-500">These fields appear at the top of the resources page.</p>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.common.pageCopy')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('dashboard.resources.pageCopySubtitle')}</p>
 
             <div className="mt-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="title">
-                  Page title
+                  {t('dashboard.common.pageTitle')}
                 </label>
                 <input
                   id="title"
@@ -233,7 +238,7 @@ const DashboardResourcesPage = () => {
 
               <div>
                 <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="subtitle">
-                  Page subtitle
+                  {t('dashboard.common.pageSubtitle')}
                 </label>
                 <textarea
                   id="subtitle"
@@ -249,29 +254,29 @@ const DashboardResourcesPage = () => {
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Resource cards</h2>
-            <p className="mt-1 text-sm text-slate-500">Edit each card to match the public page.</p>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.resources.cardsTitle')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('dashboard.resources.cardsSubtitle')}</p>
 
             <div className="mt-6 space-y-6">
               {formValues.resources.map((resource, index) => (
                 <div key={`${resource.title}-${index}`} className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      Card {index + 1}
+                      {t('dashboard.resources.cardLabel')} {index + 1}
                     </p>
                     <button
                       type="button"
                       onClick={() => handleRemoveResource(index)}
                       className="text-xs font-semibold text-rose-500 hover:text-rose-600"
                     >
-                      Delete
+                      {t('dashboard.common.delete')}
                     </button>
                   </div>
 
                   <div className="mt-4 space-y-3">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Title
+                        {t('dashboard.resources.titleLabel')}
                       </label>
                       <input
                         value={resource.title}
@@ -283,7 +288,7 @@ const DashboardResourcesPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Description
+                        {t('dashboard.resources.descriptionLabel')}
                       </label>
                       <textarea
                         rows={3}
@@ -296,7 +301,7 @@ const DashboardResourcesPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        CTA label
+                        {t('dashboard.resources.ctaLabel')}
                       </label>
                       <input
                         value={resource.ctaLabel}
@@ -308,7 +313,7 @@ const DashboardResourcesPage = () => {
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Link URL
+                        {t('dashboard.resources.linkUrlLabel')}
                       </label>
                       <input
                         value={resource.href}
@@ -326,7 +331,7 @@ const DashboardResourcesPage = () => {
               onClick={handleAddResource}
               className="mt-6 w-full rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
             >
-              Add resource card
+              {t('dashboard.resources.addCard')}
             </button>
           </div>
 
@@ -336,7 +341,7 @@ const DashboardResourcesPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty || isMissingRequired}
               className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {status === 'saving' ? 'Saving...' : 'Save changes'}
+              {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
             </button>
             <button
               type="button"
@@ -344,13 +349,16 @@ const DashboardResourcesPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty}
               className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Undo changes
+              {t('dashboard.common.undoChanges')}
             </button>
           </div>
         </form>
 
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
-          Logged in as <span className="font-semibold text-slate-700">{user?.email || 'Admin'}</span>
+          {t('dashboard.common.loggedInAs')}{' '}
+          <span className="font-semibold text-slate-700">
+            {user?.email || t('dashboard.common.adminFallback')}
+          </span>
         </div>
       </div>
     </DashboardLayout>

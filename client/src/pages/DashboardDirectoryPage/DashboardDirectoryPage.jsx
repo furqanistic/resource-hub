@@ -3,6 +3,7 @@ import { Download, UploadCloud } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import axiosInstance from '@/lib/axiosInstance'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 const emptyService = {
   providerName: '',
@@ -18,6 +19,7 @@ const emptyService = {
 
 const DashboardDirectoryPage = () => {
   const { user, token } = useSelector((state) => state.auth)
+  const { t } = useLanguage()
   const [services, setServices] = useState([])
   const [initialServices, setInitialServices] = useState([])
   const [status, setStatus] = useState('idle')
@@ -58,7 +60,7 @@ const DashboardDirectoryPage = () => {
 
     const fetchServices = async () => {
       setStatus('loading')
-      setMessage('Loading directory services...')
+      setMessage(t('dashboard.directory.loadingMessage'))
       try {
         const { data } = await axiosInstance.get('/directory')
         const list = data?.data?.services || []
@@ -72,7 +74,7 @@ const DashboardDirectoryPage = () => {
       } catch (error) {
         if (isMounted) {
           setStatus('error')
-          setMessage('Unable to load directory services.')
+          setMessage(t('dashboard.directory.loadError'))
         }
       }
     }
@@ -95,27 +97,27 @@ const DashboardDirectoryPage = () => {
   const handleAddService = () => {
     setServices((prev) => [...prev, { ...emptyService }])
     setStatus('idle')
-    setMessage('New service added.')
+    setMessage(t('dashboard.directory.newService'))
   }
 
   const handleRemoveService = (index) => {
     if (services.length === 1) {
       setStatus('error')
-      setMessage('Keep at least one service.')
+      setMessage(t('dashboard.directory.removeError'))
       return
     }
 
-    const confirmRemove = window.confirm('Remove this service?')
+    const confirmRemove = window.confirm(t('dashboard.directory.removeConfirm'))
     if (!confirmRemove) return
 
     setServices((prev) => prev.filter((_, serviceIndex) => serviceIndex !== index))
     setStatus('idle')
-    setMessage('Service removed.')
+    setMessage(t('dashboard.directory.removed'))
   }
 
   const handleReset = () => {
     setServices(initialServices)
-    setMessage('Changes reverted.')
+    setMessage(t('dashboard.common.changesReverted'))
     setStatus('idle')
   }
 
@@ -124,12 +126,12 @@ const DashboardDirectoryPage = () => {
 
     if (isMissingRequired) {
       setStatus('error')
-      setMessage('Please fill in required fields before saving.')
+      setMessage(t('dashboard.directory.fillRequiredBeforeSave'))
       return
     }
 
     setStatus('saving')
-    setMessage('Saving changes...')
+    setMessage(t('dashboard.common.savingChanges'))
 
     try {
       const payload = {
@@ -147,10 +149,10 @@ const DashboardDirectoryPage = () => {
       setServices(list)
       setInitialServices(list)
       setStatus('success')
-      setMessage('Changes saved successfully.')
+      setMessage(t('dashboard.directory.saveSuccess'))
     } catch (error) {
       setStatus('error')
-      setMessage(error.message || 'Unable to save changes.')
+      setMessage(error.message || t('dashboard.directory.saveError'))
     }
   }
 
@@ -160,7 +162,7 @@ const DashboardDirectoryPage = () => {
 
     setSelectedFileName(file.name)
     setFileStatus('uploading')
-    setMessage('Uploading file...')
+    setMessage(t('dashboard.directory.uploadMessage'))
 
     try {
       const formData = new FormData()
@@ -174,7 +176,9 @@ const DashboardDirectoryPage = () => {
       })
 
       setFileStatus('success')
-      setMessage(`Upload complete. Imported ${data?.data?.imported || 0} services.`)
+      setMessage(
+        `${t('dashboard.directory.uploadComplete')} ${data?.data?.imported || 0} ${t('dashboard.directory.servicesLabel')}`
+      )
 
       const refreshed = await axiosInstance.get('/directory')
       const list = refreshed?.data?.data?.services || []
@@ -182,13 +186,13 @@ const DashboardDirectoryPage = () => {
       setInitialServices(list)
     } catch (error) {
       setFileStatus('error')
-      setMessage(error.message || 'Upload failed.')
+      setMessage(error.message || t('dashboard.directory.uploadFailed'))
     }
   }
 
   const handleExport = async () => {
     setFileStatus('downloading')
-    setMessage('Preparing export...')
+    setMessage(t('dashboard.directory.exportMessage'))
 
     try {
       const response = await axiosInstance.get('/directory/export', {
@@ -206,10 +210,10 @@ const DashboardDirectoryPage = () => {
       window.URL.revokeObjectURL(url)
 
       setFileStatus('success')
-      setMessage('Export downloaded.')
+      setMessage(t('dashboard.directory.exportDownloaded'))
     } catch (error) {
       setFileStatus('error')
-      setMessage(error.message || 'Export failed.')
+      setMessage(error.message || t('dashboard.directory.exportFailed'))
     }
   }
 
@@ -219,22 +223,25 @@ const DashboardDirectoryPage = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              Directory Page
+              {t('dashboard.directory.pill')}
             </span>
-            <h1 className="mt-4 text-3xl font-semibold text-slate-900">Edit directory services</h1>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-900">
+              {t('dashboard.directory.title')}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Update services manually or upload an Excel/CSV file to replace the directory data.
+              {t('dashboard.directory.description')}
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
-            <p className="font-semibold text-slate-900">Status</p>
+            <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
             <p className="mt-1">
-              {status === 'loading' && 'Loading content...'}
-              {status === 'saving' && 'Saving changes...'}
-              {status === 'success' && 'All changes saved'}
-              {status === 'error' && 'Action needed'}
-              {status === 'idle' && (isDirty ? 'Unsaved changes' : 'No pending changes')}
+              {status === 'loading' && t('dashboard.common.loadingContent')}
+              {status === 'saving' && t('dashboard.common.savingChanges')}
+              {status === 'success' && t('dashboard.common.allChangesSaved')}
+              {status === 'error' && t('dashboard.common.actionNeeded')}
+              {status === 'idle' &&
+                (isDirty ? t('dashboard.common.unsavedChanges') : t('dashboard.common.noPendingChanges'))}
             </p>
           </div>
         </div>
@@ -254,9 +261,9 @@ const DashboardDirectoryPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Upload directory file</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.directory.uploadTitle')}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Upload an Excel or CSV file to replace all directory entries.
+                {t('dashboard.directory.uploadSubtitle')}
               </p>
             </div>
             <button
@@ -265,20 +272,20 @@ const DashboardDirectoryPage = () => {
               className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
             >
               <Download className="h-4 w-4" />
-              Export CSV
+              {t('dashboard.directory.exportCsv')}
             </button>
           </div>
 
           <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-700">
-                {selectedFileName || 'Choose a file to upload'}
+                {selectedFileName || t('dashboard.directory.chooseFile')}
               </p>
-              <p className="mt-1 text-xs text-slate-500">Accepted: .xlsx, .xls, .csv up to 5MB.</p>
+              <p className="mt-1 text-xs text-slate-500">{t('dashboard.directory.acceptedFiles')}</p>
             </div>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
               <UploadCloud className="h-4 w-4" />
-              Upload file
+              {t('dashboard.directory.uploadFile')}
               <input
                 type="file"
                 accept=".xlsx,.xls,.csv"
@@ -289,10 +296,10 @@ const DashboardDirectoryPage = () => {
           </div>
 
           <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-            {fileStatus === 'uploading' && 'Uploading...'}
-            {fileStatus === 'downloading' && 'Preparing export...'}
-            {fileStatus === 'success' && 'All set.'}
-            {fileStatus === 'error' && 'Something went wrong.'}
+            {fileStatus === 'uploading' && t('dashboard.directory.uploading')}
+            {fileStatus === 'downloading' && t('dashboard.directory.preparingExport')}
+            {fileStatus === 'success' && t('dashboard.directory.allSet')}
+            {fileStatus === 'error' && t('dashboard.directory.somethingWrong')}
           </div>
         </div>
 
@@ -300,31 +307,31 @@ const DashboardDirectoryPage = () => {
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Service entries</h2>
-                <p className="mt-1 text-sm text-slate-500">Provider name is required.</p>
+                <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.directory.entriesTitle')}</h2>
+                <p className="mt-1 text-sm text-slate-500">{t('dashboard.directory.entriesSubtitle')}</p>
               </div>
               <button
                 type="button"
                 onClick={handleAddService}
                 className="rounded-2xl border border-dashed border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50"
               >
-                Add service
+                {t('dashboard.directory.addService')}
               </button>
             </div>
 
             <div className="mt-6">
               <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="serviceSearch">
-                Search services
+                {t('dashboard.directory.searchLabel')}
               </label>
               <input
                 id="serviceSearch"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                placeholder="Search by provider, category, or county"
+                placeholder={t('dashboard.directory.searchPlaceholder')}
               />
               <p className="mt-2 text-xs text-slate-500">
-                Showing {visibleServices.length} of {services.length}
+                {t('dashboard.common.showing')} {visibleServices.length} {t('dashboard.common.of')} {services.length}
               </p>
             </div>
 
@@ -335,21 +342,21 @@ const DashboardDirectoryPage = () => {
                   <div key={`${service.providerName}-${index}`} className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                        Service {index + 1}
+                        {t('dashboard.directory.serviceLabel')} {index + 1}
                       </p>
                       <button
                         type="button"
                         onClick={() => handleRemoveService(index)}
                         className="text-xs font-semibold text-rose-500 hover:text-rose-600"
                       >
-                        Delete
+                        {t('dashboard.common.delete')}
                       </button>
                     </div>
 
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Provider name
+                          {t('dashboard.directory.providerName')}
                         </label>
                         <input
                           value={service.providerName}
@@ -361,7 +368,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Service category
+                          {t('dashboard.directory.serviceCategory')}
                         </label>
                         <input
                           value={service.serviceCategory}
@@ -372,7 +379,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Service types
+                          {t('dashboard.directory.serviceTypes')}
                         </label>
                         <input
                           value={service.serviceTypes}
@@ -383,7 +390,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Website URL
+                          {t('dashboard.directory.websiteUrl')}
                         </label>
                         <input
                           value={service.websiteUrl}
@@ -394,7 +401,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Phone
+                          {t('dashboard.directory.phone')}
                         </label>
                         <input
                           value={service.phone}
@@ -405,7 +412,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Service times
+                          {t('dashboard.directory.serviceTimes')}
                         </label>
                         <input
                           value={service.serviceTimes}
@@ -416,7 +423,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Accessibility
+                          {t('dashboard.directory.accessibility')}
                         </label>
                         <input
                           value={service.accessibility}
@@ -427,7 +434,7 @@ const DashboardDirectoryPage = () => {
 
                       <div>
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Cost
+                          {t('dashboard.directory.cost')}
                         </label>
                         <input
                           value={service.cost}
@@ -438,7 +445,7 @@ const DashboardDirectoryPage = () => {
 
                       <div className="lg:col-span-2">
                         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                          Counties served
+                          {t('dashboard.directory.countiesServed')}
                         </label>
                         <input
                           value={service.countiesServed}
@@ -459,7 +466,7 @@ const DashboardDirectoryPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty || isMissingRequired}
               className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {status === 'saving' ? 'Saving...' : 'Save changes'}
+              {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
             </button>
             <button
               type="button"
@@ -467,13 +474,16 @@ const DashboardDirectoryPage = () => {
               disabled={status === 'saving' || status === 'loading' || !isDirty}
               className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Undo changes
+              {t('dashboard.common.undoChanges')}
             </button>
           </div>
         </form>
 
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
-          Logged in as <span className="font-semibold text-slate-700">{user?.email || 'Admin'}</span>
+          {t('dashboard.common.loggedInAs')}{' '}
+          <span className="font-semibold text-slate-700">
+            {user?.email || t('dashboard.common.adminFallback')}
+          </span>
         </div>
       </div>
     </DashboardLayout>

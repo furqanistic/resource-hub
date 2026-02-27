@@ -1,7 +1,7 @@
+import { loginAdmin } from '@/redux/slices/authSlice'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { loginAdmin } from '@/redux/slices/authSlice'
 
 const AdminLoginPage = () => {
   const dispatch = useDispatch()
@@ -57,7 +57,7 @@ const AdminLoginPage = () => {
                   value={formValues.email}
                   onChange={handleChange}
                   className="w-full rounded-2xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-sky-400 focus:outline-none"
-                  placeholder="example@cwcog.org"
+                  placeholder="example@hubchoice.org"
                   autoComplete="email"
                   required
                 />
