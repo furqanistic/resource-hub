@@ -17,6 +17,11 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   try {
     const token = signToken(user._id)
+    const isProduction = process.env.NODE_ENV === 'production'
+    const configuredSameSite = process.env.COOKIE_SAMESITE?.toLowerCase()
+    const sameSite =
+      configuredSameSite || (isProduction ? 'none' : 'lax')
+
     const cookieOptions = {
       expires: new Date(
         Date.now() +
@@ -27,8 +32,9 @@ const createSendToken = (user, statusCode, res) => {
             1000
       ),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      // Chrome requires Secure when SameSite=None
+      secure: sameSite === 'none' || isProduction,
+      sameSite,
     }
 
     res.cookie('jwt', token, cookieOptions)

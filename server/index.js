@@ -14,14 +14,60 @@ import directoryRoute from './routes/directory.js'
 const app = express()
 dotenv.config({ quiet: true })
 
+const expandWwwVariants = (origins) => {
+  const expanded = new Set()
+
+  for (const origin of origins) {
+    if (!origin) continue
+    expanded.add(origin)
+
+    try {
+      const url = new URL(origin)
+      const hostname = url.hostname
+
+      if (hostname.startsWith('www.')) {
+        url.hostname = hostname.replace(/^www\./, '')
+        expanded.add(url.origin)
+      } else {
+        url.hostname = `www.${hostname}`
+        expanded.add(url.origin)
+      }
+    } catch {
+      // Ignore malformed origin entries and keep the original value.
+    }
+  }
+
+  return [...expanded]
+}
+
+const parseOrigins = () => {
+  const localOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174']
+  const configured = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+  const productionDefaults = ['https://hubchoice.org', 'https://www.hubchoice.org']
+  const productionOrigins = expandWwwVariants(
+    configured.length ? configured : productionDefaults
+  )
+
+  return process.env.NODE_ENV === 'production'
+    ? productionOrigins
+    : [...new Set([...localOrigins, ...configured])]
+}
+
+const allowedOrigins = parseOrigins()
+
 app.use(cookieParser())
 app.use(express.json())
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? process.env.FRONTEND_URL || 'https://www.hubchoice.org'
-        : ['http://localhost:5173', 'http://localhost:5174'],
+    origin: (origin, callback) => {
+      // Requests like server-to-server or curl may not send Origin
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.includes(origin)) return callback(null, true)
+      return callback(new Error(`CORS blocked for origin: ${origin}`))
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
