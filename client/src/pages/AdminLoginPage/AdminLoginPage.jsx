@@ -9,8 +9,8 @@ const AdminLoginPage = () => {
   const { status, error, isAuthenticated } = useSelector((state) => state.auth)
 
   const [formValues, setFormValues] = useState({
-    email: 'admin@cwcog.org',
-    password: 'testing123',
+    email: '',
+    password: '',
   })
   const [showPassword, setShowPassword] = useState(false)
 
@@ -57,7 +57,7 @@ const AdminLoginPage = () => {
                   value={formValues.email}
                   onChange={handleChange}
                   className="w-full rounded-2xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-sky-400 focus:outline-none"
-                  placeholder="admin@cwcog.org"
+                  placeholder="example@cwcog.org"
                   autoComplete="email"
                   required
                 />

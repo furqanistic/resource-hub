@@ -12,6 +12,7 @@ import DashboardPage from '@/pages/DashboardPage/DashboardPage'
 import DashboardResourcesPage from '@/pages/DashboardResourcesPage/DashboardResourcesPage'
 import DashboardAboutPage from '@/pages/DashboardAboutPage/DashboardAboutPage'
 import DashboardPartnersPage from '@/pages/DashboardPartnersPage/DashboardPartnersPage'
+import DashboardDirectoryPage from '@/pages/DashboardDirectoryPage/DashboardDirectoryPage'
 import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
 
 const ScrollToTop = () => {
@@ -42,6 +43,7 @@ const App = () => {
               <Route path='/dashboard/resources' element={<DashboardResourcesPage />} />
               <Route path='/dashboard/about' element={<DashboardAboutPage />} />
               <Route path='/dashboard/partners' element={<DashboardPartnersPage />} />
+              <Route path='/dashboard/directory' element={<DashboardDirectoryPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

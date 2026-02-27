@@ -1,6 +1,5 @@
 // File: client/src/pages/DirectoryPage/DirectoryPage.jsx
-import React, { useState, useRef, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import {
     Filter,
     Search
@@ -27,7 +26,7 @@ import {
 } from "@/components/ui/pagination";
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import rawServicesData from '@/lib/data/Transportation Services in Washington.json';
+import axiosInstance from '@/lib/axiosInstance';
 
 // Spotlight Card Component (Cleaned up and adapted)
 const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => {
@@ -78,38 +77,21 @@ const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => 
     );
 };
 
-// Transform raw data to match component structure
-const servicesData = rawServicesData.map(item => ({
-    type: item["Service Category"] || 'Transport',
-    category: item["Service Category"] || '',
-    title: item["Provider Name"],
-    subtitle: item["Service Type(s)"] || 'Transportation Service',
-    url: item["Website Url"],
-    accessibility: item["Accessibility"] || '',
+const mapService = (item) => ({
+    type: item.serviceCategory || 'Transport',
+    category: item.serviceCategory || '',
+    title: item.providerName,
+    subtitle: item.serviceTypes || 'Transportation Service',
+    url: item.websiteUrl,
+    accessibility: item.accessibility || '',
     details: [
-        { key: 'phone', labelKey: 'directory.detail.phone', value: item["Phone"] },
-        { key: 'hours', labelKey: 'directory.detail.hours', value: item["Service Times"] },
-        { key: 'access', labelKey: 'directory.detail.access', value: item["Accessibility"] },
-        { key: 'cost', labelKey: 'directory.detail.cost', value: item["Cost"] },
-        { key: 'county', labelKey: 'directory.detail.county', value: item["Counties Served"] },
-        // { label: 'Website', value: item["Website Url"] } // Optional to show as detail
-    ].filter(detail => detail.value) // Filter out missing details
-}));
-
-const container = {
-    hidden: { opacity: 0 },
-    show: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 50, damping: 20 } },
-};
+        { key: 'phone', labelKey: 'directory.detail.phone', value: item.phone },
+        { key: 'hours', labelKey: 'directory.detail.hours', value: item.serviceTimes },
+        { key: 'access', labelKey: 'directory.detail.access', value: item.accessibility },
+        { key: 'cost', labelKey: 'directory.detail.cost', value: item.cost },
+        { key: 'county', labelKey: 'directory.detail.county', value: item.countiesServed },
+    ].filter(detail => detail.value),
+});
 
 const supportedCounties = [
     'Thurston',
@@ -138,6 +120,7 @@ const typeOfHelpOptions = [
 
 const DirectoryPage = () => {
     const { t } = useLanguage();
+    const [servicesData, setServicesData] = useState([]);
     // Input State (Controlled by user interaction)
     const [searchTerm, setSearchTerm] = useState('');
     const [countyFilter, setCountyFilter] = useState('all');
@@ -201,6 +184,30 @@ const DirectoryPage = () => {
     const itemsPerPage = 9;
 
     // Reset page when ACTIVE filters change
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchServices = async () => {
+            try {
+                const { data } = await axiosInstance.get('/directory');
+                const list = data?.data?.services || [];
+                if (isMounted) {
+                    setServicesData(list.map((service) => mapService(service)));
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setServicesData([]);
+                }
+            }
+        };
+
+        fetchServices();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     React.useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, countyFilter, serviceFilter, accessibilityFilter]);
@@ -442,11 +449,8 @@ const DirectoryPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <motion.div
+                        <div
                             key={`${searchTerm}-${countyFilter}-${serviceFilter}`}
-                            variants={container}
-                            initial="hidden"
-                            animate="show"
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
                         >
                         {currentServices.length > 0 ? (
@@ -460,14 +464,9 @@ const DirectoryPage = () => {
                                     registerPreviewHeight(index, node.getBoundingClientRect().height);
                                 };
                                 return (
-                                <motion.div
+                                <div
                                     key={cardKey}
-                                    variants={itemVariants}
                                     className="h-full"
-                                    whileHover={{
-                                        y: -8,
-                                        transition: { duration: 0.3, ease: "easeOut" }
-                                    }}
                                 >
                                     <SpotlightCard enableSpotlight={false} className="p-6 bg-white border border-black/10 shadow-none hover:shadow-none hover:border-black/20 rounded-none min-h-0">
                                         <div ref={getPreviewHeight} className="flex flex-col gap-3" style={{ minHeight: maxPreviewHeight ? `${maxPreviewHeight}px` : undefined }}>
@@ -543,7 +542,7 @@ const DirectoryPage = () => {
                                             </button>
                                         )}
                                     </SpotlightCard>
-                                </motion.div>
+                                </div>
                                 );
                             })
                         ) : (
@@ -562,7 +561,7 @@ const DirectoryPage = () => {
                                 </Button>
                             </div>
                         )}
-                        </motion.div>
+                        </div>
                     )}
 
                     {/* Pagination Controls */}

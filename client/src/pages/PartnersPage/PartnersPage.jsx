@@ -284,7 +284,7 @@ const PartnersPage = () => {
                                         <div 
                                             className={cn(
                                                 "h-full flex flex-col bg-white rounded-2xl border border-black/[0.04] transition-all duration-300 overflow-hidden shadow-none",
-                                                expandedIndex === partners.indexOf(partner) ? "ring-1 ring-[#03385e]/10" : ""
+                                                expandedIndex === index ? "ring-1 ring-[#03385e]/10" : ""
                                             )}
                                         >
                                             <div className="p-5 flex flex-col h-full">
