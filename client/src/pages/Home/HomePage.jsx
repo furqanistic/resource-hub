@@ -1,11 +1,11 @@
 // File: client/src/pages/Home/HomePage.jsx
 import React, { useEffect, useState } from 'react'
 import Navbar from '@/components/Navbar'
-import Hero from '@/components/HomePage/Hero'
-import RegionalPartners from '@/components/HomePage/RegionalPartners'
-import ServiceCategories from '@/components/HomePage/ServiceCategories'
-import NeedHelp from '@/components/HomePage/NeedHelp'
-import ContactForm from '@/components/HomePage/ContactForm'
+import Hero from '@/components/HomePAge/Hero'
+import RegionalPartners from '@/components/HomePAge/RegionalPartners'
+import ServiceCategories from '@/components/HomePAge/ServiceCategories'
+import NeedHelp from '@/components/HomePAge/NeedHelp'
+import ContactForm from '@/components/HomePAge/ContactForm'
 import Footer from '@/components/Footer'
 import axiosInstance from '@/lib/axiosInstance'
 
