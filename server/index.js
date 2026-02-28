@@ -9,6 +9,7 @@ import mongoose from 'mongoose'
 import authRoute from './routes/auth.js'
 import contentRoute from './routes/content.js'
 import directoryRoute from './routes/directory.js'
+import siteThemeRoute from './routes/siteTheme.js'
 // import referralRoute from './routes/referral.js' // Comment out for now
 import dns from 'dns'
 const app = express()
@@ -78,6 +79,7 @@ app.use(
 app.use('/api/auth/', authRoute)
 app.use('/api/content/', contentRoute)
 app.use('/api/directory/', directoryRoute)
+app.use('/api/site-theme/', siteThemeRoute)
 // app.use('/api/referral/', referralRoute) // Comment out for now
 
 // Health check endpoint
