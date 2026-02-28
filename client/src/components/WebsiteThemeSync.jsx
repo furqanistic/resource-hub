@@ -7,6 +7,16 @@ import {
   setWebsiteThemeLoaded,
 } from '@/redux/slices/siteThemeSlice'
 
+const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/
+
+const toAlphaHex = (hexColor, alphaHex) => {
+  if (!HEX_COLOR_PATTERN.test(hexColor || '')) {
+    return `#03385e${alphaHex}`
+  }
+
+  return `${hexColor}${alphaHex}`
+}
+
 const WebsiteThemeSync = () => {
   const { pathname } = useLocation()
   const dispatch = useDispatch()
@@ -48,6 +58,14 @@ const WebsiteThemeSync = () => {
     root.style.setProperty('--site-background', websiteTheme.backgroundColor)
     root.style.setProperty('--site-text', websiteTheme.textColor)
     root.style.setProperty('--site-primary', websiteTheme.primaryColor)
+    root.style.setProperty(
+      '--site-primary-soft',
+      toAlphaHex(websiteTheme.primaryColor, '1f')
+    )
+    root.style.setProperty(
+      '--site-text-soft',
+      toAlphaHex(websiteTheme.textColor, 'b3')
+    )
   }, [websiteTheme])
 
   useEffect(() => {

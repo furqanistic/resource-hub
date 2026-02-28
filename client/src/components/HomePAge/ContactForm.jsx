@@ -37,7 +37,7 @@ const ContactForm = () => {
     };
 
     return (
-        <section className="relative bg-white py-24 px-4 overflow-hidden">
+        <section className="relative overflow-hidden bg-[var(--site-background)] px-4 py-24">
             <div className="max-w-3xl mx-auto">
                 <AnimatePresence mode="wait">
                     {!isSuccess ? (
@@ -53,7 +53,7 @@ const ContactForm = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8 }}
-                                    className="text-3xl sm:text-4xl font-medium text-black tracking-tight leading-[1.2]"
+                                    className="text-3xl font-medium leading-[1.2] tracking-tight text-[var(--site-primary)] sm:text-4xl"
                                 >
                                     {t('home.contactTitle')}
                                 </motion.h2>
@@ -69,42 +69,42 @@ const ContactForm = () => {
                             >
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="firstName" className="text-black font-medium">{t('home.contactFirstName')}</Label>
+                                        <Label htmlFor="firstName" className="font-medium text-[var(--site-text)]">{t('home.contactFirstName')}</Label>
                                         <Input
                                             id="firstName"
                                             {...register("firstName")}
-                                            className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                            className="h-11 rounded-none border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] shadow-none transition-all focus-visible:border-[var(--site-primary)] focus-visible:ring-1 focus-visible:ring-[var(--site-primary-soft)]"
                                         />
                                         {errors.firstName && <p className="text-destructive text-sm">{errors.firstName.message}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="lastName" className="text-black font-medium">{t('home.contactLastName')}</Label>
+                                        <Label htmlFor="lastName" className="font-medium text-[var(--site-text)]">{t('home.contactLastName')}</Label>
                                         <Input
                                             id="lastName"
                                             {...register("lastName")}
-                                            className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                            className="h-11 rounded-none border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] shadow-none transition-all focus-visible:border-[var(--site-primary)] focus-visible:ring-1 focus-visible:ring-[var(--site-primary-soft)]"
                                         />
                                         {errors.lastName && <p className="text-destructive text-sm">{errors.lastName.message}</p>}
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="email" className="text-black font-medium">{t('home.contactEmail')}</Label>
+                                    <Label htmlFor="email" className="font-medium text-[var(--site-text)]">{t('home.contactEmail')}</Label>
                                     <Input
                                         id="email"
                                         type="email"
                                         {...register("email")}
-                                        className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] transition-all text-black rounded-none h-11 shadow-none"
+                                        className="h-11 rounded-none border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] shadow-none transition-all focus-visible:border-[var(--site-primary)] focus-visible:ring-1 focus-visible:ring-[var(--site-primary-soft)]"
                                     />
                                     {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="feedback" className="text-black font-medium">{t('home.contactFeedback')}</Label>
+                                    <Label htmlFor="feedback" className="font-medium text-[var(--site-text)]">{t('home.contactFeedback')}</Label>
                                     <Textarea
                                         id="feedback"
                                         {...register("feedback")}
-                                        className="bg-white border-black/20 focus-visible:ring-1 focus-visible:ring-[#03385e] focus-visible:border-[#03385e] min-h-40 transition-all text-black rounded-none shadow-none"
+                                        className="min-h-40 rounded-none border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] shadow-none transition-all focus-visible:border-[var(--site-primary)] focus-visible:ring-1 focus-visible:ring-[var(--site-primary-soft)]"
                                     />
                                     {errors.feedback && <p className="text-destructive text-sm">{errors.feedback.message}</p>}
                                 </div>
@@ -112,7 +112,7 @@ const ContactForm = () => {
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-none h-12 transition-all rounded-none font-medium text-base"
+                                    className="h-12 w-full rounded-none bg-[var(--site-primary)] text-base font-medium text-white shadow-none transition-opacity hover:opacity-90"
                                 >
                                     {isSubmitting ? t('home.contactSubmitting') : t('home.contactSubmit')}
                                 </Button>
@@ -126,15 +126,15 @@ const ContactForm = () => {
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="py-12 flex flex-col items-center text-center space-y-4"
                         >
-                            <CheckCircle2 className="w-16 h-16 text-[#03385e] mb-2" />
-                            <h3 className="text-2xl font-semibold text-black">{t('home.contactSuccessTitle')}</h3>
-                            <p className="text-slate-600 max-w-sm">
+                            <CheckCircle2 className="mb-2 h-16 w-16 text-[var(--site-primary)]" />
+                            <h3 className="text-2xl font-semibold text-[var(--site-text)]">{t('home.contactSuccessTitle')}</h3>
+                            <p className="max-w-sm text-[var(--site-text-soft)]">
                                 {t('home.contactSuccessBody')}
                             </p>
                             <Button 
                                 variant="link" 
                                 onClick={() => setIsSuccess(false)}
-                                className="text-[#03385e] font-medium p-0 h-auto"
+                                className="h-auto p-0 font-medium text-[var(--site-primary)]"
                             >
                                 {t('home.contactSendAnother')}
                             </Button>

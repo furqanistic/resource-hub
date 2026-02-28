@@ -54,16 +54,16 @@ const categories = [
 const ServiceCategories = () => {
     const { t } = useLanguage();
     return (
-        <section className="bg-white py-14">
+        <section className="bg-[var(--site-background)] py-14">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     {categories.map((category, index) => (
                         <div
                             key={index}
-                            className="bg-[#f2f6f9] rounded-none p-8 sm:p-10 flex flex-col items-center justify-center text-center min-h-[220px]"
+                            className="min-h-[220px] rounded-none bg-[var(--site-primary-soft)] p-8 text-center sm:p-10 flex flex-col items-center justify-center"
                         >
                             <div className="mb-6">{category.icon}</div>
-                            <h3 className="text-lg sm:text-xl font-medium text-black leading-snug">
+                            <h3 className="text-lg font-medium leading-snug text-[var(--site-text)] sm:text-xl">
                                 {t(`home.categories.${category.key}`)}
                             </h3>
                         </div>

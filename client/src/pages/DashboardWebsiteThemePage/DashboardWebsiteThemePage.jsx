@@ -1,3 +1,4 @@
+// File: client/src/pages/DashboardWebsiteThemePage/DashboardWebsiteThemePage.jsx
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
@@ -8,25 +9,20 @@ import {
   setWebsiteTheme,
 } from '@/redux/slices/siteThemeSlice'
 
+const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/
+const isValidHexColor = (value) => HEX_COLOR_PATTERN.test(value || '')
+const THEME_COLOR_KEYS = ['backgroundColor', 'textColor', 'primaryColor']
+
 const DashboardWebsiteThemePage = () => {
   const token = useSelector((state) => state.auth.token)
   const websiteTheme = useSelector((state) => state.siteTheme.websiteTheme)
   const dispatch = useDispatch()
   const { t } = useLanguage()
   const [formValues, setFormValues] = useState(websiteTheme)
+  const [hexInputValues, setHexInputValues] = useState(websiteTheme)
   const [initialValues, setInitialValues] = useState(websiteTheme)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
-
-  const isDirty = useMemo(
-    () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
-    [formValues, initialValues]
-  )
-
-  useEffect(() => {
-    setFormValues(websiteTheme)
-    setInitialValues(websiteTheme)
-  }, [websiteTheme])
 
   const colorFields = [
     { key: 'backgroundColor', label: t('dashboard.websiteTheme.backgroundColor') },
@@ -34,13 +30,57 @@ const DashboardWebsiteThemePage = () => {
     { key: 'primaryColor', label: t('dashboard.websiteTheme.primaryColor') },
   ]
 
+  const isDirty = useMemo(
+    () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
+    [formValues, initialValues]
+  )
+
+  const hasInvalidHexInput = useMemo(
+    () =>
+      THEME_COLOR_KEYS.some((key) => {
+        const value = hexInputValues[key] || ''
+        return value.length > 0 && !isValidHexColor(value)
+      }),
+    [hexInputValues]
+  )
+
+  useEffect(() => {
+    setFormValues(websiteTheme)
+    setHexInputValues(websiteTheme)
+    setInitialValues(websiteTheme)
+  }, [websiteTheme])
+
   const handleValueChange = (key, value) => {
     setFormValues((prev) => ({ ...prev, [key]: value }))
+    setHexInputValues((prev) => ({ ...prev, [key]: value }))
     setStatus('idle')
     setMessage('')
   }
 
+  const handleHexInputChange = (key, value) => {
+    setHexInputValues((prev) => ({ ...prev, [key]: value }))
+
+    if (isValidHexColor(value)) {
+      setFormValues((prev) => ({ ...prev, [key]: value.toLowerCase() }))
+      setStatus('idle')
+      setMessage('')
+    }
+  }
+
+  const handleHexInputBlur = (key) => {
+    setHexInputValues((prev) => ({
+      ...prev,
+      [key]: formValues[key],
+    }))
+  }
+
   const handleSave = async () => {
+    if (hasInvalidHexInput) {
+      setStatus('error')
+      setMessage(t('dashboard.websiteTheme.invalidHex'))
+      return
+    }
+
     setStatus('saving')
     setMessage(t('dashboard.common.savingChanges'))
 
@@ -55,6 +95,7 @@ const DashboardWebsiteThemePage = () => {
       dispatch(setWebsiteTheme(savedTheme))
       setInitialValues(savedTheme)
       setFormValues(savedTheme)
+      setHexInputValues(savedTheme)
       setStatus('success')
       setMessage(t('dashboard.websiteTheme.saveSuccess'))
     } catch (error) {
@@ -67,12 +108,14 @@ const DashboardWebsiteThemePage = () => {
 
   const handleUndoChanges = () => {
     setFormValues(initialValues)
+    setHexInputValues(initialValues)
     setStatus('idle')
     setMessage(t('dashboard.common.changesReverted'))
   }
 
   const handleLoadDefaults = () => {
     setFormValues(defaultWebsiteTheme)
+    setHexInputValues(defaultWebsiteTheme)
     setStatus('idle')
     setMessage(t('dashboard.websiteTheme.defaultsLoaded'))
   }
@@ -133,17 +176,32 @@ const DashboardWebsiteThemePage = () => {
                   {field.label}
                 </label>
                 <div className="mt-2 flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={formValues[field.key]}
-                    onChange={(event) => handleValueChange(field.key, event.target.value)}
-                    className="h-10 w-12 cursor-pointer rounded-lg border border-slate-200 bg-white p-1"
-                  />
+                  <div className="relative h-10 w-12 overflow-hidden rounded-lg border border-slate-200 bg-white p-1">
+                    <div
+                      className="h-full w-full rounded-md border border-slate-200"
+                      style={{
+                        backgroundColor: isValidHexColor(hexInputValues[field.key])
+                          ? hexInputValues[field.key]
+                          : formValues[field.key],
+                      }}
+                    />
+                    <input
+                      type="color"
+                      value={formValues[field.key]}
+                      onChange={(event) => handleValueChange(field.key, event.target.value)}
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                    />
+                  </div>
                   <input
                     type="text"
-                    value={formValues[field.key]}
-                    readOnly
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700"
+                    value={hexInputValues[field.key]}
+                    onChange={(event) => handleHexInputChange(field.key, event.target.value)}
+                    onBlur={() => handleHexInputBlur(field.key)}
+                    className={`w-full rounded-xl border px-3 py-2 text-sm ${
+                      isValidHexColor(hexInputValues[field.key])
+                        ? 'border-slate-200 text-slate-700'
+                        : 'border-rose-300 text-rose-700'
+                    }`}
                   />
                 </div>
               </div>
@@ -154,7 +212,7 @@ const DashboardWebsiteThemePage = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={!isDirty || status === 'saving'}
+                disabled={!isDirty || status === 'saving' || hasInvalidHexInput}
                 className="min-w-[150px] rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}

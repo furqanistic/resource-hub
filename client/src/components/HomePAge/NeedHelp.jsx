@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const NeedHelp = () => {
     const { t } = useLanguage();
     return (
-        <section className="relative py-20 bg-[#03385e] overflow-hidden">
+        <section className="relative overflow-hidden bg-[var(--site-primary)] py-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -21,7 +21,7 @@ const NeedHelp = () => {
 
                     <Button
                         size="lg"
-                        className="bg-[#b1ccdf] text-black font-medium px-8 py-6 text-lg rounded-none shadow-none hover:bg-[#b1ccdf]/90 transition-colors"
+                        className="rounded-none bg-[var(--site-background)] px-8 py-6 text-lg font-medium text-[var(--site-text)] shadow-none transition-opacity hover:opacity-90"
                     >
                         {t('home.needHelpCta')}
                     </Button>

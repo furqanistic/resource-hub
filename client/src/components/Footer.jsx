@@ -3,7 +3,7 @@ import React from 'react';
 
 const Footer = () => {
     return (
-        <footer className="bg-white border-t border-slate-200 py-10">
+        <footer className="border-t border-[var(--site-primary-soft)] bg-[var(--site-background)] py-10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 {/* Left: Logo */}
                 <div className="flex items-center">
@@ -11,7 +11,7 @@ const Footer = () => {
                 </div>
 
                 {/* Right: Copyright */}
-                <div className="text-black text-sm text-center md:text-right">
+                <div className="text-sm text-center text-[var(--site-text)] md:text-right">
                     All Rights Reserved. 2026
                 </div>
             </div>

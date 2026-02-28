@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const RegionalPartners = () => {
     const { t } = useLanguage();
     return (
-        <section className="py-20 bg-white overflow-hidden">
+        <section className="overflow-hidden bg-[var(--site-background)] py-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
@@ -19,13 +19,13 @@ const RegionalPartners = () => {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="flex flex-col gap-6"
                     >
-                        <h2 className="text-4xl sm:text-5xl font-semibold text-black leading-tight">
+                        <h2 className="text-4xl font-semibold leading-tight text-[var(--site-primary)] sm:text-5xl">
                             {t('home.regionalTitleLine1')}
                             <br />
                             {t('home.regionalTitleLine2')}
                         </h2>
 
-                        <div className="text-black text-base sm:text-lg leading-relaxed max-w-xl space-y-4">
+                        <div className="max-w-xl space-y-4 text-base leading-relaxed text-[var(--site-text)] sm:text-lg">
                             <p>
                                 {t('home.regionalP1')}
                             </p>

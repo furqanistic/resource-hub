@@ -21,7 +21,7 @@ const HomePage = () => {
         if (isMounted) {
           setHomeContent(data?.data?.content || null)
         }
-      } catch (error) {
+      } catch {
         if (isMounted) {
           setHomeContent(null)
         }
@@ -36,7 +36,7 @@ const HomePage = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-(--site-background) text-(--site-text)">
+    <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]">
       <Navbar />
       <main>
         <Hero content={homeContent} />
