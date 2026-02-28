@@ -1,6 +1,7 @@
 // File: client/src/pages/PartnersPage/PartnersPage.jsx
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
+import SectionThemeScope from '@/components/SectionThemeScope';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -242,6 +243,7 @@ const PartnersPage = () => {
             <Navbar />
 
             <main className="grow py-12 sm:py-16 px-4 sm:px-6">
+                <SectionThemeScope scopeKey="partners-main">
                 <div className="max-w-5xl mx-auto">
                     {/* Search Bar */}
                     <motion.div 
@@ -390,6 +392,7 @@ const PartnersPage = () => {
                         )}
                     </AnimatePresence>
                 </div>
+                </SectionThemeScope>
             </main>
 
             <Footer />

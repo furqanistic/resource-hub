@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SectionThemeScope from '@/components/SectionThemeScope';
 import { useLanguage } from '@/contexts/LanguageContext';
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -42,32 +43,34 @@ const AboutPage = () => {
             <Navbar />
 
             <main className="grow py-20 sm:py-24 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-5xl mx-auto space-y-10">
-                    <div className="space-y-6 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-[var(--site-primary)]"
-                        >
-                            {pageTitle}
-                        </motion.h1>
-                    </div>
-
-                    <div className="max-w-4xl mx-auto space-y-8 text-left">
-                        {paragraphs.map((paragraph, index) => (
-                            <motion.p
-                                key={`${paragraph.slice(0, 20)}-${index}`}
-                                initial={{ opacity: 0, y: 10 }}
+                <SectionThemeScope scopeKey="about-main">
+                    <div className="max-w-5xl mx-auto space-y-10">
+                        <div className="space-y-6 text-center">
+                            <motion.h1
+                                initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.2 + index * 0.15, ease: "easeOut" }}
-                                className="text-base sm:text-lg leading-relaxed text-[var(--site-text-soft)]"
+                                transition={{ duration: 0.8, ease: "easeOut" }}
+                                className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-[var(--site-primary)]"
                             >
-                                {paragraph}
-                            </motion.p>
-                        ))}
+                                {pageTitle}
+                            </motion.h1>
+                        </div>
+
+                        <div className="max-w-4xl mx-auto space-y-8 text-left">
+                            {paragraphs.map((paragraph, index) => (
+                                <motion.p
+                                    key={`${paragraph.slice(0, 20)}-${index}`}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.2 + index * 0.15, ease: "easeOut" }}
+                                    className="text-base sm:text-lg leading-relaxed text-[var(--site-text-soft)]"
+                                >
+                                    {paragraph}
+                                </motion.p>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </SectionThemeScope>
             </main>
 
             <Footer />

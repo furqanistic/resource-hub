@@ -12,6 +12,10 @@ export const SECTION_THEME_SCOPES = [
   { key: 'home-services', labelKey: 'dashboard.websiteTheme.scopeSectionHomeServices' },
   { key: 'home-need-help', labelKey: 'dashboard.websiteTheme.scopeSectionHomeNeedHelp' },
   { key: 'home-contact', labelKey: 'dashboard.websiteTheme.scopeSectionHomeContact' },
+  { key: 'directory-main', labelKey: 'dashboard.websiteTheme.scopeSectionDirectoryMain' },
+  { key: 'resources-main', labelKey: 'dashboard.websiteTheme.scopeSectionResourcesMain' },
+  { key: 'about-main', labelKey: 'dashboard.websiteTheme.scopeSectionAboutMain' },
+  { key: 'partners-main', labelKey: 'dashboard.websiteTheme.scopeSectionPartnersMain' },
 ]
 
 export const resolvePublicPageScopeKey = (pathname = '') => {

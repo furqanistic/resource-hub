@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SectionThemeScope from '@/components/SectionThemeScope';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -262,6 +263,7 @@ const DirectoryPage = () => {
             <Navbar />
 
             <main className="grow">
+                <SectionThemeScope scopeKey="directory-main">
                 <div className="bg-[var(--site-background)] border-b border-[var(--site-primary-soft)]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
                         <div className="max-w-3xl">
@@ -599,6 +601,7 @@ const DirectoryPage = () => {
                         </div>
                     )}
                 </div>
+                </SectionThemeScope>
             </main>
 
             <Footer />
