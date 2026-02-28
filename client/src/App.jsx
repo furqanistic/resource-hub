@@ -1,7 +1,7 @@
 // File: client/src/App.jsx
 import HomePage from '@/pages/Home/HomePage'
 import React, { useEffect } from 'react'
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import AboutPage from '@/pages/AboutPage/AboutPage'
 import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
@@ -47,7 +47,8 @@ const App = () => {
               <Route path='/dashboard/about' element={<DashboardAboutPage />} />
               <Route path='/dashboard/partners' element={<DashboardPartnersPage />} />
               <Route path='/dashboard/directory' element={<DashboardDirectoryPage />} />
-              <Route path='/dashboard/website-theme' element={<DashboardWebsiteThemePage />} />
+              <Route path='/dashboard/website-theme' element={<Navigate to='/dashboard/website-theme/colors' replace />} />
+              <Route path='/dashboard/website-theme/colors' element={<DashboardWebsiteThemePage />} />
             </Route>
           </Routes>
         </BrowserRouter>

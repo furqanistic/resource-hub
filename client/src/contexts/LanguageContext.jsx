@@ -38,6 +38,7 @@ const translations = {
         partnersEditor: 'Partners Editor',
         directoryEditor: 'Directory Editor',
         websiteThemeEditor: 'Website Theme',
+        themeColorsEditor: 'Theme Colors',
       },
       common: {
         status: 'Status',
@@ -195,9 +196,9 @@ const translations = {
         saveError: 'Unable to save changes.',
       },
       websiteTheme: {
-        pill: 'Website Theme',
-        title: 'Customize website colors',
-        description: 'Phase 1: control global website background, text, and primary action color.',
+        pill: 'Theme Colors',
+        title: 'Customize theme colors',
+        description: 'Phase 2 - Step 1: control global background, text, and primary color.',
         autoSaveTitle: 'Auto save enabled',
         autoSaveDescription: 'Use Save Changes to apply updates to the public website.',
         controlsTitle: 'Theme controls',
@@ -340,6 +341,7 @@ const translations = {
         partnersEditor: 'Editor de socios',
         directoryEditor: 'Editor de directorio',
         websiteThemeEditor: 'Tema del sitio',
+        themeColorsEditor: 'Colores del tema',
       },
       common: {
         status: 'Estado',
@@ -497,9 +499,9 @@ const translations = {
         saveError: 'No se pudieron guardar los cambios.',
       },
       websiteTheme: {
-        pill: 'Tema del sitio',
-        title: 'Personalizar colores del sitio',
-        description: 'Fase 1: controla el fondo global, el texto y el color primario del sitio.',
+        pill: 'Colores del tema',
+        title: 'Personalizar colores del tema',
+        description: 'Fase 2 - Paso 1: controla fondo global, texto y color primario.',
         autoSaveTitle: 'Auto guardado activo',
         autoSaveDescription: 'Usa Guardar cambios para aplicar las actualizaciones al sitio público.',
         controlsTitle: 'Controles del tema',
