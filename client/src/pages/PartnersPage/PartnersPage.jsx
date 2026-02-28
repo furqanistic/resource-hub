@@ -250,14 +250,14 @@ const PartnersPage = () => {
                         className="max-w-md mx-auto mb-10 relative group"
                     >
                         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                            <Search className="w-4 h-4 text-black/20 group-focus-within:text-[#03385e] transition-colors" />
+                            <Search className="h-4 w-4 text-[var(--site-text-soft)] group-focus-within:text-[var(--site-primary)] transition-colors" />
                         </div>
                         <Input
                             type="text"
                             placeholder={t('partners.searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-11 h-12 bg-white border-black/10 rounded-xl focus-visible:ring-[#03385e]/10 focus-visible:border-[#03385e]/30 transition-all text-sm shadow-none"
+                            className="h-12 rounded-xl border-[var(--site-primary-soft)] bg-[var(--site-background)] pl-11 text-sm text-[var(--site-text)] shadow-none transition-all placeholder:text-[var(--site-text-soft)] focus-visible:border-[var(--site-primary)] focus-visible:ring-[var(--site-primary-soft)]"
                         />
                     </motion.div>
 
@@ -284,13 +284,13 @@ const PartnersPage = () => {
                                     >
                                         <div 
                                             className={cn(
-                                                "h-full flex flex-col bg-white rounded-2xl border border-black/[0.04] transition-all duration-300 overflow-hidden shadow-none",
-                                                expandedIndex === index ? "ring-1 ring-[#03385e]/10" : ""
+                                                "h-full flex flex-col overflow-hidden rounded-2xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] shadow-none transition-all duration-300",
+                                                expandedIndex === index ? "ring-1 ring-[var(--site-primary-soft)]" : ""
                                             )}
                                         >
                                             <div className="p-5 flex flex-col h-full">
                                                 <div className="flex items-start justify-between gap-4 mb-4">
-                                                    <div className="h-24 w-full flex items-center justify-center bg-[#f8fafc]/50 border border-black/[0.02] rounded-xl p-4 overflow-hidden">
+                                                    <div className="h-24 w-full flex items-center justify-center overflow-hidden rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-4">
                                                         {logoSrc ? (
                                                             <img
                                                                 src={logoSrc}
@@ -301,7 +301,7 @@ const PartnersPage = () => {
                                                                 )}
                                                             />
                                                         ) : (
-                                                            <div className="flex flex-col items-center gap-2 text-black/40">
+                                                            <div className="flex flex-col items-center gap-2 text-[var(--site-text-soft)]">
                                                                 <Building2 className="h-8 w-8" />
                                                                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">
                                                                     {partner.name}
@@ -312,14 +312,14 @@ const PartnersPage = () => {
                                                 </div>
 
                                                 <div className="flex items-baseline justify-between gap-3 mb-2">
-                                                    <h3 className="text-[15px] font-bold text-[#03385e] leading-tight group-hover:text-[#03385e]/80 transition-colors">
+                                                    <h3 className="text-[15px] font-bold leading-tight text-[var(--site-primary)] transition-opacity group-hover:opacity-80">
                                                         {partner.name}
                                                     </h3>
                                                     <a 
                                                         href={partner.url}
                                                         target="_blank"
                                                         rel="noreferrer"
-                                                        className="p-2 rounded-lg bg-[#f8fafc] hover:bg-[#03385e] text-black/20 hover:text-white transition-all duration-300 shrink-0"
+                                                        className="shrink-0 rounded-lg border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-2 text-[var(--site-text-soft)] transition-all duration-300 hover:bg-[var(--site-primary)] hover:text-white"
                                                     >
                                                         <ArrowUpRight className="w-4 h-4" />
                                                     </a>
@@ -337,7 +337,7 @@ const PartnersPage = () => {
                                                                     initial={false}
                                                                     animate={{ height: expandedIndex === index ? "auto" : "2.5rem" }}
                                                                     className={cn(
-                                                                        "text-[13px] text-black/50 leading-relaxed overflow-hidden",
+                                                                        "overflow-hidden text-[13px] leading-relaxed text-[var(--site-text-soft)]",
                                                                         expandedIndex === index ? "" : "line-clamp-2"
                                                                     )}
                                                                 >
@@ -347,7 +347,7 @@ const PartnersPage = () => {
                                                                 {description.length > 80 && (
                                                                     <button
                                                                         onClick={(e) => toggleExpanded(e, index)}
-                                                                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#03385e]/60 hover:text-[#03385e] transition-colors"
+                                                                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[var(--site-primary)] opacity-80 transition-opacity hover:opacity-100"
                                                                     >
                                                                         {expandedIndex === index ? (
                                                                             <>{t('partners.showLess')} <ChevronUp className="w-3 h-3" /></>
@@ -361,12 +361,12 @@ const PartnersPage = () => {
                                                     })()}
                                                 </div>
 
-                                                <div className="mt-4 pt-4 border-t border-black/[0.02] flex items-center justify-end">
+                                                <div className="mt-4 flex items-center justify-end border-t border-[var(--site-primary-soft)] pt-4">
                                                     <a 
                                                         href={partner.url}
                                                         target="_blank"
                                                         rel="noreferrer"
-                                                        className="text-xs font-bold text-[#03385e]/70 hover:text-[#03385e] flex items-center gap-1 group/link"
+                                                        className="flex items-center gap-1 text-xs font-bold text-[var(--site-primary)] opacity-80 hover:opacity-100 group/link"
                                                     >
                                                         {t('partners.website')} <ExternalLink className="w-3 h-3 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                                                     </a>
@@ -383,9 +383,9 @@ const PartnersPage = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="text-center py-20 bg-white rounded-2xl border border-dashed border-black/10"
+                                className="rounded-2xl border border-dashed border-[var(--site-primary-soft)] bg-[var(--site-background)] py-20 text-center"
                             >
-                                <p className="text-sm text-black/30 text-center">{t('partners.noResults')}</p>
+                                <p className="text-center text-sm text-[var(--site-text-soft)]">{t('partners.noResults')}</p>
                             </motion.div>
                         )}
                     </AnimatePresence>

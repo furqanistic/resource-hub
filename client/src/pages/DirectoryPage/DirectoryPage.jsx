@@ -56,8 +56,8 @@ const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => 
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={cn(
-                "relative overflow-hidden border border-black/10 bg-white text-black transition-colors duration-200 flex flex-col group min-h-[380px]",
-                "hover:border-black/20",
+                "relative overflow-hidden border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] transition-colors duration-200 flex flex-col group min-h-[380px]",
+                "hover:border-[var(--site-primary-soft)]",
                 className
             )}
         >
@@ -67,7 +67,7 @@ const SpotlightCard = ({ children, className = "", enableSpotlight = true }) => 
                     className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
                     style={{
                         opacity,
-                        background: `radial-gradient(360px circle at ${position.x}px ${position.y}px, rgba(3, 56, 94, 0.06), transparent 80%)`,
+                        background: `radial-gradient(360px circle at ${position.x}px ${position.y}px, var(--site-primary-soft), transparent 80%)`,
                     }}
                 />
             )}
@@ -262,10 +262,10 @@ const DirectoryPage = () => {
             <Navbar />
 
             <main className="grow">
-                <div className="bg-[#f6f9fb] border-b border-black/5">
+                <div className="bg-[var(--site-background)] border-b border-[var(--site-primary-soft)]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
                         <div className="max-w-3xl">
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black tracking-tight leading-[1.05]">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[var(--site-primary)] tracking-tight leading-[1.05]">
                                 {t('directory.title')}
                             </h1>
                         </div>
@@ -273,11 +273,11 @@ const DirectoryPage = () => {
                 </div>
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div className="rounded-2xl border border-black/10 bg-white shadow-[0_20px_60px_-50px_rgba(3,56,94,0.4)]">
-                        <div className="flex items-center justify-between gap-3 px-6 sm:px-8 py-6 border-b border-black/5">
-                            <div className="flex items-center gap-3 text-black">
-                                <div className="h-10 w-10 rounded-full bg-[#03385e]/10 flex items-center justify-center">
-                                    <Filter className="w-5 h-5 text-[#03385e]" />
+                    <div className="rounded-2xl border border-[var(--site-primary-soft)] bg-[var(--site-background)]">
+                        <div className="flex items-center justify-between gap-3 px-6 sm:px-8 py-6 border-b border-[var(--site-primary-soft)]">
+                            <div className="flex items-center gap-3 text-[var(--site-text)]">
+                                <div className="h-10 w-10 rounded-full bg-[var(--site-primary-soft)] flex items-center justify-center">
+                                    <Filter className="w-5 h-5 text-[var(--site-primary)]" />
                                 </div>
                                 <div>
                                     <div className="text-lg font-semibold">{t('directory.filterTitle')}</div>
@@ -289,7 +289,7 @@ const DirectoryPage = () => {
                             <div className="relative">
                                 <Input
                                     placeholder={t('directory.searchByName')}
-                                    className="bg-white border border-black/15 h-12 rounded-xl w-full text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm"
+                                    className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -304,16 +304,16 @@ const DirectoryPage = () => {
                                     }}
                                     key={`county-${countyFilter}`}
                                 >
-                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
                                         <SelectValue placeholder={t('directory.allCounties')} />
                                     </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
                                         <div className="p-2">
                                             <Input
                                                 placeholder={t('directory.searchCounties')}
                                                 value={countyQuery}
                                                 onChange={(e) => setCountyQuery(e.target.value)}
-                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
                                             />
                                         </div>
                                         <SelectItem value="all">{t('directory.allCounties')}</SelectItem>
@@ -321,7 +321,7 @@ const DirectoryPage = () => {
                                             <SelectItem
                                                 key={county}
                                                 value={county}
-                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
                                             >
                                                 {county}
                                             </SelectItem>
@@ -337,16 +337,16 @@ const DirectoryPage = () => {
                                     }}
                                     key={`service-${serviceFilter}`}
                                 >
-                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
                                         <SelectValue placeholder={t('directory.allServices')} />
                                     </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
                                         <div className="p-2">
                                             <Input
                                                 placeholder={t('directory.searchServices')}
                                                 value={serviceQuery}
                                                 onChange={(e) => setServiceQuery(e.target.value)}
-                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
                                             />
                                         </div>
                                         <SelectItem value="all">{t('directory.allServices')}</SelectItem>
@@ -354,7 +354,7 @@ const DirectoryPage = () => {
                                             <SelectItem
                                                 key={service}
                                                 value={service}
-                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
                                             >
                                                 {service}
                                             </SelectItem>
@@ -370,16 +370,16 @@ const DirectoryPage = () => {
                                     }}
                                     key={`accessibility-${accessibilityFilter}`}
                                 >
-                                    <SelectTrigger className="w-full bg-white border border-black/15 h-12 rounded-xl text-black focus-visible:ring-0 focus-visible:border-[#03385e]/40 shadow-sm">
+                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
                                         <SelectValue placeholder={t('directory.allAccessibility')} />
                                     </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-black/10">
+                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
                                         <div className="p-2">
                                             <Input
                                                 placeholder={t('directory.searchAccessibility')}
                                                 value={accessibilityQuery}
                                                 onChange={(e) => setAccessibilityQuery(e.target.value)}
-                                                className="h-9 bg-white border border-black/20 rounded-md text-black placeholder:text-black/50 focus-visible:ring-0 focus-visible:border-[#03385e]/40"
+                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
                                             />
                                         </div>
                                         <SelectItem value="all">{t('directory.allAccessibility')}</SelectItem>
@@ -387,7 +387,7 @@ const DirectoryPage = () => {
                                             <SelectItem
                                                 key={accessibility}
                                                 value={accessibility}
-                                                className="data-[highlighted]:bg-[#03385e]/10 data-[highlighted]:text-black"
+                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
                                             >
                                                 {accessibility}
                                             </SelectItem>
@@ -398,14 +398,14 @@ const DirectoryPage = () => {
 
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
                                 <Button
-                                    className="bg-[#03385e] hover:bg-[#03385e]/90 text-white h-12 px-8 rounded-xl font-medium shadow-none"
+                                    className="h-12 rounded-xl bg-[var(--site-primary)] px-8 font-medium text-white shadow-none hover:opacity-90"
                                     onClick={() => setCurrentPage(1)}
                                 >
                                     {t('directory.startSearch')}
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="border border-[#03385e]/40 text-[#03385e] h-12 px-8 rounded-xl font-medium hover:bg-[#03385e]/5"
+                                    className="h-12 rounded-xl border border-[var(--site-primary-soft)] px-8 font-medium text-[var(--site-primary)] hover:bg-[var(--site-primary-soft)]"
                                     onClick={clearFilters}
                                 >
                                     {t('directory.clearAll')}
@@ -420,29 +420,29 @@ const DirectoryPage = () => {
                     {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                             {Array.from({ length: 6 }).map((_, idx) => (
-                                <div key={idx} className="border border-black/10 bg-white p-6 rounded-none">
-                                    <div className="h-5 w-2/3 bg-black/10 rounded-sm mb-3 animate-pulse" />
-                                    <div className="h-4 w-1/3 bg-black/10 rounded-sm mb-6 animate-pulse" />
+                                <div key={idx} className="border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-6 rounded-none">
+                                    <div className="h-5 w-2/3 bg-[var(--site-primary-soft)] rounded-sm mb-3 animate-pulse" />
+                                    <div className="h-4 w-1/3 bg-[var(--site-primary-soft)] rounded-sm mb-6 animate-pulse" />
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                         <div>
-                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
-                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
-                                            <div className="h-3 w-5/6 bg-black/10 rounded-sm animate-pulse" />
+                                            <div className="h-4 w-20 bg-[var(--site-primary-soft)] rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-[var(--site-primary-soft)] rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-5/6 bg-[var(--site-primary-soft)] rounded-sm animate-pulse" />
                                         </div>
                                         <div>
-                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
-                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
-                                            <div className="h-3 w-4/5 bg-black/10 rounded-sm animate-pulse" />
+                                            <div className="h-4 w-20 bg-[var(--site-primary-soft)] rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-[var(--site-primary-soft)] rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-4/5 bg-[var(--site-primary-soft)] rounded-sm animate-pulse" />
                                         </div>
                                         <div>
-                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
-                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
-                                            <div className="h-3 w-3/4 bg-black/10 rounded-sm animate-pulse" />
+                                            <div className="h-4 w-20 bg-[var(--site-primary-soft)] rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-[var(--site-primary-soft)] rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-3/4 bg-[var(--site-primary-soft)] rounded-sm animate-pulse" />
                                         </div>
                                         <div>
-                                            <div className="h-4 w-20 bg-black/10 rounded-sm mb-2 animate-pulse" />
-                                            <div className="h-3 w-full bg-black/10 rounded-sm mb-1 animate-pulse" />
-                                            <div className="h-3 w-2/3 bg-black/10 rounded-sm animate-pulse" />
+                                            <div className="h-4 w-20 bg-[var(--site-primary-soft)] rounded-sm mb-2 animate-pulse" />
+                                            <div className="h-3 w-full bg-[var(--site-primary-soft)] rounded-sm mb-1 animate-pulse" />
+                                            <div className="h-3 w-2/3 bg-[var(--site-primary-soft)] rounded-sm animate-pulse" />
                                         </div>
                                     </div>
                                 </div>
@@ -468,14 +468,14 @@ const DirectoryPage = () => {
                                     key={cardKey}
                                     className="h-full"
                                 >
-                                    <SpotlightCard enableSpotlight={false} className="p-6 bg-white border border-black/10 shadow-none hover:shadow-none hover:border-black/20 rounded-none min-h-0">
+                                    <SpotlightCard enableSpotlight={false} className="p-6 bg-[var(--site-background)] border border-[var(--site-primary-soft)] shadow-none hover:shadow-none hover:border-[var(--site-primary-soft)] rounded-none min-h-0">
                                         <div ref={getPreviewHeight} className="flex flex-col gap-3" style={{ minHeight: maxPreviewHeight ? `${maxPreviewHeight}px` : undefined }}>
                                             <div className="flex items-start justify-between gap-4">
                                             <div>
-                                                <h3 className="text-xl font-medium mb-1 leading-tight text-black tracking-tight">
+                                                <h3 className="text-xl font-medium mb-1 leading-tight text-[var(--site-primary)] tracking-tight">
                                                     {service.title}
                                                 </h3>
-                                                <p className="text-black/70 mb-4 text-sm font-normal leading-relaxed">
+                                                <p className="text-[var(--site-text-soft)] mb-4 text-sm font-normal leading-relaxed">
                                                     {service.subtitle}
                                                 </p>
                                             </div>
@@ -484,11 +484,11 @@ const DirectoryPage = () => {
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                             {previewDetails.map((detail, idx) => (
                                                 <div key={idx}>
-                                                    <div className="text-[#03385e] font-semibold text-sm mb-1">
+                                                    <div className="text-[var(--site-primary)] font-semibold text-sm mb-1">
                                                         {t(detail.labelKey)}
                                                     </div>
                                                     <div
-                                                        className="text-black text-xs leading-snug"
+                                                        className="text-[var(--site-text)] text-xs leading-snug"
                                                         style={
                                                             isExpanded
                                                                 ? undefined
@@ -508,14 +508,14 @@ const DirectoryPage = () => {
                                         </div>
 
                                         {remainingDetails.length > 0 && (
-                                            <div className={cn("mt-4 pt-4 border-t border-black/5", isExpanded ? "block" : "hidden")}>
+                                            <div className={cn("mt-4 pt-4 border-t border-[var(--site-primary-soft)]", isExpanded ? "block" : "hidden")}>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                                     {remainingDetails.map((detail, idx) => (
                                                         <div key={idx}>
-                                                            <div className="text-[#03385e] font-semibold text-sm mb-1">
+                                                            <div className="text-[var(--site-primary)] font-semibold text-sm mb-1">
                                                                 {t(detail.labelKey)}
                                                             </div>
-                                                            <div className="text-black text-xs leading-snug">
+                                                            <div className="text-[var(--site-text)] text-xs leading-snug">
                                                                 {detail.value}
                                                             </div>
                                                         </div>
@@ -528,7 +528,7 @@ const DirectoryPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => toggleService(cardKey)}
-                                                className="mt-4 w-full inline-flex items-center justify-end gap-2 text-xs font-semibold text-[#03385e] hover:text-[#03385e]/80"
+                                                className="mt-4 w-full inline-flex items-center justify-end gap-2 text-xs font-semibold text-[var(--site-primary)] hover:opacity-80"
                                             >
                                                 {isExpanded ? t('partners.showLess') : t('partners.readMore')}
                                                 <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -547,16 +547,16 @@ const DirectoryPage = () => {
                             })
                         ) : (
                             <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="p-6 rounded-3xl bg-[#03385e]/10 text-black/50">
+                                <div className="p-6 rounded-3xl bg-[var(--site-primary-soft)] text-[var(--site-text-soft)]">
                                     <Search className="w-12 h-12 opacity-20" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold mb-2">{t('directory.noServicesTitle')}</h3>
-                                    <p className="text-black/60 max-w-xs">
+                                    <p className="text-[var(--site-text-soft)] max-w-xs">
                                         {t('directory.noServicesBody')}
                                     </p>
                                 </div>
-                                <Button variant="link" onClick={clearFilters} className="text-[#03385e] font-bold">
+                                <Button variant="link" onClick={clearFilters} className="text-[var(--site-primary)] font-bold">
                                     {t('directory.clearFilters')}
                                 </Button>
                             </div>
@@ -581,7 +581,7 @@ const DirectoryPage = () => {
                                         <PaginationLink
                                             isActive={currentPage === page}
                                             onClick={() => handlePageChange(page)}
-                                            className="cursor-pointer hover:bg-[#03385e]/10 hover:text-[#03385e]"
+                                            className="cursor-pointer hover:bg-[var(--site-primary-soft)] hover:text-[var(--site-primary)]"
                                         >
                                             {page}
                                         </PaginationLink>
@@ -607,3 +607,4 @@ const DirectoryPage = () => {
 };
 
 export default DirectoryPage;
+

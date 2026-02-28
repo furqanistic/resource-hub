@@ -48,7 +48,7 @@ const AboutPage = () => {
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
-                            className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-black"
+                            className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-[var(--site-primary)]"
                         >
                             {pageTitle}
                         </motion.h1>
@@ -61,7 +61,7 @@ const AboutPage = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 + index * 0.15, ease: "easeOut" }}
-                                className="text-base sm:text-lg leading-relaxed text-black/80"
+                                className="text-base sm:text-lg leading-relaxed text-[var(--site-text-soft)]"
                             >
                                 {paragraph}
                             </motion.p>

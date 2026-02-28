@@ -60,13 +60,13 @@ const ResourcesPage = () => {
             <Navbar />
 
             <main className="flex-grow">
-                <section className="bg-[#f6f9fb] border-b border-black/5">
+                <section className="border-b border-[var(--site-primary-soft)] bg-[var(--site-background)]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
                         <div className="max-w-3xl">
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black tracking-tight leading-[1.05]">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[var(--site-primary)] tracking-tight leading-[1.05]">
                                 {pageTitle}
                             </h1>
-                            <p className="mt-4 text-sm sm:text-base text-black/60">
+                            <p className="mt-4 text-sm sm:text-base text-[var(--site-text-soft)]">
                                 {pageSubtitle}
                             </p>
                         </div>
@@ -78,14 +78,14 @@ const ResourcesPage = () => {
                         {resources.map((resource) => (
                             <div
                                 key={resource.id || resource.title}
-                                className="rounded-2xl border border-black/10 bg-white p-6 sm:p-8 shadow-[0_20px_60px_-50px_rgba(3,56,94,0.4)]"
+                                className="rounded-2xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-6 sm:p-8"
                             >
                                 <div className="flex items-start justify-between gap-4">
-                                    <h2 className="text-xl sm:text-2xl font-semibold text-black">
+                                    <h2 className="text-xl sm:text-2xl font-semibold text-[var(--site-primary)]">
                                         {resource.title}
                                     </h2>
                                 </div>
-                                <p className="mt-3 text-sm sm:text-base text-black/60 leading-relaxed">
+                                <p className="mt-3 text-sm sm:text-base text-[var(--site-text-soft)] leading-relaxed">
                                     {resource.description}
                                 </p>
                                 <div className="mt-6">
@@ -93,7 +93,7 @@ const ResourcesPage = () => {
                                         href={resource.href}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#03385e] hover:text-[#03385e]/80"
+                                        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--site-primary)] hover:opacity-80"
                                     >
                                         {resource.ctaLabel}
                                         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
