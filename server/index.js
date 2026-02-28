@@ -10,10 +10,10 @@ import authRoute from './routes/auth.js'
 import contentRoute from './routes/content.js'
 import directoryRoute from './routes/directory.js'
 // import referralRoute from './routes/referral.js' // Comment out for now
-
+import dns from 'dns'
 const app = express()
 dotenv.config({ quiet: true })
-
+dns.setServers(['8.8.8.8', '8.8.4.4'])
 const expandWwwVariants = (origins) => {
   const expanded = new Set()
 
