@@ -189,6 +189,7 @@ body.site-theme-public {
   background-color: var(--site-background);
   color: var(--site-text);
   font-family: var(--site-font-family);
+  --font-sans: var(--site-font-family);
   line-height: var(--site-line-height);
   --text-lg: calc(1.125rem * var(--site-heading-scale));
   --text-xl: calc(1.25rem * var(--site-heading-scale));
@@ -202,4 +203,29 @@ body.site-theme-public {
 body.site-theme-public #root {
   background-color: var(--site-background);
   color: var(--site-text);
+}
+
+body.site-theme-public h1,
+body.site-theme-public h2,
+body.site-theme-public h3,
+body.site-theme-public h4,
+body.site-theme-public h5,
+body.site-theme-public h6,
+body.site-theme-public p,
+body.site-theme-public li,
+body.site-theme-public a,
+body.site-theme-public span,
+body.site-theme-public label,
+body.site-theme-public button,
+body.site-theme-public input,
+body.site-theme-public textarea,
+body.site-theme-public select {
+  line-height: var(--site-line-height);
+}
+
+body.site-theme-public button,
+body.site-theme-public input,
+body.site-theme-public textarea,
+body.site-theme-public select {
+  font-family: var(--site-font-family);
 }

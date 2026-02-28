@@ -59,6 +59,7 @@ const WebsiteThemeSync = () => {
     root.style.setProperty('--site-text', websiteTheme.textColor)
     root.style.setProperty('--site-primary', websiteTheme.primaryColor)
     root.style.setProperty('--site-font-family', websiteTheme.fontFamily)
+    root.style.setProperty('--font-sans', websiteTheme.fontFamily)
     root.style.setProperty(
       '--site-heading-scale',
       String(websiteTheme.headingScale)
