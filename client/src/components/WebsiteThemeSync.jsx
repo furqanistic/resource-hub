@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import axiosInstance from '@/lib/axiosInstance'
@@ -8,6 +8,7 @@ import {
 } from '@/redux/slices/siteThemeSlice'
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/
+const FETCH_RETRY_DELAYS_MS = [0, 1500, 4000]
 
 const toAlphaHex = (hexColor, alphaHex) => {
   if (!HEX_COLOR_PATTERN.test(hexColor || '')) {
@@ -21,27 +22,46 @@ const WebsiteThemeSync = () => {
   const { pathname } = useLocation()
   const dispatch = useDispatch()
   const { websiteTheme, isLoaded } = useSelector((state) => state.siteTheme)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     if (isLoaded) return
 
     let isMounted = true
+    let retryTimeoutId
+
+    const wait = (ms) =>
+      new Promise((resolve) => {
+        retryTimeoutId = window.setTimeout(resolve, ms)
+      })
 
     const fetchThemeSettings = async () => {
-      try {
-        const { data } = await axiosInstance.get('/site-theme')
-        const theme = data?.data?.theme
+      for (let attempt = 0; attempt < FETCH_RETRY_DELAYS_MS.length; attempt += 1) {
+        if (!isMounted) return
 
-        if (isMounted && theme) {
-          dispatch(setWebsiteTheme(theme))
-          return
+        const delay = FETCH_RETRY_DELAYS_MS[attempt]
+        if (delay > 0) {
+          await wait(delay)
+          if (!isMounted) return
         }
-      } catch {
-        // Keep defaults when API is unavailable.
-      }
 
-      if (isMounted) {
-        dispatch(setWebsiteThemeLoaded())
+        try {
+          const { data } = await axiosInstance.get('/site-theme')
+          const theme = data?.data?.theme
+
+          if (isMounted && theme) {
+            dispatch(setWebsiteTheme(theme))
+            return
+          }
+
+          // API responded but payload is missing: keep defaults and stop retrying.
+          if (isMounted) {
+            dispatch(setWebsiteThemeLoaded())
+          }
+          return
+        } catch {
+          // Keep defaults when API is unavailable. Retry a few times.
+        }
       }
     }
 
@@ -49,8 +69,32 @@ const WebsiteThemeSync = () => {
 
     return () => {
       isMounted = false
+      if (retryTimeoutId) {
+        window.clearTimeout(retryTimeoutId)
+      }
     }
-  }, [dispatch, isLoaded])
+  }, [dispatch, isLoaded, refreshKey])
+
+  useEffect(() => {
+    if (isLoaded) return
+
+    const triggerRefetch = () => setRefreshKey((current) => current + 1)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        triggerRefetch()
+      }
+    }
+
+    window.addEventListener('focus', triggerRefetch)
+    window.addEventListener('online', triggerRefetch)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('focus', triggerRefetch)
+      window.removeEventListener('online', triggerRefetch)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [isLoaded])
 
   useEffect(() => {
     const root = window.document.documentElement
