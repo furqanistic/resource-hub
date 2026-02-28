@@ -13,6 +13,7 @@ const defaultTheme = {
 }
 
 const hexColorPattern = /^#[0-9a-fA-F]{6}$/
+const scopeKeyPattern = /^[a-z0-9-]{2,64}$/
 const colorKeys = ['backgroundColor', 'textColor', 'primaryColor']
 const allowedFontFamilies = [
   "'Poppins', 'Inter', sans-serif",
@@ -25,6 +26,7 @@ const numericLimits = {
   bodySize: { min: 14, max: 20, integer: true },
   lineHeight: { min: 1.2, max: 2 },
 }
+const allowedScopeTypes = new Set(['global', 'page', 'section'])
 
 const serializeTheme = (theme) => ({
   backgroundColor: theme.backgroundColor || defaultTheme.backgroundColor,
@@ -102,15 +104,94 @@ const normalizeThemeInput = (payload = {}) => {
   return { value: result }
 }
 
+const serializeThemeOverride = (override = {}) => {
+  const serialized = {}
+
+  for (const key of Object.keys(defaultTheme)) {
+    const rawValue = override?.[key]
+
+    if (rawValue === undefined || rawValue === null) {
+      continue
+    }
+
+    if (colorKeys.includes(key)) {
+      if (typeof rawValue === 'string' && hexColorPattern.test(rawValue)) {
+        serialized[key] = rawValue.toLowerCase()
+      }
+      continue
+    }
+
+    if (key === 'fontFamily') {
+      if (typeof rawValue === 'string' && allowedFontFamilies.includes(rawValue)) {
+        serialized.fontFamily = rawValue
+      }
+      continue
+    }
+
+    const limits = numericLimits[key]
+    if (!limits) continue
+
+    if (!Number.isFinite(rawValue)) {
+      continue
+    }
+
+    if (limits.integer && !Number.isInteger(rawValue)) {
+      continue
+    }
+
+    if (rawValue < limits.min || rawValue > limits.max) {
+      continue
+    }
+
+    serialized[key] = rawValue
+  }
+
+  return serialized
+}
+
+const serializeOverrideMap = (overrideMap) => {
+  const result = {}
+  const entries =
+    overrideMap instanceof Map
+      ? [...overrideMap.entries()]
+      : Object.entries(overrideMap || {})
+
+  for (const [scopeKey, value] of entries) {
+    const plainValue =
+      value && typeof value.toObject === 'function' ? value.toObject() : value
+    const serializedValue = serializeThemeOverride(plainValue)
+
+    if (Object.keys(serializedValue).length) {
+      result[scopeKey] = serializedValue
+    }
+  }
+
+  return result
+}
+
+const serializeThemeSettings = (themeDoc) => {
+  if (!themeDoc) {
+    return {
+      theme: defaultTheme,
+      pageOverrides: {},
+      sectionOverrides: {},
+    }
+  }
+
+  return {
+    theme: serializeTheme(themeDoc),
+    pageOverrides: serializeOverrideMap(themeDoc.pageOverrides),
+    sectionOverrides: serializeOverrideMap(themeDoc.sectionOverrides),
+  }
+}
+
 export const getSiteThemeSettings = async (req, res, next) => {
   try {
-    const theme = await SiteThemeSettings.findOne().sort({ updatedAt: -1 })
+    const themeDoc = await SiteThemeSettings.findOne().sort({ updatedAt: -1 })
 
     res.status(200).json({
       status: 'success',
-      data: {
-        theme: theme ? serializeTheme(theme) : defaultTheme,
-      },
+      data: serializeThemeSettings(themeDoc),
     })
   } catch (error) {
     console.error('Error in getSiteThemeSettings:', error)
@@ -120,6 +201,74 @@ export const getSiteThemeSettings = async (req, res, next) => {
 
 export const updateSiteThemeSettings = async (req, res, next) => {
   try {
+    const scopeTypeRaw = req.body?.scopeType
+    const scopeType = typeof scopeTypeRaw === 'string' ? scopeTypeRaw.trim().toLowerCase() : 'global'
+    const shouldClearScope = req.body?.clearScope === true || req.body?.clearScope === 'true'
+
+    if (!allowedScopeTypes.has(scopeType)) {
+      return next(createError(400, 'scopeType must be one of: global, page, section'))
+    }
+
+    if (scopeType === 'global') {
+      if (shouldClearScope) {
+        return next(createError(400, 'clearScope is not supported for global scope'))
+      }
+
+      const normalized = normalizeThemeInput(req.body)
+
+      if (normalized.error) {
+        return next(createError(400, normalized.error))
+      }
+
+      const nextValues = normalized.value || {}
+      if (!Object.keys(nextValues).length) {
+        return next(createError(400, 'Please provide at least one theme value'))
+      }
+
+      const updatedTheme = await SiteThemeSettings.findOneAndUpdate(
+        {},
+        nextValues,
+        {
+          new: true,
+          upsert: true,
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        }
+      )
+
+      return res.status(200).json({
+        status: 'success',
+        data: serializeThemeSettings(updatedTheme),
+      })
+    }
+
+    if (typeof req.body?.scopeKey !== 'string' || !req.body.scopeKey.trim()) {
+      return next(createError(400, 'scopeKey is required for page and section scopes'))
+    }
+
+    const normalizedScopeKey = req.body.scopeKey.trim().toLowerCase()
+    if (!scopeKeyPattern.test(normalizedScopeKey)) {
+      return next(createError(400, 'scopeKey must use lowercase letters, numbers, and hyphens only'))
+    }
+
+    let themeDoc = await SiteThemeSettings.findOne().sort({ updatedAt: -1 })
+    if (!themeDoc) {
+      themeDoc = new SiteThemeSettings({})
+    }
+
+    const mapName = scopeType === 'page' ? 'pageOverrides' : 'sectionOverrides'
+    const overrideMap = themeDoc[mapName]
+
+    if (shouldClearScope) {
+      overrideMap.delete(normalizedScopeKey)
+      await themeDoc.save()
+
+      return res.status(200).json({
+        status: 'success',
+        data: serializeThemeSettings(themeDoc),
+      })
+    }
+
     const normalized = normalizeThemeInput(req.body)
 
     if (normalized.error) {
@@ -131,22 +280,22 @@ export const updateSiteThemeSettings = async (req, res, next) => {
       return next(createError(400, 'Please provide at least one theme value'))
     }
 
-    const updatedTheme = await SiteThemeSettings.findOneAndUpdate(
-      {},
-      nextValues,
-      {
-        new: true,
-        upsert: true,
-        runValidators: true,
-        setDefaultsOnInsert: true,
-      }
-    )
+    const currentOverride = overrideMap.get(normalizedScopeKey)
+    const currentPlain =
+      currentOverride && typeof currentOverride.toObject === 'function'
+        ? currentOverride.toObject()
+        : currentOverride || {}
 
-    res.status(200).json({
+    overrideMap.set(normalizedScopeKey, {
+      ...currentPlain,
+      ...nextValues,
+    })
+
+    await themeDoc.save()
+
+    return res.status(200).json({
       status: 'success',
-      data: {
-        theme: serializeTheme(updatedTheme),
-      },
+      data: serializeThemeSettings(themeDoc),
     })
   } catch (error) {
     console.error('Error in updateSiteThemeSettings:', error)

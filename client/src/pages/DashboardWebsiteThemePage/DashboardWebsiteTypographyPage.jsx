@@ -5,8 +5,12 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import axiosInstance from '@/lib/axiosInstance'
 import {
   defaultWebsiteTheme,
-  setWebsiteTheme,
+  setWebsiteThemeSettings,
 } from '@/redux/slices/siteThemeSlice'
+import {
+  PAGE_THEME_SCOPES,
+  SECTION_THEME_SCOPES,
+} from '@/constants/siteThemeScopes'
 
 const FONT_FAMILY_OPTIONS = [
   { value: "'Poppins', 'Inter', sans-serif", labelKey: 'dashboard.websiteTheme.fontOptionPoppins' },
@@ -21,7 +25,7 @@ const TYPOGRAPHY_LIMITS = {
   lineHeight: { min: 1.2, max: 2, step: 0.05 },
 }
 
-const normalizeTypography = (theme) => ({
+const extractTypographyValues = (theme = {}) => ({
   fontFamily: theme.fontFamily,
   headingScale: Number(theme.headingScale),
   bodySize: Number(theme.bodySize),
@@ -30,22 +34,57 @@ const normalizeTypography = (theme) => ({
 
 const DashboardWebsiteTypographyPage = () => {
   const token = useSelector((state) => state.auth.token)
-  const websiteTheme = useSelector((state) => state.siteTheme.websiteTheme)
+  const { websiteTheme, pageOverrides, sectionOverrides } = useSelector(
+    (state) => state.siteTheme
+  )
   const dispatch = useDispatch()
   const { t } = useLanguage()
+
+  const [scopeType, setScopeType] = useState('global')
+  const [pageScopeKey, setPageScopeKey] = useState(PAGE_THEME_SCOPES[0]?.key || 'home')
+  const [sectionScopeKey, setSectionScopeKey] = useState(
+    SECTION_THEME_SCOPES[0]?.key || 'home-hero'
+  )
   const [draftValues, setDraftValues] = useState(null)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
 
-  const initialValues = useMemo(
-    () => normalizeTypography(websiteTheme),
-    [websiteTheme]
+  const activeScopeKey = scopeType === 'page' ? pageScopeKey : sectionScopeKey
+
+  const activeOverride = useMemo(() => {
+    if (scopeType === 'page') {
+      return pageOverrides?.[pageScopeKey] || {}
+    }
+
+    if (scopeType === 'section') {
+      return sectionOverrides?.[sectionScopeKey] || {}
+    }
+
+    return {}
+  }, [pageOverrides, pageScopeKey, scopeType, sectionOverrides, sectionScopeKey])
+
+  const hasScopeOverride = useMemo(
+    () => scopeType !== 'global' && Object.keys(activeOverride).length > 0,
+    [activeOverride, scopeType]
   )
-  const formValues = draftValues || initialValues
+
+  const sourceValues = useMemo(() => {
+    const scopedTheme =
+      scopeType === 'global'
+        ? websiteTheme
+        : {
+            ...websiteTheme,
+            ...activeOverride,
+          }
+
+    return extractTypographyValues(scopedTheme)
+  }, [activeOverride, scopeType, websiteTheme])
+
+  const formValues = draftValues || sourceValues
 
   const isDirty = useMemo(
-    () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
-    [formValues, initialValues]
+    () => JSON.stringify(formValues) !== JSON.stringify(sourceValues),
+    [formValues, sourceValues]
   )
 
   const hasInvalidInput = useMemo(() => {
@@ -82,6 +121,26 @@ const DashboardWebsiteTypographyPage = () => {
     )
   }, [formValues])
 
+  const resetDraftState = () => {
+    setDraftValues(null)
+    setStatus('idle')
+    setMessage('')
+  }
+
+  const handleScopeTypeChange = (nextScopeType) => {
+    setScopeType(nextScopeType)
+    resetDraftState()
+  }
+
+  const handleScopeKeyChange = (nextScopeKey) => {
+    if (scopeType === 'page') {
+      setPageScopeKey(nextScopeKey)
+    } else {
+      setSectionScopeKey(nextScopeKey)
+    }
+    resetDraftState()
+  }
+
   const handleValueChange = (key, value) => {
     setDraftValues((prev) => ({
       ...(prev || formValues),
@@ -95,6 +154,16 @@ const DashboardWebsiteTypographyPage = () => {
     const numericValue = Number(value)
     if (!Number.isFinite(numericValue)) return
     handleValueChange(key, numericValue)
+  }
+
+  const buildScopePayload = (basePayload) => {
+    if (scopeType === 'global') return basePayload
+
+    return {
+      ...basePayload,
+      scopeType,
+      scopeKey: activeScopeKey,
+    }
   }
 
   const handleSave = async () => {
@@ -117,15 +186,22 @@ const DashboardWebsiteTypographyPage = () => {
 
       const { data } = await axiosInstance.put(
         '/site-theme',
-        payload,
+        buildScopePayload(payload),
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       )
 
-      const savedTheme = data?.data?.theme || { ...websiteTheme, ...payload }
-      dispatch(setWebsiteTheme(savedTheme))
+      const nextSettings = data?.data
+      if (nextSettings?.theme) {
+        dispatch(setWebsiteThemeSettings(nextSettings))
+      }
+
       setDraftValues(null)
       setStatus('success')
-      setMessage(t('dashboard.websiteTheme.typographySaveSuccess'))
+      setMessage(
+        scopeType === 'global'
+          ? t('dashboard.websiteTheme.typographySaveSuccess')
+          : t('dashboard.websiteTheme.overrideSaveSuccess')
+      )
     } catch (error) {
       setStatus('error')
       setMessage(
@@ -141,13 +217,47 @@ const DashboardWebsiteTypographyPage = () => {
   }
 
   const handleLoadDefaults = () => {
-    const defaults = normalizeTypography(defaultWebsiteTheme)
-    setDraftValues(defaults)
+    const base = scopeType === 'global' ? defaultWebsiteTheme : websiteTheme
+    setDraftValues(extractTypographyValues(base))
     setStatus('idle')
     setMessage(t('dashboard.websiteTheme.defaultsLoaded'))
   }
 
+  const handleClearOverride = async () => {
+    if (scopeType === 'global') return
+
+    setStatus('saving')
+    setMessage(t('dashboard.common.savingChanges'))
+
+    try {
+      const { data } = await axiosInstance.put(
+        '/site-theme',
+        {
+          scopeType,
+          scopeKey: activeScopeKey,
+          clearScope: true,
+        },
+        token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      )
+
+      const nextSettings = data?.data
+      if (nextSettings?.theme) {
+        dispatch(setWebsiteThemeSettings(nextSettings))
+      }
+
+      setDraftValues(null)
+      setStatus('success')
+      setMessage(t('dashboard.websiteTheme.overrideCleared'))
+    } catch (error) {
+      setStatus('error')
+      setMessage(
+        error?.response?.data?.message || error?.message || t('dashboard.websiteTheme.saveError')
+      )
+    }
+  }
+
   const previewHeadingSize = `${Math.round(34 * Number(formValues.headingScale))}px`
+  const scopeOptions = scopeType === 'page' ? PAGE_THEME_SCOPES : SECTION_THEME_SCOPES
 
   return (
     <DashboardLayout>
@@ -189,6 +299,59 @@ const DashboardWebsiteTypographyPage = () => {
             {message}
           </div>
         )}
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">
+            {t('dashboard.websiteTheme.scopeTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('dashboard.websiteTheme.scopeDescription')}
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {t('dashboard.websiteTheme.scopeTypeLabel')}
+              </label>
+              <select
+                value={scopeType}
+                onChange={(event) => handleScopeTypeChange(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              >
+                <option value="global">{t('dashboard.websiteTheme.scopeGlobal')}</option>
+                <option value="page">{t('dashboard.websiteTheme.scopePage')}</option>
+                <option value="section">{t('dashboard.websiteTheme.scopeSection')}</option>
+              </select>
+            </div>
+
+            {scopeType !== 'global' && (
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  {t('dashboard.websiteTheme.scopeKeyLabel')}
+                </label>
+                <select
+                  value={activeScopeKey}
+                  onChange={(event) => handleScopeKeyChange(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                >
+                  {scopeOptions.map((option) => (
+                    <option key={option.key} value={option.key}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {scopeType !== 'global' && (
+            <p className="mt-4 text-xs text-slate-500">
+              {hasScopeOverride
+                ? t('dashboard.websiteTheme.overrideApplied')
+                : t('dashboard.websiteTheme.overrideNotApplied')}
+            </p>
+          )}
+        </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">
@@ -346,6 +509,17 @@ const DashboardWebsiteTypographyPage = () => {
             >
               {t('dashboard.websiteTheme.resetTheme')}
             </button>
+
+            {scopeType !== 'global' && (
+              <button
+                type="button"
+                onClick={handleClearOverride}
+                disabled={!hasScopeOverride || status === 'saving'}
+                className="min-w-[150px] rounded-xl border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold whitespace-nowrap text-rose-700 transition hover:border-rose-300 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t('dashboard.websiteTheme.clearOverride')}
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,77 +1,158 @@
 // File: client/src/pages/DashboardWebsiteThemePage/DashboardWebsiteThemePage.jsx
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import { useLanguage } from '@/contexts/LanguageContext'
 import axiosInstance from '@/lib/axiosInstance'
 import {
   defaultWebsiteTheme,
-  setWebsiteTheme,
+  setWebsiteThemeSettings,
 } from '@/redux/slices/siteThemeSlice'
+import {
+  PAGE_THEME_SCOPES,
+  SECTION_THEME_SCOPES,
+} from '@/constants/siteThemeScopes'
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/
 const isValidHexColor = (value) => HEX_COLOR_PATTERN.test(value || '')
-const THEME_COLOR_KEYS = ['backgroundColor', 'textColor', 'primaryColor']
+
+const extractColorValues = (theme = {}) => ({
+  backgroundColor: theme.backgroundColor,
+  textColor: theme.textColor,
+  primaryColor: theme.primaryColor,
+})
 
 const DashboardWebsiteThemePage = () => {
   const token = useSelector((state) => state.auth.token)
-  const websiteTheme = useSelector((state) => state.siteTheme.websiteTheme)
+  const { websiteTheme, pageOverrides, sectionOverrides } = useSelector(
+    (state) => state.siteTheme
+  )
   const dispatch = useDispatch()
   const { t } = useLanguage()
-  const [formValues, setFormValues] = useState(websiteTheme)
-  const [hexInputValues, setHexInputValues] = useState(websiteTheme)
-  const [initialValues, setInitialValues] = useState(websiteTheme)
+
+  const [scopeType, setScopeType] = useState('global')
+  const [pageScopeKey, setPageScopeKey] = useState(PAGE_THEME_SCOPES[0]?.key || 'home')
+  const [sectionScopeKey, setSectionScopeKey] = useState(
+    SECTION_THEME_SCOPES[0]?.key || 'home-hero'
+  )
+  const [draftValues, setDraftValues] = useState(null)
+  const [hexDraftValues, setHexDraftValues] = useState(null)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
 
-  const colorFields = [
-    { key: 'backgroundColor', label: t('dashboard.websiteTheme.backgroundColor') },
-    { key: 'textColor', label: t('dashboard.websiteTheme.textColor') },
-    { key: 'primaryColor', label: t('dashboard.websiteTheme.primaryColor') },
-  ]
+  const activeScopeKey = scopeType === 'page' ? pageScopeKey : sectionScopeKey
+
+  const activeOverride = useMemo(() => {
+    if (scopeType === 'page') {
+      return pageOverrides?.[pageScopeKey] || {}
+    }
+
+    if (scopeType === 'section') {
+      return sectionOverrides?.[sectionScopeKey] || {}
+    }
+
+    return {}
+  }, [pageOverrides, pageScopeKey, scopeType, sectionOverrides, sectionScopeKey])
+
+  const hasScopeOverride = useMemo(
+    () => scopeType !== 'global' && Object.keys(activeOverride).length > 0,
+    [activeOverride, scopeType]
+  )
+
+  const sourceValues = useMemo(() => {
+    const scopedTheme =
+      scopeType === 'global'
+        ? websiteTheme
+        : {
+            ...websiteTheme,
+            ...activeOverride,
+          }
+
+    return extractColorValues(scopedTheme)
+  }, [activeOverride, scopeType, websiteTheme])
+
+  const formValues = draftValues || sourceValues
+  const hexInputValues = hexDraftValues || formValues
 
   const isDirty = useMemo(
-    () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
-    [formValues, initialValues]
+    () => JSON.stringify(formValues) !== JSON.stringify(sourceValues),
+    [formValues, sourceValues]
   )
 
   const hasInvalidHexInput = useMemo(
     () =>
-      THEME_COLOR_KEYS.some((key) => {
-        const value = hexInputValues[key] || ''
-        return value.length > 0 && !isValidHexColor(value)
+      Object.values(hexInputValues).some((value) => {
+        const inputValue = value || ''
+        return inputValue.length > 0 && !isValidHexColor(inputValue)
       }),
     [hexInputValues]
   )
 
-  useEffect(() => {
-    setFormValues(websiteTheme)
-    setHexInputValues(websiteTheme)
-    setInitialValues(websiteTheme)
-  }, [websiteTheme])
+  const resetDraftState = () => {
+    setDraftValues(null)
+    setHexDraftValues(null)
+    setStatus('idle')
+    setMessage('')
+  }
+
+  const handleScopeTypeChange = (nextScopeType) => {
+    setScopeType(nextScopeType)
+    resetDraftState()
+  }
+
+  const handleScopeKeyChange = (nextScopeKey) => {
+    if (scopeType === 'page') {
+      setPageScopeKey(nextScopeKey)
+    } else {
+      setSectionScopeKey(nextScopeKey)
+    }
+    resetDraftState()
+  }
 
   const handleValueChange = (key, value) => {
-    setFormValues((prev) => ({ ...prev, [key]: value }))
-    setHexInputValues((prev) => ({ ...prev, [key]: value }))
+    setDraftValues((prev) => ({
+      ...(prev || formValues),
+      [key]: value,
+    }))
+    setHexDraftValues((prev) => ({
+      ...(prev || formValues),
+      [key]: value,
+    }))
     setStatus('idle')
     setMessage('')
   }
 
   const handleHexInputChange = (key, value) => {
-    setHexInputValues((prev) => ({ ...prev, [key]: value }))
+    setHexDraftValues((prev) => ({
+      ...(prev || formValues),
+      [key]: value,
+    }))
 
     if (isValidHexColor(value)) {
-      setFormValues((prev) => ({ ...prev, [key]: value.toLowerCase() }))
+      setDraftValues((prev) => ({
+        ...(prev || formValues),
+        [key]: value.toLowerCase(),
+      }))
       setStatus('idle')
       setMessage('')
     }
   }
 
   const handleHexInputBlur = (key) => {
-    setHexInputValues((prev) => ({
-      ...prev,
+    setHexDraftValues((prev) => ({
+      ...(prev || formValues),
       [key]: formValues[key],
     }))
+  }
+
+  const buildScopePayload = (basePayload) => {
+    if (scopeType === 'global') return basePayload
+
+    return {
+      ...basePayload,
+      scopeType,
+      scopeKey: activeScopeKey,
+    }
   }
 
   const handleSave = async () => {
@@ -87,17 +168,23 @@ const DashboardWebsiteThemePage = () => {
     try {
       const { data } = await axiosInstance.put(
         '/site-theme',
-        formValues,
+        buildScopePayload(formValues),
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       )
 
-      const savedTheme = data?.data?.theme || formValues
-      dispatch(setWebsiteTheme(savedTheme))
-      setInitialValues(savedTheme)
-      setFormValues(savedTheme)
-      setHexInputValues(savedTheme)
+      const nextSettings = data?.data
+      if (nextSettings?.theme) {
+        dispatch(setWebsiteThemeSettings(nextSettings))
+      }
+
+      setDraftValues(null)
+      setHexDraftValues(null)
       setStatus('success')
-      setMessage(t('dashboard.websiteTheme.saveSuccess'))
+      setMessage(
+        scopeType === 'global'
+          ? t('dashboard.websiteTheme.saveSuccess')
+          : t('dashboard.websiteTheme.overrideSaveSuccess')
+      )
     } catch (error) {
       setStatus('error')
       setMessage(
@@ -107,18 +194,62 @@ const DashboardWebsiteThemePage = () => {
   }
 
   const handleUndoChanges = () => {
-    setFormValues(initialValues)
-    setHexInputValues(initialValues)
+    setDraftValues(null)
+    setHexDraftValues(null)
     setStatus('idle')
     setMessage(t('dashboard.common.changesReverted'))
   }
 
   const handleLoadDefaults = () => {
-    setFormValues(defaultWebsiteTheme)
-    setHexInputValues(defaultWebsiteTheme)
+    const base = scopeType === 'global' ? defaultWebsiteTheme : websiteTheme
+    const defaultColors = extractColorValues(base)
+    setDraftValues(defaultColors)
+    setHexDraftValues(defaultColors)
     setStatus('idle')
     setMessage(t('dashboard.websiteTheme.defaultsLoaded'))
   }
+
+  const handleClearOverride = async () => {
+    if (scopeType === 'global') return
+
+    setStatus('saving')
+    setMessage(t('dashboard.common.savingChanges'))
+
+    try {
+      const { data } = await axiosInstance.put(
+        '/site-theme',
+        {
+          scopeType,
+          scopeKey: activeScopeKey,
+          clearScope: true,
+        },
+        token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      )
+
+      const nextSettings = data?.data
+      if (nextSettings?.theme) {
+        dispatch(setWebsiteThemeSettings(nextSettings))
+      }
+
+      setDraftValues(null)
+      setHexDraftValues(null)
+      setStatus('success')
+      setMessage(t('dashboard.websiteTheme.overrideCleared'))
+    } catch (error) {
+      setStatus('error')
+      setMessage(
+        error?.response?.data?.message || error?.message || t('dashboard.websiteTheme.saveError')
+      )
+    }
+  }
+
+  const colorFields = [
+    { key: 'backgroundColor', label: t('dashboard.websiteTheme.backgroundColor') },
+    { key: 'textColor', label: t('dashboard.websiteTheme.textColor') },
+    { key: 'primaryColor', label: t('dashboard.websiteTheme.primaryColor') },
+  ]
+
+  const scopeOptions = scopeType === 'page' ? PAGE_THEME_SCOPES : SECTION_THEME_SCOPES
 
   return (
     <DashboardLayout>
@@ -160,6 +291,59 @@ const DashboardWebsiteThemePage = () => {
             {message}
           </div>
         )}
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">
+            {t('dashboard.websiteTheme.scopeTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('dashboard.websiteTheme.scopeDescription')}
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {t('dashboard.websiteTheme.scopeTypeLabel')}
+              </label>
+              <select
+                value={scopeType}
+                onChange={(event) => handleScopeTypeChange(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              >
+                <option value="global">{t('dashboard.websiteTheme.scopeGlobal')}</option>
+                <option value="page">{t('dashboard.websiteTheme.scopePage')}</option>
+                <option value="section">{t('dashboard.websiteTheme.scopeSection')}</option>
+              </select>
+            </div>
+
+            {scopeType !== 'global' && (
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  {t('dashboard.websiteTheme.scopeKeyLabel')}
+                </label>
+                <select
+                  value={activeScopeKey}
+                  onChange={(event) => handleScopeKeyChange(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                >
+                  {scopeOptions.map((option) => (
+                    <option key={option.key} value={option.key}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {scopeType !== 'global' && (
+            <p className="mt-4 text-xs text-slate-500">
+              {hasScopeOverride
+                ? t('dashboard.websiteTheme.overrideApplied')
+                : t('dashboard.websiteTheme.overrideNotApplied')}
+            </p>
+          )}
+        </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">
@@ -209,22 +393,22 @@ const DashboardWebsiteThemePage = () => {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={!isDirty || status === 'saving' || hasInvalidHexInput}
-                className="min-w-[150px] rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
-              </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!isDirty || status === 'saving' || hasInvalidHexInput}
+              className="min-w-[150px] rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {status === 'saving' ? t('dashboard.common.saving') : t('dashboard.common.saveChanges')}
+            </button>
 
-              <button
-                type="button"
-                onClick={handleUndoChanges}
-                disabled={!isDirty || status === 'saving'}
-                className="min-w-[150px] rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold whitespace-nowrap text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {t('dashboard.common.undoChanges')}
+            <button
+              type="button"
+              onClick={handleUndoChanges}
+              disabled={!isDirty || status === 'saving'}
+              className="min-w-[150px] rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold whitespace-nowrap text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {t('dashboard.common.undoChanges')}
             </button>
 
             <button
@@ -235,6 +419,17 @@ const DashboardWebsiteThemePage = () => {
             >
               {t('dashboard.websiteTheme.resetTheme')}
             </button>
+
+            {scopeType !== 'global' && (
+              <button
+                type="button"
+                onClick={handleClearOverride}
+                disabled={!hasScopeOverride || status === 'saving'}
+                className="min-w-[150px] rounded-xl border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold whitespace-nowrap text-rose-700 transition hover:border-rose-300 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t('dashboard.websiteTheme.clearOverride')}
+              </button>
+            )}
           </div>
         </div>
       </div>

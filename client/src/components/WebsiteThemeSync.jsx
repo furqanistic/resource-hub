@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import axiosInstance from '@/lib/axiosInstance'
+import { resolvePublicPageScopeKey } from '@/constants/siteThemeScopes'
 import {
-  setWebsiteTheme,
+  setWebsiteThemeSettings,
   setWebsiteThemeLoaded,
 } from '@/redux/slices/siteThemeSlice'
 
@@ -21,7 +22,9 @@ const toAlphaHex = (hexColor, alphaHex) => {
 const WebsiteThemeSync = () => {
   const { pathname } = useLocation()
   const dispatch = useDispatch()
-  const { websiteTheme, isLoaded } = useSelector((state) => state.siteTheme)
+  const { websiteTheme, pageOverrides, isLoaded } = useSelector(
+    (state) => state.siteTheme
+  )
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -47,10 +50,11 @@ const WebsiteThemeSync = () => {
 
         try {
           const { data } = await axiosInstance.get('/site-theme')
-          const theme = data?.data?.theme
+          const themeSettings = data?.data
+          const theme = themeSettings?.theme
 
           if (isMounted && theme) {
-            dispatch(setWebsiteTheme(theme))
+            dispatch(setWebsiteThemeSettings(themeSettings))
             return
           }
 
@@ -97,42 +101,55 @@ const WebsiteThemeSync = () => {
   }, [isLoaded])
 
   useEffect(() => {
+    const pageScopeKey = resolvePublicPageScopeKey(pathname)
+    const pageOverride = pageScopeKey ? pageOverrides?.[pageScopeKey] || {} : {}
+    const activeTheme = {
+      ...websiteTheme,
+      ...pageOverride,
+    }
+
     const root = window.document.documentElement
 
-    root.style.setProperty('--site-background', websiteTheme.backgroundColor)
-    root.style.setProperty('--site-text', websiteTheme.textColor)
-    root.style.setProperty('--site-primary', websiteTheme.primaryColor)
-    root.style.setProperty('--site-font-family', websiteTheme.fontFamily)
-    root.style.setProperty('--font-sans', websiteTheme.fontFamily)
+    root.style.setProperty('--site-background', activeTheme.backgroundColor)
+    root.style.setProperty('--site-text', activeTheme.textColor)
+    root.style.setProperty('--site-primary', activeTheme.primaryColor)
+    root.style.setProperty('--site-font-family', activeTheme.fontFamily)
+    root.style.setProperty('--font-sans', activeTheme.fontFamily)
     root.style.setProperty(
       '--site-heading-scale',
-      String(websiteTheme.headingScale)
+      String(activeTheme.headingScale)
     )
-    root.style.setProperty('--site-body-size', `${websiteTheme.bodySize}px`)
-    root.style.setProperty('--site-line-height', String(websiteTheme.lineHeight))
+    root.style.setProperty('--site-body-size', `${activeTheme.bodySize}px`)
+    root.style.setProperty('--site-line-height', String(activeTheme.lineHeight))
     root.style.setProperty(
       '--site-primary-soft',
-      toAlphaHex(websiteTheme.primaryColor, '1f')
+      toAlphaHex(activeTheme.primaryColor, '1f')
     )
     root.style.setProperty(
       '--site-text-soft',
-      toAlphaHex(websiteTheme.textColor, 'b3')
+      toAlphaHex(activeTheme.textColor, 'b3')
     )
-  }, [websiteTheme])
+  }, [pathname, pageOverrides, websiteTheme])
 
   useEffect(() => {
     const root = window.document.documentElement
     const isPublicRoute =
       !pathname.startsWith('/dashboard') && !pathname.startsWith('/admin')
+    const pageScopeKey = resolvePublicPageScopeKey(pathname)
+    const pageOverride = pageScopeKey ? pageOverrides?.[pageScopeKey] || {} : {}
+    const activeTheme = {
+      ...websiteTheme,
+      ...pageOverride,
+    }
 
     if (isPublicRoute) {
-      root.style.setProperty('font-size', `${websiteTheme.bodySize}px`)
+      root.style.setProperty('font-size', `${activeTheme.bodySize}px`)
       window.document.body.classList.add('site-theme-public')
     } else {
       root.style.removeProperty('font-size')
       window.document.body.classList.remove('site-theme-public')
     }
-  }, [pathname, websiteTheme.bodySize])
+  }, [pathname, pageOverrides, websiteTheme])
 
   return null
 }
