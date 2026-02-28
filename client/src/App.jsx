@@ -15,6 +15,7 @@ import DashboardPartnersPage from '@/pages/DashboardPartnersPage/DashboardPartne
 import DashboardDirectoryPage from '@/pages/DashboardDirectoryPage/DashboardDirectoryPage'
 import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
 import DashboardWebsiteThemePage from '@/pages/DashboardWebsiteThemePage/DashboardWebsiteThemePage'
+import DashboardWebsiteTypographyPage from '@/pages/DashboardWebsiteThemePage/DashboardWebsiteTypographyPage'
 import WebsiteThemeSync from '@/components/WebsiteThemeSync'
 
 const ScrollToTop = () => {
@@ -49,6 +50,7 @@ const App = () => {
               <Route path='/dashboard/directory' element={<DashboardDirectoryPage />} />
               <Route path='/dashboard/website-theme' element={<Navigate to='/dashboard/website-theme/colors' replace />} />
               <Route path='/dashboard/website-theme/colors' element={<DashboardWebsiteThemePage />} />
+              <Route path='/dashboard/website-theme/typography' element={<DashboardWebsiteTypographyPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

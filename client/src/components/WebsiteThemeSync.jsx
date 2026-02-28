@@ -58,6 +58,13 @@ const WebsiteThemeSync = () => {
     root.style.setProperty('--site-background', websiteTheme.backgroundColor)
     root.style.setProperty('--site-text', websiteTheme.textColor)
     root.style.setProperty('--site-primary', websiteTheme.primaryColor)
+    root.style.setProperty('--site-font-family', websiteTheme.fontFamily)
+    root.style.setProperty(
+      '--site-heading-scale',
+      String(websiteTheme.headingScale)
+    )
+    root.style.setProperty('--site-body-size', `${websiteTheme.bodySize}px`)
+    root.style.setProperty('--site-line-height', String(websiteTheme.lineHeight))
     root.style.setProperty(
       '--site-primary-soft',
       toAlphaHex(websiteTheme.primaryColor, '1f')
@@ -69,15 +76,18 @@ const WebsiteThemeSync = () => {
   }, [websiteTheme])
 
   useEffect(() => {
+    const root = window.document.documentElement
     const isPublicRoute =
       !pathname.startsWith('/dashboard') && !pathname.startsWith('/admin')
 
     if (isPublicRoute) {
+      root.style.setProperty('font-size', `${websiteTheme.bodySize}px`)
       window.document.body.classList.add('site-theme-public')
     } else {
+      root.style.removeProperty('font-size')
       window.document.body.classList.remove('site-theme-public')
     }
-  }, [pathname])
+  }, [pathname, websiteTheme.bodySize])
 
   return null
 }

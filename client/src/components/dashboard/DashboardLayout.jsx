@@ -31,6 +31,7 @@ const DashboardLayout = ({ children }) => {
 
   const websiteThemeLinks = [
     { name: t('dashboard.links.themeColorsEditor'), path: '/dashboard/website-theme/colors' },
+    { name: t('dashboard.links.themeTypographyEditor'), path: '/dashboard/website-theme/typography' },
   ]
 
   const isActive = (path) => location.pathname === path

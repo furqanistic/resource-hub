@@ -4,6 +4,10 @@ export const defaultWebsiteTheme = {
   backgroundColor: '#fcfdfe',
   textColor: '#03385e',
   primaryColor: '#03385e',
+  fontFamily: "'Poppins', 'Inter', sans-serif",
+  headingScale: 1,
+  bodySize: 16,
+  lineHeight: 1.6,
 }
 
 const siteThemeSlice = createSlice({
