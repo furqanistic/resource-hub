@@ -277,7 +277,6 @@ const DashboardWebsiteTypographyPage = () => {
 
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
             <p className="font-semibold text-slate-900">{t('dashboard.common.status')}</p>
-            <p className="mt-1">{t('dashboard.websiteTheme.autoSaveDescription')}</p>
             <p className="mt-1">
               {status === 'saving' && t('dashboard.common.savingChanges')}
               {status === 'success' && t('dashboard.common.allChangesSaved')}
