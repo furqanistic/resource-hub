@@ -56,7 +56,7 @@ const ResourcesPage = () => {
     const pageTitle = content?.title || t('resources.title');
     const pageSubtitle = content?.subtitle || t('resources.subtitle');
     return (
-        <div className="min-h-screen flex flex-col bg-white text-black font-sans">
+        <div className="min-h-screen flex flex-col bg-[var(--site-background)] text-[var(--site-text)] font-sans">
             <Navbar />
 
             <main className="flex-grow">

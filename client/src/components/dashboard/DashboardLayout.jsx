@@ -1,3 +1,4 @@
+// File: client/src/components/dashboard/DashboardLayout.jsx
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -26,6 +27,10 @@ const DashboardLayout = ({ children }) => {
     { name: t('dashboard.links.aboutEditor'), path: '/dashboard/about' },
     { name: t('dashboard.links.partnersEditor'), path: '/dashboard/partners' },
     { name: t('dashboard.links.directoryEditor'), path: '/dashboard/directory' },
+  ]
+
+  const websiteThemeLinks = [
+    { name: t('dashboard.links.websiteThemeEditor'), path: '/dashboard/website-theme' },
   ]
 
   const isActive = (path) => location.pathname === path
@@ -135,6 +140,26 @@ const DashboardLayout = ({ children }) => {
                 </Link>
               ))}
             </div>
+
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+                {t('dashboard.layout.websiteThemeSection')}
+              </p>
+              {websiteThemeLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={cn(
+                    'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
+                    isActive(link.path)
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
           </nav>
 
           <button
@@ -192,7 +217,29 @@ const DashboardLayout = ({ children }) => {
               )}
             >
               <nav className="space-y-2 pb-2">
+                <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  {t('dashboard.layout.dashboardSection')}
+                </p>
                 {dashboardLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={handleMobileNavigate}
+                    className={cn(
+                      'block rounded-lg px-4 py-2 text-sm font-medium transition',
+                      isActive(link.path)
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+
+                <p className="px-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  {t('dashboard.layout.websiteThemeSection')}
+                </p>
+                {websiteThemeLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}

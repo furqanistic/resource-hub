@@ -1,3 +1,4 @@
+// File: client/src/pages/AboutPage/AboutPage.jsx
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
@@ -37,7 +38,7 @@ const AboutPage = () => {
         ? content.paragraphs
         : [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
     return (
-        <div className="min-h-screen bg-white text-black flex flex-col font-sans">
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
             <Navbar />
 
             <main className="grow py-20 sm:py-24 px-4 sm:px-6 lg:px-8">

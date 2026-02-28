@@ -36,7 +36,7 @@ const HomePage = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-background selection:bg-primary/20">
+    <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]">
       <Navbar />
       <main>
         <Hero content={homeContent} />

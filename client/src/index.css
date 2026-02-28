@@ -61,6 +61,9 @@
 }
 
 :root {
+  --site-background: #fcfdfe;
+  --site-text: #03385e;
+  --site-primary: #03385e;
   --background: oklch(0.9751 0.0127 244.2507);
   --foreground: oklch(0.3729 0.0306 259.7328);
   --card: oklch(1.0000 0 0);
@@ -174,4 +177,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body.site-theme-public {
+  background-color: var(--site-background);
+  color: var(--site-text);
+}
+
+body.site-theme-public #root {
+  background-color: var(--site-background);
+  color: var(--site-text);
 }

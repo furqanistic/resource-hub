@@ -14,6 +14,8 @@ import DashboardAboutPage from '@/pages/DashboardAboutPage/DashboardAboutPage'
 import DashboardPartnersPage from '@/pages/DashboardPartnersPage/DashboardPartnersPage'
 import DashboardDirectoryPage from '@/pages/DashboardDirectoryPage/DashboardDirectoryPage'
 import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
+import DashboardWebsiteThemePage from '@/pages/DashboardWebsiteThemePage/DashboardWebsiteThemePage'
+import WebsiteThemeSync from '@/components/WebsiteThemeSync'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -30,6 +32,7 @@ const App = () => {
     <ThemeProvider defaultTheme="light" storageKey="choice-theme">
       <LanguageProvider>
         <BrowserRouter>
+          <WebsiteThemeSync />
           <ScrollToTop />
           <Routes>
             <Route path='/'>
@@ -44,6 +47,7 @@ const App = () => {
               <Route path='/dashboard/about' element={<DashboardAboutPage />} />
               <Route path='/dashboard/partners' element={<DashboardPartnersPage />} />
               <Route path='/dashboard/directory' element={<DashboardDirectoryPage />} />
+              <Route path='/dashboard/website-theme' element={<DashboardWebsiteThemePage />} />
             </Route>
           </Routes>
         </BrowserRouter>

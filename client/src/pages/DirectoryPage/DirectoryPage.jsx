@@ -258,7 +258,7 @@ const DirectoryPage = () => {
     }, [currentServices, maxPreviewHeight]);
 
     return (
-        <div className="min-h-screen bg-white text-black flex flex-col font-sans">
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
             <Navbar />
 
             <main className="grow">

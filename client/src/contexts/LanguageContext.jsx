@@ -1,3 +1,4 @@
+// File: client/src/contexts/LanguageContext.jsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 const LanguageContext = createContext(null);
@@ -21,6 +22,7 @@ const translations = {
         dashboardTitle: 'Dashboard',
         dashboardSection: 'Dashboard',
         mainSiteSection: 'Main Site',
+        websiteThemeSection: 'Website Theme',
         logout: 'Logout',
       },
       sidebar: {
@@ -35,6 +37,7 @@ const translations = {
         aboutEditor: 'About Editor',
         partnersEditor: 'Partners Editor',
         directoryEditor: 'Directory Editor',
+        websiteThemeEditor: 'Website Theme',
       },
       common: {
         status: 'Status',
@@ -191,6 +194,27 @@ const translations = {
         saveSuccess: 'Changes saved successfully.',
         saveError: 'Unable to save changes.',
       },
+      websiteTheme: {
+        pill: 'Website Theme',
+        title: 'Customize website colors',
+        description: 'Phase 1: control global website background, text, and primary action color.',
+        autoSaveTitle: 'Auto save enabled',
+        autoSaveDescription: 'Use Save Changes to apply updates to the public website.',
+        controlsTitle: 'Theme controls',
+        controlsDescription: 'Use these color pickers to define your base website palette.',
+        backgroundColor: 'Background color',
+        textColor: 'Text color',
+        primaryColor: 'Primary color',
+        resetTheme: 'Reset to default',
+        defaultsLoaded: 'Default theme loaded. Click Save Changes to apply it.',
+        saveSuccess: 'Website theme saved successfully.',
+        saveError: 'Unable to save website theme.',
+        previewTitle: 'Live preview',
+        previewDescription: 'This preview matches the public website theme variables.',
+        previewHeading: 'Sample section',
+        previewBody: 'Your website style updates immediately while you edit these values.',
+        previewButton: 'Primary action',
+      },
     },
     home: {
       heroTitle: 'CHOICE Regional Transportation Hub',
@@ -300,6 +324,7 @@ const translations = {
         dashboardTitle: 'Panel',
         dashboardSection: 'Panel',
         mainSiteSection: 'Sitio principal',
+        websiteThemeSection: 'Tema del sitio',
         logout: 'Cerrar sesión',
       },
       sidebar: {
@@ -314,6 +339,7 @@ const translations = {
         aboutEditor: 'Editor de acerca de',
         partnersEditor: 'Editor de socios',
         directoryEditor: 'Editor de directorio',
+        websiteThemeEditor: 'Tema del sitio',
       },
       common: {
         status: 'Estado',
@@ -469,6 +495,27 @@ const translations = {
         countiesServed: 'Condados atendidos',
         saveSuccess: 'Cambios guardados correctamente.',
         saveError: 'No se pudieron guardar los cambios.',
+      },
+      websiteTheme: {
+        pill: 'Tema del sitio',
+        title: 'Personalizar colores del sitio',
+        description: 'Fase 1: controla el fondo global, el texto y el color primario del sitio.',
+        autoSaveTitle: 'Auto guardado activo',
+        autoSaveDescription: 'Usa Guardar cambios para aplicar las actualizaciones al sitio público.',
+        controlsTitle: 'Controles del tema',
+        controlsDescription: 'Usa estos selectores para definir la paleta base del sitio.',
+        backgroundColor: 'Color de fondo',
+        textColor: 'Color de texto',
+        primaryColor: 'Color primario',
+        resetTheme: 'Restablecer valores',
+        defaultsLoaded: 'Tema predeterminado cargado. Haz clic en Guardar cambios para aplicarlo.',
+        saveSuccess: 'Tema del sitio guardado correctamente.',
+        saveError: 'No se pudo guardar el tema del sitio.',
+        previewTitle: 'Vista previa en vivo',
+        previewDescription: 'Esta vista previa usa las mismas variables del sitio público.',
+        previewHeading: 'Sección de ejemplo',
+        previewBody: 'El estilo del sitio se actualiza de inmediato mientras editas.',
+        previewButton: 'Acción primaria',
       },
     },
     home: {

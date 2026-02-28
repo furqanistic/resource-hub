@@ -1,3 +1,4 @@
+// File: client/src/pages/PartnersPage/PartnersPage.jsx
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { Input } from '@/components/ui/input';
@@ -237,7 +238,7 @@ const PartnersPage = () => {
     }, [content, language, searchQuery]);
 
     return (
-        <div className="min-h-screen bg-[#fcfdfe] text-[#03385e] flex flex-col font-sans selection:bg-[#b1ccdf]/30">
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
             <Navbar />
 
             <main className="grow py-12 sm:py-16 px-4 sm:px-6">
