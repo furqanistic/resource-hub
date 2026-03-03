@@ -61,6 +61,15 @@
 }
 
 :root {
+  --site-background: #fcfdfe;
+  --site-text: #03385e;
+  --site-primary: #03385e;
+  --site-font-family: 'Poppins', 'Inter', sans-serif;
+  --site-heading-scale: 1;
+  --site-body-size: 16px;
+  --site-line-height: 1.6;
+  --site-primary-soft: #03385e1f;
+  --site-text-soft: #03385eb3;
   --background: oklch(0.9751 0.0127 244.2507);
   --foreground: oklch(0.3729 0.0306 259.7328);
   --card: oklch(1.0000 0 0);
@@ -174,4 +183,49 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body.site-theme-public {
+  background-color: var(--site-background);
+  color: var(--site-text);
+  font-family: var(--site-font-family);
+  --font-sans: var(--site-font-family);
+  line-height: var(--site-line-height);
+  --text-lg: calc(1.125rem * var(--site-heading-scale));
+  --text-xl: calc(1.25rem * var(--site-heading-scale));
+  --text-2xl: calc(1.5rem * var(--site-heading-scale));
+  --text-3xl: calc(1.875rem * var(--site-heading-scale));
+  --text-4xl: calc(2.25rem * var(--site-heading-scale));
+  --text-5xl: calc(3rem * var(--site-heading-scale));
+  --text-6xl: calc(3.75rem * var(--site-heading-scale));
+}
+
+body.site-theme-public #root {
+  background-color: var(--site-background);
+  color: var(--site-text);
+}
+
+body.site-theme-public h1,
+body.site-theme-public h2,
+body.site-theme-public h3,
+body.site-theme-public h4,
+body.site-theme-public h5,
+body.site-theme-public h6,
+body.site-theme-public p,
+body.site-theme-public li,
+body.site-theme-public a,
+body.site-theme-public span,
+body.site-theme-public label,
+body.site-theme-public button,
+body.site-theme-public input,
+body.site-theme-public textarea,
+body.site-theme-public select {
+  line-height: var(--site-line-height);
+}
+
+body.site-theme-public button,
+body.site-theme-public input,
+body.site-theme-public textarea,
+body.site-theme-public select {
+  font-family: var(--site-font-family);
 }

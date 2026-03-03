@@ -1,7 +1,7 @@
 // File: client/src/App.jsx
 import HomePage from '@/pages/Home/HomePage'
 import React, { useEffect } from 'react'
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import AboutPage from '@/pages/AboutPage/AboutPage'
 import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
@@ -14,6 +14,9 @@ import DashboardAboutPage from '@/pages/DashboardAboutPage/DashboardAboutPage'
 import DashboardPartnersPage from '@/pages/DashboardPartnersPage/DashboardPartnersPage'
 import DashboardDirectoryPage from '@/pages/DashboardDirectoryPage/DashboardDirectoryPage'
 import AdminLoginPage from '@/pages/AdminLoginPage/AdminLoginPage'
+import DashboardWebsiteThemePage from '@/pages/DashboardWebsiteThemePage/DashboardWebsiteThemePage'
+import DashboardWebsiteTypographyPage from '@/pages/DashboardWebsiteThemePage/DashboardWebsiteTypographyPage'
+import WebsiteThemeSync from '@/components/WebsiteThemeSync'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -30,6 +33,7 @@ const App = () => {
     <ThemeProvider defaultTheme="light" storageKey="choice-theme">
       <LanguageProvider>
         <BrowserRouter>
+          <WebsiteThemeSync />
           <ScrollToTop />
           <Routes>
             <Route path='/'>
@@ -44,6 +48,9 @@ const App = () => {
               <Route path='/dashboard/about' element={<DashboardAboutPage />} />
               <Route path='/dashboard/partners' element={<DashboardPartnersPage />} />
               <Route path='/dashboard/directory' element={<DashboardDirectoryPage />} />
+              <Route path='/dashboard/website-theme' element={<Navigate to='/dashboard/website-theme/colors' replace />} />
+              <Route path='/dashboard/website-theme/colors' element={<DashboardWebsiteThemePage />} />
+              <Route path='/dashboard/website-theme/typography' element={<DashboardWebsiteTypographyPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

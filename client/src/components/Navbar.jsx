@@ -22,7 +22,7 @@ const Navbar = () => {
     const LanguageToggle = ({ compact = false }) => (
         <div
             className={cn(
-                "flex items-center gap-2 rounded-full border border-[#03385e]/20 bg-white/90 p-1 shadow-sm",
+                "flex items-center gap-2 rounded-full border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-1 shadow-sm",
                 compact ? "text-[11px]" : "text-xs"
             )}
             role="group"
@@ -34,8 +34,8 @@ const Navbar = () => {
                 className={cn(
                     "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
                     language === 'en'
-                        ? "bg-[#03385e] text-white"
-                        : "text-[#03385e]/70 hover:text-[#03385e]"
+                        ? "bg-[var(--site-primary)] text-white"
+                        : "text-[var(--site-text)] opacity-80 hover:opacity-100 hover:text-[var(--site-primary)]"
                 )}
                 aria-pressed={language === 'en'}
             >
@@ -47,8 +47,8 @@ const Navbar = () => {
                 className={cn(
                     "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
                     language === 'es'
-                        ? "bg-[#03385e] text-white"
-                        : "text-[#03385e]/70 hover:text-[#03385e]"
+                        ? "bg-[var(--site-primary)] text-white"
+                        : "text-[var(--site-text)] opacity-80 hover:opacity-100 hover:text-[var(--site-primary)]"
                 )}
                 aria-pressed={language === 'es'}
             >
@@ -58,7 +58,7 @@ const Navbar = () => {
     );
 
     return (
-        <nav className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
+        <nav className="sticky top-0 z-50 w-full border-b border-[var(--site-primary-soft)] bg-[var(--site-background)]">
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
@@ -83,8 +83,8 @@ const Navbar = () => {
                                 className={cn(
                                     "font-medium transition-colors duration-200 text-base tracking-wide relative py-1",
                                     isActive(link.path)
-                                        ? "text-[#03385e]"
-                                        : "text-[#03385e]/80 hover:text-[#03385e]"
+                                        ? "text-[var(--site-primary)]"
+                                        : "text-[var(--site-text)] opacity-80 hover:text-[var(--site-primary)] hover:opacity-100"
                                 )}
                             >
                                 {link.name}
@@ -101,7 +101,7 @@ const Navbar = () => {
                         <LanguageToggle compact />
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 rounded-md text-[#03385e] hover:bg-slate-100 focus:outline-none transition-colors"
+                            className="rounded-md p-2 text-[var(--site-primary)] transition-colors hover:bg-[var(--site-primary-soft)] focus:outline-none"
                             aria-label="Toggle menu"
                         >
                             {isMobileMenuOpen ? (
@@ -120,7 +120,7 @@ const Navbar = () => {
                 {/* Mobile Menu */}
                 <div
                     className={cn(
-                        "md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-t border-slate-200",
+                        "md:hidden overflow-hidden border-t border-[var(--site-primary-soft)] bg-[var(--site-background)] transition-all duration-300 ease-in-out",
                         isMobileMenuOpen ? "max-h-96 opacity-100 py-4" : "max-h-0 opacity-0"
                     )}
                 >
@@ -133,8 +133,8 @@ const Navbar = () => {
                                 className={cn(
                                     "block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200",
                                     isActive(link.path)
-                                        ? "bg-slate-100 text-[#03385e]"
-                                        : "text-[#03385e]/80 hover:bg-slate-100 hover:text-[#03385e]"
+                                        ? "bg-[var(--site-primary-soft)] text-[var(--site-primary)]"
+                                        : "text-[var(--site-text)] opacity-80 hover:bg-[var(--site-primary-soft)] hover:text-[var(--site-primary)] hover:opacity-100"
                                 )}
                             >
                                 {link.name}

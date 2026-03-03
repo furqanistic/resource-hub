@@ -40,9 +40,9 @@ const Hero = ({ content }) => {
     };
 
     return (
-        <section className="relative overflow-hidden bg-white py-10 sm:py-14 lg:py-16">
+        <section className="relative overflow-hidden bg-[var(--site-background)] py-10 sm:py-14 lg:py-16">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="bg-[#b1ccdf] rounded-none p-6 sm:p-10 lg:p-14">
+                <div className="rounded-none bg-[var(--site-primary-soft)] p-6 sm:p-10 lg:p-14">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 sm:gap-10 lg:gap-14 items-center">
                     {/* Left Column: Content */}
                     <motion.div
@@ -53,16 +53,16 @@ const Hero = ({ content }) => {
                     >
                         <motion.h1
                             variants={fadeInUp}
-                            className="max-w-xl text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-[-0.01em] text-[#03385e] mb-4 leading-[1.08]"
+                            className="mb-4 max-w-xl text-3xl font-semibold leading-[1.08] tracking-[-0.01em] text-[var(--site-primary)] sm:text-4xl lg:text-5xl"
                         >
                             {heroTitle}
                         </motion.h1>
 
                         <motion.div variants={fadeInUp} className="mb-6 sm:mb-8 space-y-3">
-                            <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
+                            <p className="max-w-2xl text-[var(--site-text)] text-[14px] leading-relaxed sm:text-base">
                                 {heroDescription1}
                             </p>
-                            <p className="max-w-2xl text-[14px] sm:text-base text-black/90 leading-relaxed">
+                            <p className="max-w-2xl text-[var(--site-text)] text-[14px] leading-relaxed sm:text-base">
                                 {heroDescription2}
                             </p>
                         </motion.div>
@@ -73,7 +73,7 @@ const Hero = ({ content }) => {
                         >
                             <Button
                                 size="default"
-                                className="group w-full sm:w-auto px-6 sm:px-8 h-11 text-sm font-semibold bg-[#03385e] text-white hover:bg-[#03385e]/90 shadow-sm hover:shadow-[#03385e]/20 transition-all rounded-none"
+                                className="group h-11 w-full rounded-none bg-[var(--site-primary)] px-6 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 sm:w-auto sm:px-8"
                             >
                                 {heroCta}
                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -103,7 +103,7 @@ const Hero = ({ content }) => {
                 </div>
                 </div>
                 <div className="mt-12">
-                    <p className="mb-4 text-center text-xs sm:text-sm font-semibold tracking-wide uppercase text-[#03385e]/70">
+                    <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-[var(--site-text-soft)] sm:text-sm">
                         {supportingPartnersLabel}
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
