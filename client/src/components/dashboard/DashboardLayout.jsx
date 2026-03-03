@@ -1,5 +1,5 @@
 // File: client/src/components/dashboard/DashboardLayout.jsx
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -12,6 +12,8 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate()
   const { t, language, setLanguage } = useLanguage()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMainSiteOpen, setIsMainSiteOpen] = useState(false)
+  const [isMobileMainSiteOpen, setIsMobileMainSiteOpen] = useState(false)
 
   const navLinks = [
     { name: t('nav.home'), path: '/' },
@@ -35,6 +37,14 @@ const DashboardLayout = ({ children }) => {
   ]
 
   const isActive = (path) => location.pathname === path
+  const isMainSiteActive = navLinks.some((link) => isActive(link.path))
+
+  useEffect(() => {
+    if (isMainSiteActive) {
+      setIsMainSiteOpen(true)
+      setIsMobileMainSiteOpen(true)
+    }
+  }, [isMainSiteActive])
 
   const LanguageToggle = ({ compact = false }) => (
     <div
@@ -81,6 +91,7 @@ const DashboardLayout = ({ children }) => {
 
   const handleMobileNavigate = () => {
     setIsMobileMenuOpen(false)
+    setIsMobileMainSiteOpen(false)
   }
 
   return (
@@ -124,26 +135,6 @@ const DashboardLayout = ({ children }) => {
 
             <div className="space-y-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
-                {t('dashboard.layout.mainSiteSection')}
-              </p>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={cn(
-                    'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
-                    isActive(link.path)
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  )}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
                 {t('dashboard.layout.websiteThemeSection')}
               </p>
               {websiteThemeLinks.map((link) => (
@@ -160,6 +151,51 @@ const DashboardLayout = ({ children }) => {
                   {link.name}
                 </Link>
               ))}
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setIsMainSiteOpen((prev) => !prev)}
+                className={cn(
+                  'flex w-full items-center justify-between rounded-xl px-4 py-2 text-left text-sm font-medium transition',
+                  isMainSiteActive
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                )}
+                aria-expanded={isMainSiteOpen}
+              >
+                <span>{t('dashboard.layout.mainSiteSection')}</span>
+                <svg
+                  className={cn('h-4 w-4 transition-transform', isMainSiteOpen ? 'rotate-180' : 'rotate-0')}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={cn(
+                  'space-y-1 overflow-hidden pl-2 transition-all duration-300 ease-in-out',
+                  isMainSiteOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                )}
+              >
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={cn(
+                      'flex items-center rounded-xl px-4 py-2 text-sm font-medium transition',
+                      isActive(link.path)
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </nav>
 
@@ -255,6 +291,55 @@ const DashboardLayout = ({ children }) => {
                     {link.name}
                   </Link>
                 ))}
+
+                <div className="pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMainSiteOpen((prev) => !prev)}
+                    className={cn(
+                      'flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-sm font-medium transition',
+                      isMainSiteActive
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    )}
+                    aria-expanded={isMobileMainSiteOpen}
+                  >
+                    <span>{t('dashboard.layout.mainSiteSection')}</span>
+                    <svg
+                      className={cn(
+                        'h-4 w-4 transition-transform',
+                        isMobileMainSiteOpen ? 'rotate-180' : 'rotate-0'
+                      )}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div
+                    className={cn(
+                      'space-y-1 overflow-hidden pl-2 transition-all duration-300 ease-in-out',
+                      isMobileMainSiteOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                    )}
+                  >
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        onClick={handleMobileNavigate}
+                        className={cn(
+                          'block rounded-lg px-4 py-2 text-sm font-medium transition',
+                          isActive(link.path)
+                            ? 'bg-slate-900 text-white'
+                            : 'text-slate-700 hover:bg-slate-100'
+                        )}
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               </nav>
             </div>
           </header>
