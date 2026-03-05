@@ -63,6 +63,7 @@ const HomePage = () => {
         <SectionThemeScope scopeKey="home-hero">
           <Hero content={homeContent} />
         </SectionThemeScope>
+        <AboutPage embedded />
         <SectionThemeScope scopeKey="home-regional">
           <RegionalPartners />
         </SectionThemeScope>
@@ -71,7 +72,6 @@ const HomePage = () => {
         </SectionThemeScope>
         <DirectoryPage embedded />
         <ResourcesPage embedded />
-        <AboutPage embedded />
         <PartnersPage embedded />
         <SectionThemeScope scopeKey="home-need-help">
           <NeedHelp />
