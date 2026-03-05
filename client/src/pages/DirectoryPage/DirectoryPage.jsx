@@ -119,14 +119,14 @@ const typeOfHelpOptions = [
     'Disability services',
 ];
 
-const DirectoryPage = () => {
+const DirectoryPage = ({ embedded = false }) => {
     const { t } = useLanguage();
     const [servicesData, setServicesData] = useState([]);
     // Input State (Controlled by user interaction)
     const [searchTerm, setSearchTerm] = useState('');
     const [countyFilter, setCountyFilter] = useState('all');
     const [serviceFilter, setServiceFilter] = useState('all');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [countyQuery, setCountyQuery] = useState('');
     const [serviceQuery, setServiceQuery] = useState('');
     const [accessibilityFilter, setAccessibilityFilter] = useState('all');
@@ -189,6 +189,10 @@ const DirectoryPage = () => {
         let isMounted = true;
 
         const fetchServices = async () => {
+            if (isMounted) {
+                setIsLoading(true);
+            }
+
             try {
                 const { data } = await axiosInstance.get('/directory');
                 const list = data?.data?.services || [];
@@ -198,6 +202,10 @@ const DirectoryPage = () => {
             } catch (error) {
                 if (isMounted) {
                     setServicesData([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
                 }
             }
         };
@@ -217,18 +225,18 @@ const DirectoryPage = () => {
         setExpandedServiceIndices([]);
     }, [currentPage]);
 
-    React.useEffect(() => {
-        setIsLoading(true);
-        const t = setTimeout(() => setIsLoading(false), 300);
-        return () => clearTimeout(t);
-    }, [searchTerm, countyFilter, serviceFilter, accessibilityFilter, currentPage]);
-
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentServices = filteredServices.slice(startIndex, startIndex + itemsPerPage);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
+        if (embedded) {
+            const section = document.getElementById('directory');
+            section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -258,12 +266,8 @@ const DirectoryPage = () => {
         }
     }, [currentServices, maxPreviewHeight]);
 
-    return (
-        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
-            <Navbar />
-
-            <main className="grow">
-                <SectionThemeScope scopeKey="directory-main">
+    const directoryContent = (
+        <SectionThemeScope scopeKey="directory-main">
                 <div className="bg-[var(--site-background)] border-b border-[var(--site-primary-soft)]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
                         <div className="max-w-3xl">
@@ -601,13 +605,24 @@ const DirectoryPage = () => {
                         </div>
                     )}
                 </div>
-                </SectionThemeScope>
-            </main>
+        </SectionThemeScope>
+    );
 
+    if (embedded) {
+        return (
+            <section id="directory" className="scroll-mt-28">
+                {directoryContent}
+            </section>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
+            <Navbar />
+            <main className="grow">{directoryContent}</main>
             <Footer />
         </div>
     );
 };
 
 export default DirectoryPage;
-

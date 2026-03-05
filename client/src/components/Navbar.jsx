@@ -1,24 +1,53 @@
 // File: client/src/components/Navbar.jsx
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const { language, setLanguage, t } = useLanguage();
 
     const navLinks = [
         { name: t('nav.home'), path: '/' },
-        { name: t('nav.directory'), path: '/directory' },
+        { name: t('nav.directory'), path: '/#directory', scrollTarget: 'directory' },
         { name: t('nav.resources'), path: '/resources' },
         { name: t('nav.about'), path: '/about' },
         { name: t('nav.partners'), path: '/partners' },
         { name: t('nav.adminLogin'), path: '/admin/login' },
     ];
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (link) => {
+        if (link.scrollTarget) {
+            return location.pathname === '/' && location.hash === `#${link.scrollTarget}`;
+        }
+
+        return location.pathname === link.path;
+    };
+
+    const handleNavClick = (event, link) => {
+        if (!link.scrollTarget) {
+            setIsMobileMenuOpen(false);
+            return;
+        }
+
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+
+        if (location.pathname === '/') {
+            const section = document.getElementById(link.scrollTarget);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.history.replaceState(null, '', `/#${link.scrollTarget}`);
+            }
+            return;
+        }
+
+        navigate(`/#${link.scrollTarget}`);
+    };
+
     const LanguageToggle = ({ compact = false }) => (
         <div
             className={cn(
@@ -80,9 +109,10 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
+                                onClick={(event) => handleNavClick(event, link)}
                                 className={cn(
                                     "font-medium transition-colors duration-200 text-base tracking-wide relative py-1",
-                                    isActive(link.path)
+                                    isActive(link)
                                         ? "text-[var(--site-primary)]"
                                         : "text-[var(--site-text)] opacity-80 hover:text-[var(--site-primary)] hover:opacity-100"
                                 )}
@@ -129,10 +159,10 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                onClick={() => setIsMobileMenuOpen(false)}
+                                onClick={(event) => handleNavClick(event, link)}
                                 className={cn(
                                     "block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200",
-                                    isActive(link.path)
+                                    isActive(link)
                                         ? "bg-[var(--site-primary-soft)] text-[var(--site-primary)]"
                                         : "text-[var(--site-text)] opacity-80 hover:bg-[var(--site-primary-soft)] hover:text-[var(--site-primary)] hover:opacity-100"
                                 )}

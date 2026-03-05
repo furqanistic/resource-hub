@@ -1,5 +1,6 @@
 // File: client/src/pages/Home/HomePage.jsx
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/HomePAge/Hero'
 import RegionalPartners from '@/components/HomePAge/RegionalPartners'
@@ -9,9 +10,11 @@ import ContactForm from '@/components/HomePAge/ContactForm'
 import Footer from '@/components/Footer'
 import SectionThemeScope from '@/components/SectionThemeScope'
 import axiosInstance from '@/lib/axiosInstance'
+import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 
 const HomePage = () => {
   const [homeContent, setHomeContent] = useState(null)
+  const location = useLocation()
 
   useEffect(() => {
     let isMounted = true
@@ -36,6 +39,20 @@ const HomePage = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!location.hash) return
+
+    const sectionId = location.hash.replace('#', '')
+    const section = document.getElementById(sectionId)
+    if (!section) return
+
+    const scrollTimeout = window.setTimeout(() => {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
+
+    return () => window.clearTimeout(scrollTimeout)
+  }, [location.hash])
+
   return (
     <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]">
       <Navbar />
@@ -49,6 +66,7 @@ const HomePage = () => {
         <SectionThemeScope scopeKey="home-services">
           <ServiceCategories />
         </SectionThemeScope>
+        <DirectoryPage embedded />
         <SectionThemeScope scopeKey="home-need-help">
           <NeedHelp />
         </SectionThemeScope>
