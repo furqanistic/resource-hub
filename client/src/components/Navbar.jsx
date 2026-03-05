@@ -1,11 +1,14 @@
 // File: client/src/components/Navbar.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+const SECTION_TARGETS = ['about', 'directory', 'resources', 'partners'];
+
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [activeScrollTarget, setActiveScrollTarget] = useState(null);
     const location = useLocation();
     const navigate = useNavigate();
     const { language, setLanguage, t } = useLanguage();
@@ -19,9 +22,69 @@ const Navbar = () => {
         { name: t('nav.adminLogin'), path: '/admin/login' },
     ];
 
+    useEffect(() => {
+        if (location.pathname !== '/') {
+            setActiveScrollTarget(null);
+            return;
+        }
+
+        const sections = SECTION_TARGETS
+            .map((target) => document.getElementById(target))
+            .filter(Boolean);
+
+        if (!sections.length) {
+            setActiveScrollTarget(null);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visibleEntries = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+                if (visibleEntries.length > 0) {
+                    setActiveScrollTarget(visibleEntries[0].target.id);
+                    return;
+                }
+
+                if (window.scrollY < 120) {
+                    setActiveScrollTarget(null);
+                }
+            },
+            {
+                root: null,
+                rootMargin: '-30% 0px -55% 0px',
+                threshold: [0.1, 0.25, 0.4, 0.6, 0.8],
+            }
+        );
+
+        sections.forEach((section) => observer.observe(section));
+
+        const handleTopReset = () => {
+            if (window.scrollY < 120) {
+                setActiveScrollTarget(null);
+            }
+        };
+
+        window.addEventListener('scroll', handleTopReset, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleTopReset);
+        };
+    }, [location.pathname]);
+
     const isActive = (link) => {
+        const hashTarget = location.hash ? location.hash.replace('#', '') : null;
+
+        if (link.path === '/') {
+            return location.pathname === '/' && !activeScrollTarget && !hashTarget;
+        }
+
         if (link.scrollTarget) {
-            return location.pathname === '/' && location.hash === `#${link.scrollTarget}`;
+            if (location.pathname !== '/') return false;
+            return activeScrollTarget === link.scrollTarget || (!activeScrollTarget && hashTarget === link.scrollTarget);
         }
 
         return location.pathname === link.path;
@@ -35,6 +98,7 @@ const Navbar = () => {
                 event.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 window.history.replaceState(null, '', '/');
+                setActiveScrollTarget(null);
             }
 
             return;
@@ -53,6 +117,7 @@ const Navbar = () => {
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 window.history.replaceState(null, '', `/#${link.scrollTarget}`);
+                setActiveScrollTarget(link.scrollTarget);
             }
             return;
         }
