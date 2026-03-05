@@ -7,7 +7,7 @@ import SectionThemeScope from '@/components/SectionThemeScope';
 import { useLanguage } from '@/contexts/LanguageContext';
 import axiosInstance from '@/lib/axiosInstance';
 
-const AboutPage = () => {
+const AboutPage = ({ embedded = false }) => {
     const { t } = useLanguage();
     const [content, setContent] = useState(null);
 
@@ -38,12 +38,8 @@ const AboutPage = () => {
     const paragraphs = content?.paragraphs?.length
         ? content.paragraphs
         : [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
-    return (
-        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
-            <Navbar />
-
-            <main className="grow py-20 sm:py-24 px-4 sm:px-6 lg:px-8">
-                <SectionThemeScope scopeKey="about-main">
+    const aboutContent = (
+        <SectionThemeScope scopeKey="about-main">
                     <div className="max-w-5xl mx-auto space-y-10">
                         <div className="space-y-6 text-center">
                             <motion.h1
@@ -70,9 +66,21 @@ const AboutPage = () => {
                             ))}
                         </div>
                     </div>
-                </SectionThemeScope>
-            </main>
+        </SectionThemeScope>
+    );
 
+    if (embedded) {
+        return (
+            <section id="about" className="scroll-mt-28 py-20 sm:py-24 px-4 sm:px-6 lg:px-8">
+                {aboutContent}
+            </section>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
+            <Navbar />
+            <main className="grow py-20 sm:py-24 px-4 sm:px-6 lg:px-8">{aboutContent}</main>
             <Footer />
         </div>
     );
