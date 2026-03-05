@@ -63,13 +63,13 @@ const ServiceCategories = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16">
           <div className="max-w-2xl">
             <div className="inline-block px-4 py-1.5 mb-4 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-widest uppercase">
-              Our Services
+              {t('home.servicesBadge')}
             </div>
             <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[var(--site-primary)]">
-              Support at Every Step
+              {t('home.servicesTitle')}
             </h3>
             <p className="mt-4 text-[16px] sm:text-[17px] text-[var(--site-text-soft)] leading-relaxed">
-              Explore the various ways we can help you stay mobile and connected to essential services in your community.
+              {t('home.servicesSubtitle')}
             </p>
           </div>
         </div>
@@ -96,7 +96,7 @@ const ServiceCategories = () => {
               </div>
               
               <div className="relative z-10 mt-4 flex items-center gap-2 text-sm font-bold text-[var(--site-primary)] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                Learn more 
+                {t('home.learnMore')}
                 <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>

@@ -280,7 +280,7 @@ const DirectoryPage = ({ embedded = false }) => {
                         <div className={`flex flex-col md:flex-row md:items-end justify-between gap-8 ${headingSpacingClass}`}>
                             <div className="max-w-2xl">
                                 <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-widest uppercase">
-                                    Directory
+                                    {t('nav.directory')}
                                 </div>
                                 <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--site-primary)] tracking-tight leading-[1.1]">
                                     {t('directory.title')}

@@ -7,7 +7,7 @@ import axiosInstance from '@/lib/axiosInstance';
 import React, { useEffect, useMemo, useState } from 'react';
 
 const ResourcesPage = ({ embedded = false }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [content, setContent] = useState(null);
 
     useEffect(() => {
@@ -53,9 +53,10 @@ const ResourcesPage = ({ embedded = false }) => {
         [t]
     );
 
-    const resources = content?.resources?.length ? content.resources : fallbackResources;
-    const pageTitle = content?.title || t('resources.title');
-    const pageSubtitle = content?.subtitle || t('resources.subtitle');
+    const prefersLocalizedCopy = language !== 'en';
+    const resources = prefersLocalizedCopy ? fallbackResources : (content?.resources?.length ? content.resources : fallbackResources);
+    const pageTitle = prefersLocalizedCopy ? t('resources.title') : (content?.title || t('resources.title'));
+    const pageSubtitle = prefersLocalizedCopy ? t('resources.subtitle') : (content?.subtitle || t('resources.subtitle'));
     const sectionYClass = embedded ? 'py-8 sm:py-10' : 'py-16 sm:py-24';
     const headingSpaceClass = embedded ? 'mb-8' : 'mb-16';
     const cardGapClass = embedded ? 'gap-6 lg:gap-8' : 'gap-8 lg:gap-10';
@@ -71,7 +72,7 @@ const ResourcesPage = ({ embedded = false }) => {
                     <div className={`flex flex-col md:flex-row md:items-end justify-between gap-8 ${headingSpaceClass}`}>
                         <div className="max-w-2xl">
                             <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-widest uppercase">
-                                Resources
+                                {t('nav.resources')}
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--site-primary)] tracking-tight leading-[1.1]">
                                 {pageTitle}

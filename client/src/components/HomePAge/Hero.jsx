@@ -7,12 +7,13 @@ import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 const Hero = ({ content }) => {
-  const { t } = useLanguage()
-  const heroTitle = content?.heroTitle || t('home.heroTitle')
-  const heroDescription1 = content?.heroDescription1 || t('home.heroDescription1')
-  const heroDescription2 = content?.heroDescription2 || t('home.heroDescription2')
-  const heroCta = content?.heroCta || t('home.heroCta')
-  const heroImageAlt = content?.heroImageAlt || t('home.heroImageAlt')
+  const { t, language } = useLanguage()
+  const prefersLocalizedCopy = language !== 'en'
+  const heroTitle = prefersLocalizedCopy ? t('home.heroTitle') : (content?.heroTitle || t('home.heroTitle'))
+  const heroDescription1 = prefersLocalizedCopy ? t('home.heroDescription1') : (content?.heroDescription1 || t('home.heroDescription1'))
+  const heroDescription2 = prefersLocalizedCopy ? t('home.heroDescription2') : (content?.heroDescription2 || t('home.heroDescription2'))
+  const heroCta = prefersLocalizedCopy ? t('home.heroCta') : (content?.heroCta || t('home.heroCta'))
+  const heroImageAlt = prefersLocalizedCopy ? t('home.heroImageAlt') : (content?.heroImageAlt || t('home.heroImageAlt'))
   const heroImageSrc = content?.heroImageUrl?.trim() ? content.heroImageUrl : heroImg
 
   const scrollToDirectory = () => {
@@ -49,7 +50,7 @@ const Hero = ({ content }) => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--site-primary)] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--site-primary)]"></span>
               </span>
-              Community Resource Hub
+              {t('home.communityHubBadge')}
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight text-[var(--site-primary)] mb-8">
@@ -108,7 +109,7 @@ const Hero = ({ content }) => {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-[var(--site-primary)]">100+</div>
-                  <div className="text-xs font-medium text-[var(--site-text-soft)]">Verified Resources</div>
+                  <div className="text-xs font-medium text-[var(--site-text-soft)]">{t('home.verifiedResources')}</div>
                 </div>
               </div>
             </motion.div>

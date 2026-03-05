@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
 const AboutRegionalCombined = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [aboutContent, setAboutContent] = useState(null);
 
     useEffect(() => {
@@ -24,9 +24,18 @@ const AboutRegionalCombined = () => {
         return () => { isMounted = false; };
     }, []);
 
-    const aboutTitle = aboutContent?.title || t('about.title');
+    const prefersLocalizedCopy = language !== 'en';
+    const aboutTitle = prefersLocalizedCopy ? t('about.title') : (aboutContent?.title || t('about.title'));
+    const titleParts = aboutTitle.includes('&')
+        ? aboutTitle.split('&').map((part) => part.trim())
+        : aboutTitle.includes(' y ')
+            ? aboutTitle.split(' y ').map((part) => part.trim())
+            : [aboutTitle];
+    const titleConnector = aboutTitle.includes('&') ? '&' : (aboutTitle.includes(' y ') ? 'y' : null);
     const placeholders = [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
-    const aboutParagraphs = aboutContent?.paragraphs?.length ? aboutContent.paragraphs : placeholders;
+    const aboutParagraphs = prefersLocalizedCopy
+        ? placeholders
+        : (aboutContent?.paragraphs?.length ? aboutContent.paragraphs : placeholders);
 
     return (
         <SectionThemeScope scopeKey="home-regional">
@@ -51,9 +60,9 @@ const AboutRegionalCombined = () => {
                                     {t('nav.about')}
                                 </div>
                                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight text-[var(--site-primary)]">
-                                    {aboutTitle.split('&').map((part, i) => (
+                                    {titleParts.map((part, i) => (
                                         <React.Fragment key={i}>
-                                            {i > 0 && <span className="text-[var(--site-text-soft)] mx-2">&</span>}
+                                            {i > 0 && titleConnector && <span className="text-[var(--site-text-soft)] mx-2">{titleConnector}</span>}
                                             {part.trim()}
                                         </React.Fragment>
                                     ))}
@@ -114,7 +123,7 @@ const AboutRegionalCombined = () => {
                             >
                                 <div className="inline-flex items-center gap-3 px-4 py-1.5 mb-6 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-[0.15em] uppercase">
                                     <span className="w-2 h-2 rounded-full bg-[var(--site-primary)] animate-pulse" />
-                                    Regional Impact
+                                    {t('home.regionalImpact')}
                                 </div>
                                 <h3 className="text-3xl sm:text-4xl font-bold leading-tight text-[var(--site-primary)] mb-8">
                                     {t('home.regionalTitleLine1')} <br />
@@ -139,7 +148,7 @@ const AboutRegionalCombined = () => {
                                 
                                 <div className="mt-10 p-6 rounded-2xl bg-gradient-to-br from-[var(--site-primary)]/5 to-transparent border border-[var(--site-primary-soft)]/20">
                                     <p className="text-sm font-medium italic text-[var(--site-primary)] opacity-80">
-                                        "Working together on community-driven solutions to solve some our most complex challenges."
+                                        "{t('home.regionalP2')}"
                                     </p>
                                 </div>
                             </motion.div>

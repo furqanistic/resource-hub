@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import axiosInstance from '@/lib/axiosInstance';
 
 const AboutPage = ({ embedded = false }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [content, setContent] = useState(null);
 
     useEffect(() => {
@@ -34,10 +34,12 @@ const AboutPage = ({ embedded = false }) => {
         };
     }, []);
 
-    const pageTitle = content?.title || t('about.title');
-    const paragraphs = content?.paragraphs?.length
-        ? content.paragraphs
-        : [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
+    const prefersLocalizedCopy = language !== 'en';
+    const translatedParagraphs = [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
+    const pageTitle = prefersLocalizedCopy ? t('about.title') : (content?.title || t('about.title'));
+    const paragraphs = prefersLocalizedCopy
+        ? translatedParagraphs
+        : (content?.paragraphs?.length ? content.paragraphs : translatedParagraphs);
 
     const aboutContent = (
         <SectionThemeScope scopeKey="about-main">
