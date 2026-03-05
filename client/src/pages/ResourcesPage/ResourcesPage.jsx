@@ -6,7 +6,7 @@ import SectionThemeScope from '@/components/SectionThemeScope';
 import { useLanguage } from '@/contexts/LanguageContext';
 import axiosInstance from '@/lib/axiosInstance';
 
-const ResourcesPage = () => {
+const ResourcesPage = ({ embedded = false }) => {
     const { t } = useLanguage();
     const [content, setContent] = useState(null);
 
@@ -56,12 +56,8 @@ const ResourcesPage = () => {
     const resources = content?.resources?.length ? content.resources : fallbackResources;
     const pageTitle = content?.title || t('resources.title');
     const pageSubtitle = content?.subtitle || t('resources.subtitle');
-    return (
-        <div className="min-h-screen flex flex-col bg-[var(--site-background)] text-[var(--site-text)] font-sans">
-            <Navbar />
-
-            <main className="flex-grow">
-                <SectionThemeScope scopeKey="resources-main">
+    const resourcesContent = (
+        <SectionThemeScope scopeKey="resources-main">
                     <section className="border-b border-[var(--site-primary-soft)] bg-[var(--site-background)]">
                         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
                             <div className="max-w-3xl">
@@ -107,9 +103,21 @@ const ResourcesPage = () => {
                             ))}
                         </div>
                     </section>
-                </SectionThemeScope>
-            </main>
+        </SectionThemeScope>
+    );
 
+    if (embedded) {
+        return (
+            <section id="resources" className="scroll-mt-28">
+                {resourcesContent}
+            </section>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col bg-[var(--site-background)] text-[var(--site-text)] font-sans">
+            <Navbar />
+            <main className="flex-grow">{resourcesContent}</main>
             <Footer />
         </div>
     );

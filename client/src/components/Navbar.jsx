@@ -13,7 +13,7 @@ const Navbar = () => {
     const navLinks = [
         { name: t('nav.home'), path: '/' },
         { name: t('nav.directory'), path: '/#directory', scrollTarget: 'directory' },
-        { name: t('nav.resources'), path: '/resources' },
+        { name: t('nav.resources'), path: '/#resources', scrollTarget: 'resources' },
         { name: t('nav.about'), path: '/about' },
         { name: t('nav.partners'), path: '/partners' },
         { name: t('nav.adminLogin'), path: '/admin/login' },

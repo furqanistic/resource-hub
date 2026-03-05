@@ -11,6 +11,7 @@ import Footer from '@/components/Footer'
 import SectionThemeScope from '@/components/SectionThemeScope'
 import axiosInstance from '@/lib/axiosInstance'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
+import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
 
 const HomePage = () => {
   const [homeContent, setHomeContent] = useState(null)
@@ -67,6 +68,7 @@ const HomePage = () => {
           <ServiceCategories />
         </SectionThemeScope>
         <DirectoryPage embedded />
+        <ResourcesPage embedded />
         <SectionThemeScope scopeKey="home-need-help">
           <NeedHelp />
         </SectionThemeScope>
