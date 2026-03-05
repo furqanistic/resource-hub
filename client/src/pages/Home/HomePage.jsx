@@ -17,6 +17,7 @@ import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 
 const HomePage = () => {
   const [homeContent, setHomeContent] = useState(null)
+  const [showBackToTop, setShowBackToTop] = useState(false)
   const location = useLocation()
 
   useEffect(() => {
@@ -56,6 +57,23 @@ const HomePage = () => {
     return () => window.clearTimeout(scrollTimeout)
   }, [location.hash])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]">
       <Navbar />
@@ -81,7 +99,17 @@ const HomePage = () => {
         </SectionThemeScope>
       </main>
       <Footer />
-    </div >
+      <button
+        type="button"
+        onClick={scrollToTop}
+        aria-label="Back to top"
+        className={`fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full border border-[var(--site-primary-soft)] bg-[var(--site-primary)] text-white shadow-lg transition-all duration-300 hover:opacity-90 ${showBackToTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
+      >
+        <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5M5 12l7-7 7 7" />
+        </svg>
+      </button>
+    </div>
   )
 }
 
