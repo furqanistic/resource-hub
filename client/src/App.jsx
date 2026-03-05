@@ -4,8 +4,6 @@ import React, { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import AboutPage from '@/pages/AboutPage/AboutPage'
-import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
-import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import DashboardPage from '@/pages/DashboardPage/DashboardPage'
@@ -38,8 +36,8 @@ const App = () => {
           <Routes>
             <Route path='/'>
               <Route index element={<HomePage />} />
-              <Route path='/directory' element={<DirectoryPage />} />
-              <Route path='/resources' element={<ResourcesPage />} />
+              <Route path='/directory' element={<Navigate to='/#directory' replace />} />
+              <Route path='/resources' element={<Navigate to='/#resources' replace />} />
               <Route path='/about' element={<AboutPage />} />
               <Route path='/partners' element={<PartnersPage />} />
               <Route path='/admin/login' element={<AdminLoginPage />} />
