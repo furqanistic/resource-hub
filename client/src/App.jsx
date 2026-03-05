@@ -3,7 +3,6 @@ import HomePage from '@/pages/Home/HomePage'
 import React, { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@/components/ThemeProvider'
-import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import DashboardPage from '@/pages/DashboardPage/DashboardPage'
 import DashboardResourcesPage from '@/pages/DashboardResourcesPage/DashboardResourcesPage'
@@ -38,7 +37,7 @@ const App = () => {
               <Route path='/directory' element={<Navigate to='/#directory' replace />} />
               <Route path='/resources' element={<Navigate to='/#resources' replace />} />
               <Route path='/about' element={<Navigate to='/#about' replace />} />
-              <Route path='/partners' element={<PartnersPage />} />
+              <Route path='/partners' element={<Navigate to='/#partners' replace />} />
               <Route path='/admin/login' element={<AdminLoginPage />} />
               <Route path='/dashboard' element={<DashboardPage />} />
               <Route path='/dashboard/resources' element={<DashboardResourcesPage />} />

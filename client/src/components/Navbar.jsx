@@ -15,7 +15,7 @@ const Navbar = () => {
         { name: t('nav.directory'), path: '/#directory', scrollTarget: 'directory' },
         { name: t('nav.resources'), path: '/#resources', scrollTarget: 'resources' },
         { name: t('nav.about'), path: '/#about', scrollTarget: 'about' },
-        { name: t('nav.partners'), path: '/partners' },
+        { name: t('nav.partners'), path: '/#partners', scrollTarget: 'partners' },
         { name: t('nav.adminLogin'), path: '/admin/login' },
     ];
 

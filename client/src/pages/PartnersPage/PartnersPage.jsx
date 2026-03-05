@@ -192,7 +192,7 @@ const itemVariants = {
     },
 };
 
-const PartnersPage = () => {
+const PartnersPage = ({ embedded = false }) => {
     const { t, language } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null);
@@ -238,12 +238,8 @@ const PartnersPage = () => {
         });
     }, [content, language, searchQuery]);
 
-    return (
-        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
-            <Navbar />
-
-            <main className="grow py-12 sm:py-16 px-4 sm:px-6">
-                <SectionThemeScope scopeKey="partners-main">
+    const partnersContent = (
+        <SectionThemeScope scopeKey="partners-main">
                 <div className="max-w-5xl mx-auto">
                     {/* Search Bar */}
                     <motion.div 
@@ -392,9 +388,21 @@ const PartnersPage = () => {
                         )}
                     </AnimatePresence>
                 </div>
-                </SectionThemeScope>
-            </main>
+        </SectionThemeScope>
+    );
 
+    if (embedded) {
+        return (
+            <section id="partners" className="scroll-mt-28 py-12 sm:py-16 px-4 sm:px-6">
+                {partnersContent}
+            </section>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
+            <Navbar />
+            <main className="grow py-12 sm:py-16 px-4 sm:px-6">{partnersContent}</main>
             <Footer />
         </div>
     );

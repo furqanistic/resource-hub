@@ -13,6 +13,7 @@ import axiosInstance from '@/lib/axiosInstance'
 import DirectoryPage from '@/pages/DirectoryPage/DirectoryPage'
 import ResourcesPage from '@/pages/ResourcesPage/ResourcesPage'
 import AboutPage from '@/pages/AboutPage/AboutPage'
+import PartnersPage from '@/pages/PartnersPage/PartnersPage'
 
 const HomePage = () => {
   const [homeContent, setHomeContent] = useState(null)
@@ -71,6 +72,7 @@ const HomePage = () => {
         <DirectoryPage embedded />
         <ResourcesPage embedded />
         <AboutPage embedded />
+        <PartnersPage embedded />
         <SectionThemeScope scopeKey="home-need-help">
           <NeedHelp />
         </SectionThemeScope>
