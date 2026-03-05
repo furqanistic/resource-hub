@@ -28,6 +28,18 @@ const Navbar = () => {
     };
 
     const handleNavClick = (event, link) => {
+        if (link.path === '/') {
+            setIsMobileMenuOpen(false);
+
+            if (location.pathname === '/') {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.history.replaceState(null, '', '/');
+            }
+
+            return;
+        }
+
         if (!link.scrollTarget) {
             setIsMobileMenuOpen(false);
             return;
