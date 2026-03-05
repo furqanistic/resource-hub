@@ -238,6 +238,10 @@ const PartnersPage = ({ embedded = false }) => {
         });
     }, [content, language, searchQuery]);
 
+    const searchMarginClass = embedded ? 'mb-6' : 'mb-10';
+    const emptyStateClass = embedded ? 'py-12' : 'py-20';
+    const sectionWrapClass = embedded ? 'scroll-mt-28 py-6 sm:py-8 px-4 sm:px-6' : 'grow py-12 sm:py-16 px-4 sm:px-6';
+
     const partnersContent = (
         <SectionThemeScope scopeKey="partners-main">
                 <div className="max-w-5xl mx-auto">
@@ -245,7 +249,7 @@ const PartnersPage = ({ embedded = false }) => {
                     <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="max-w-md mx-auto mb-10 relative group"
+                        className={`max-w-md mx-auto ${searchMarginClass} relative group`}
                     >
                         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-[var(--site-text-soft)] group-focus-within:text-[var(--site-primary)] transition-colors" />
@@ -381,7 +385,7 @@ const PartnersPage = ({ embedded = false }) => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="rounded-2xl border border-dashed border-[var(--site-primary-soft)] bg-[var(--site-background)] py-20 text-center"
+                                className={`rounded-2xl border border-dashed border-[var(--site-primary-soft)] bg-[var(--site-background)] ${emptyStateClass} text-center`}
                             >
                                 <p className="text-center text-sm text-[var(--site-text-soft)]">{t('partners.noResults')}</p>
                             </motion.div>
@@ -393,7 +397,7 @@ const PartnersPage = ({ embedded = false }) => {
 
     if (embedded) {
         return (
-            <section id="partners" className="scroll-mt-28 py-12 sm:py-16 px-4 sm:px-6">
+            <section id="partners" className={sectionWrapClass}>
                 {partnersContent}
             </section>
         );
@@ -402,7 +406,7 @@ const PartnersPage = ({ embedded = false }) => {
     return (
         <div className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)] flex flex-col font-sans">
             <Navbar />
-            <main className="grow py-12 sm:py-16 px-4 sm:px-6">{partnersContent}</main>
+            <main className={sectionWrapClass}>{partnersContent}</main>
             <Footer />
         </div>
     );

@@ -1,10 +1,22 @@
-// File: client/src/components/Navbar.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const SECTION_TARGETS = ['about', 'directory', 'resources', 'partners'];
+const SECTION_TARGETS = ['about', 'directory', 'resources', 'partners', 'contact'];
+const STICKY_NAV_OFFSET = 96;
+
+const scrollToSectionWithOffset = (sectionId, behavior = 'smooth') => {
+    const section = document.getElementById(sectionId);
+    if (!section) return false;
+
+    const nextTop = section.getBoundingClientRect().top + window.scrollY - STICKY_NAV_OFFSET;
+    window.scrollTo({
+        top: Math.max(0, nextTop),
+        behavior,
+    });
+    return true;
+};
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,6 +31,7 @@ const Navbar = () => {
         { name: t('nav.directory'), path: '/#directory', scrollTarget: 'directory' },
         { name: t('nav.resources'), path: '/#resources', scrollTarget: 'resources' },
         { name: t('nav.partners'), path: '/#partners', scrollTarget: 'partners' },
+        { name: t('nav.contact') || 'Contact', path: '/#contact', scrollTarget: 'contact' },
         { name: t('nav.adminLogin'), path: '/admin/login' },
     ];
 
@@ -32,10 +45,7 @@ const Navbar = () => {
             .map((target) => document.getElementById(target))
             .filter(Boolean);
 
-        if (!sections.length) {
-            setActiveScrollTarget(null);
-            return;
-        }
+        if (!sections.length) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -113,9 +123,8 @@ const Navbar = () => {
         setIsMobileMenuOpen(false);
 
         if (location.pathname === '/') {
-            const section = document.getElementById(link.scrollTarget);
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const didScroll = scrollToSectionWithOffset(link.scrollTarget, 'smooth');
+            if (didScroll) {
                 window.history.replaceState(null, '', `/#${link.scrollTarget}`);
                 setActiveScrollTarget(link.scrollTarget);
             }
@@ -128,8 +137,8 @@ const Navbar = () => {
     const LanguageToggle = ({ compact = false }) => (
         <div
             className={cn(
-                "flex items-center gap-2 rounded-full border border-[var(--site-primary-soft)] bg-[var(--site-background)] p-1 shadow-sm",
-                compact ? "text-[11px]" : "text-xs"
+                'flex items-center rounded-full bg-[var(--site-primary-soft)]/40 p-1',
+                compact ? 'text-[11px]' : 'text-xs'
             )}
             role="group"
             aria-label={t('nav.language')}
@@ -138,10 +147,8 @@ const Navbar = () => {
                 type="button"
                 onClick={() => setLanguage('en')}
                 className={cn(
-                    "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
-                    language === 'en'
-                        ? "bg-[var(--site-primary)] text-white"
-                        : "text-[var(--site-text)] opacity-80 hover:opacity-100 hover:text-[var(--site-primary)]"
+                    'rounded-full px-3 py-1.5 font-semibold tracking-wide transition-colors',
+                    language === 'en' ? 'bg-[var(--site-primary)] text-white' : 'text-[var(--site-text)] opacity-80 hover:opacity-100'
                 )}
                 aria-pressed={language === 'en'}
             >
@@ -151,10 +158,8 @@ const Navbar = () => {
                 type="button"
                 onClick={() => setLanguage('es')}
                 className={cn(
-                    "px-3 py-1 rounded-full font-semibold tracking-wide transition-colors",
-                    language === 'es'
-                        ? "bg-[var(--site-primary)] text-white"
-                        : "text-[var(--site-text)] opacity-80 hover:opacity-100 hover:text-[var(--site-primary)]"
+                    'rounded-full px-3 py-1.5 font-semibold tracking-wide transition-colors',
+                    language === 'es' ? 'bg-[var(--site-primary)] text-white' : 'text-[var(--site-text)] opacity-80 hover:opacity-100'
                 )}
                 aria-pressed={language === 'es'}
             >
@@ -164,51 +169,42 @@ const Navbar = () => {
     );
 
     return (
-        <nav className="sticky top-0 z-50 w-full border-b border-[var(--site-primary-soft)] bg-[var(--site-background)]">
-            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
-                    {/* Logo */}
-                    <Link
-                        to="/"
-                        className="flex items-center gap-3"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        <img
-                            src="/logo.avif"
-                            alt="CHOICE Logo"
-                            className="h-12 w-auto"
-                        />
+        <nav className="sticky top-0 z-50 w-full bg-[color-mix(in_srgb,var(--site-background)_84%,transparent)] backdrop-blur-xl">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-4">
+                    <Link to="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                        <img src="/logo.avif" alt="CHOICE Logo" className="h-11 w-auto sm:h-12" />
                     </Link>
 
-                    {/* Desktop Navigation Links - Centered */}
-                    <div className="hidden md:flex flex-1 items-center justify-center gap-12">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                onClick={(event) => handleNavClick(event, link)}
-                                className={cn(
-                                    "font-medium transition-colors duration-200 text-base tracking-wide relative py-1",
-                                    isActive(link)
-                                        ? "text-[var(--site-primary)]"
-                                        : "text-[var(--site-text)] opacity-80 hover:text-[var(--site-primary)] hover:opacity-100"
-                                )}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                    <div className="hidden md:flex justify-center">
+                        <div className="inline-flex items-center gap-1 rounded-full bg-[var(--site-primary-soft)]/35 p-1.5">
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.name}
+                                    to={link.path}
+                                    onClick={(event) => handleNavClick(event, link)}
+                                    className={cn(
+                                        'rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
+                                        isActive(link)
+                                            ? 'bg-[var(--site-primary)] text-white'
+                                            : 'text-[var(--site-text)]/90 hover:bg-[var(--site-background)]/75 hover:text-[var(--site-primary)]'
+                                    )}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="hidden md:flex items-center gap-3">
+                    <div className="hidden md:flex items-center justify-end">
                         <LanguageToggle />
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <div className="md:hidden flex items-center gap-3">
+                    <div className="col-span-2 flex items-center justify-end gap-3 md:hidden">
                         <LanguageToggle compact />
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="rounded-md p-2 text-[var(--site-primary)] transition-colors hover:bg-[var(--site-primary-soft)] focus:outline-none"
+                            className="rounded-full bg-[var(--site-primary-soft)]/45 p-2 text-[var(--site-primary)] transition-colors"
                             aria-label="Toggle menu"
                         >
                             {isMobileMenuOpen ? (
@@ -224,24 +220,23 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
                 <div
                     className={cn(
-                        "md:hidden overflow-hidden border-t border-[var(--site-primary-soft)] bg-[var(--site-background)] transition-all duration-300 ease-in-out",
-                        isMobileMenuOpen ? "max-h-96 opacity-100 py-4" : "max-h-0 opacity-0"
+                        'md:hidden overflow-hidden transition-all duration-300 ease-in-out',
+                        isMobileMenuOpen ? 'max-h-[28rem] pb-4 opacity-100' : 'max-h-0 opacity-0'
                     )}
                 >
-                    <div className="space-y-1 px-2 pb-3 pt-2">
+                    <div className="space-y-1 rounded-2xl bg-[var(--site-primary-soft)]/25 p-2">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 to={link.path}
                                 onClick={(event) => handleNavClick(event, link)}
                                 className={cn(
-                                    "block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200",
+                                    'block rounded-xl px-4 py-3 text-base font-medium transition-colors',
                                     isActive(link)
-                                        ? "bg-[var(--site-primary-soft)] text-[var(--site-primary)]"
-                                        : "text-[var(--site-text)] opacity-80 hover:bg-[var(--site-primary-soft)] hover:text-[var(--site-primary)] hover:opacity-100"
+                                        ? 'bg-[var(--site-primary)] text-white'
+                                        : 'text-[var(--site-text)]/90 hover:bg-[var(--site-background)]/75 hover:text-[var(--site-primary)]'
                                 )}
                             >
                                 {link.name}

@@ -1,137 +1,123 @@
 // File: client/src/components/HomePAge/Hero.jsx
-import heroImg from '@/assets/CloudLogos/hero-img.jpg';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import React from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-
-import gcrLogo from '@/assets/Brand/Greater Columbia River Behavioral Health Administrative Services Organization (GCRBHASO).png';
-import cwcogLogo from '@/assets/Brand/Coastal Washington Council of Governments (CWCOG).png';
-
-const logos = [
-    { name: 'Great Rivers BH-ASO', src: gcrLogo },
-    { name: 'UnitedHealthcare', src: null },
-    { name: 'Cowlitz-Wahkiakum Council of Governments', src: cwcogLogo },
-];
-
+import heroImg from '@/assets/CloudLogos/hero-img.jpg'
+import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { motion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
+import React from 'react'
 
 const Hero = ({ content }) => {
-    const { t } = useLanguage();
-    const heroTitle = content?.heroTitle || t('home.heroTitle');
-    const heroDescription1 = content?.heroDescription1 || t('home.heroDescription1');
-    const heroDescription2 = content?.heroDescription2 || t('home.heroDescription2');
-    const heroCta = content?.heroCta || t('home.heroCta');
-    const heroImageAlt = content?.heroImageAlt || t('home.heroImageAlt');
-    const supportingPartnersLabel = content?.supportingPartnersLabel || t('home.supportingPartners');
-    const heroImageSrc = content?.heroImageUrl?.trim() ? content.heroImageUrl : heroImg;
-    const fadeInUp = {
-        initial: { opacity: 0, y: 20 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
-    };
+  const { t } = useLanguage()
+  const heroTitle = content?.heroTitle || t('home.heroTitle')
+  const heroDescription1 = content?.heroDescription1 || t('home.heroDescription1')
+  const heroDescription2 = content?.heroDescription2 || t('home.heroDescription2')
+  const heroCta = content?.heroCta || t('home.heroCta')
+  const heroImageAlt = content?.heroImageAlt || t('home.heroImageAlt')
+  const heroImageSrc = content?.heroImageUrl?.trim() ? content.heroImageUrl : heroImg
 
-    const stagger = {
-        animate: {
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
+  const scrollToDirectory = () => {
+    const directorySection = document.getElementById('directory')
+    if (!directorySection) return
+    directorySection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.history.replaceState(null, '', '/#directory')
+  }
 
-    return (
-        <section className="relative overflow-hidden bg-[var(--site-background)] py-10 sm:py-14 lg:py-16">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="rounded-none bg-[var(--site-primary-soft)] p-6 sm:p-10 lg:p-14">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 sm:gap-10 lg:gap-14 items-center">
-                    {/* Left Column: Content */}
-                    <motion.div
-                        variants={stagger}
-                        initial="initial"
-                        animate="animate"
-                        className="flex flex-col justify-center text-left"
-                    >
-                        <motion.h1
-                            variants={fadeInUp}
-                            className="mb-4 max-w-xl text-3xl font-semibold leading-[1.08] tracking-[-0.01em] text-[var(--site-primary)] sm:text-4xl lg:text-5xl"
-                        >
-                            {heroTitle}
-                        </motion.h1>
+  return (
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-[var(--site-background)] py-12 sm:py-20 lg:py-28">
+      {/* Dynamic Background Elements - Clean replacement */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.05]">
+        <div className="absolute inset-0 bg-[radial-gradient(var(--site-secondary-soft)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      </div>
 
-                        <motion.div variants={fadeInUp} className="mb-6 sm:mb-8 space-y-3">
-                            <p className="max-w-2xl text-[var(--site-text)] text-[14px] leading-relaxed sm:text-base">
-                                {heroDescription1}
-                            </p>
-                            <p className="max-w-2xl text-[var(--site-text)] text-[14px] leading-relaxed sm:text-base">
-                                {heroDescription2}
-                            </p>
-                        </motion.div>
 
-                        <motion.div
-                            variants={fadeInUp}
-                            className="flex flex-col sm:flex-row gap-4 justify-start"
-                        >
-                            <Button
-                                size="default"
-                                className="group h-11 w-full rounded-none bg-[var(--site-primary)] px-6 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 sm:w-auto sm:px-8"
-                            >
-                                {heroCta}
-                                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                        </motion.div>
-                    </motion.div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 items-center">
+          {/* Content Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-7"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-widest uppercase"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--site-primary)] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--site-primary)]"></span>
+              </span>
+              Community Resource Hub
+            </motion.div>
 
-                    {/* Right Column: Image */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative max-w-lg lg:max-w-none mx-auto lg:mx-0"
-                    >
-                        <motion.div
-                            animate={{ y: [0, -6, 0] }}
-                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                            className="relative z-10 rounded-xl overflow-hidden shadow-xl border border-black/5"
-                        >
-                            <img
-                                src={heroImageSrc}
-                                alt={heroImageAlt}
-                                className="w-full aspect-4/3 object-cover"
-                            />
-                        </motion.div>
-                    </motion.div>
-                </div>
-                </div>
-                <div className="mt-12">
-                    <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-[var(--site-text-soft)] sm:text-sm">
-                        {supportingPartnersLabel}
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
-                        {logos.map((logo, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center justify-center w-36 h-16"
-                            >
-                                {logo.src ? (
-                                    <img
-                                        src={logo.src}
-                                        alt={logo.name}
-                                        className="max-h-full max-w-full object-contain grayscale opacity-70"
-                                    />
-                                ) : (
-                                    <div className="h-full w-full flex items-center justify-center rounded-sm bg-black/85 px-2">
-                                        <span className="text-[10px] sm:text-xs text-white text-center leading-tight">
-                                            {logo.name}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight text-[var(--site-primary)] mb-8">
+              {heroTitle}
+            </h1>
+
+            <div className="flex flex-col gap-6 text-[17px] sm:text-[18px] leading-relaxed text-[var(--site-text)] mb-10 max-w-2xl">
+              <p className="opacity-90">{heroDescription1}</p>
+              <p className="opacity-80 border-l-4 border-[var(--site-primary-soft)] pl-6 italic">{heroDescription2}</p>
             </div>
-        </section>
-    );
-};
 
-export default Hero;
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <Button
+                size="lg"
+                onClick={scrollToDirectory}
+                className="group relative h-14 w-full sm:w-auto rounded-2xl bg-[var(--site-primary)] px-10 text-base font-bold text-white transition-all hover:scale-[1.02] hover:bg-[var(--site-primary)]/90 overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {heroCta}
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              </Button>
+            
+            </div>
+          </motion.div>
+
+          {/* Image Side */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="lg:col-span-5 relative"
+          >
+            <div className="relative z-10 aspect-[4/5] sm:aspect-square lg:aspect-[4/5] rounded-[3rem] overflow-hidden border-[8px] border-white/30 backdrop-blur-sm">
+              <img 
+                src={heroImageSrc} 
+                alt={heroImageAlt} 
+                className="h-full w-full object-cover transition-transform duration-[2s] hover:scale-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--site-primary)]/20 to-transparent pointer-events-none" />
+            </div>
+
+            {/* Floating Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="absolute -bottom-6 -left-6 sm:-left-12 z-20 p-5 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/50 min-w-[200px]"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-[var(--site-primary)] text-white">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-[var(--site-primary)]">100+</div>
+                  <div className="text-xs font-medium text-[var(--site-text-soft)]">Verified Resources</div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+export default Hero

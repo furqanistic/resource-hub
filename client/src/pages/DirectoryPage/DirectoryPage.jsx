@@ -1,22 +1,9 @@
 // File: client/src/pages/DirectoryPage/DirectoryPage.jsx
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import {
-    Filter,
-    Search
-} from 'lucide-react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 import SectionThemeScope from '@/components/SectionThemeScope';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 import {
     Pagination,
     PaginationContent,
@@ -25,7 +12,20 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import {
+    Filter,
+    Search
+} from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import axiosInstance from '@/lib/axiosInstance';
 
@@ -266,162 +266,159 @@ const DirectoryPage = ({ embedded = false }) => {
         }
     }, [currentServices, maxPreviewHeight]);
 
+    const sectionYClass = embedded ? 'py-8 sm:py-10' : 'py-16 sm:py-24';
+    const headingSpacingClass = embedded ? 'mb-8 sm:mb-10' : 'mb-12 sm:mb-16';
+    const filterCardClass = embedded ? 'p-5 sm:p-6 mb-8' : 'p-8 sm:p-10 mb-16';
+    const resultWrapClass = embedded ? 'pb-8' : 'pb-20';
+    const emptyStateClass = embedded ? 'py-16' : 'py-40';
+    const paginationTopClass = embedded ? 'mt-10' : 'mt-16';
+
     const directoryContent = (
         <SectionThemeScope scopeKey="directory-main">
-                <div className="bg-[var(--site-background)] border-b border-[var(--site-primary-soft)]">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-                        <div className="max-w-3xl">
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[var(--site-primary)] tracking-tight leading-[1.05]">
-                                {t('directory.title')}
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div className="rounded-2xl border border-[var(--site-primary-soft)] bg-[var(--site-background)]">
-                        <div className="flex items-center justify-between gap-3 px-6 sm:px-8 py-6 border-b border-[var(--site-primary-soft)]">
-                            <div className="flex items-center gap-3 text-[var(--site-text)]">
-                                <div className="h-10 w-10 rounded-full bg-[var(--site-primary-soft)] flex items-center justify-center">
-                                    <Filter className="w-5 h-5 text-[var(--site-primary)]" />
+                <div className={`bg-[var(--site-background)] ${sectionYClass} relative overflow-hidden`}>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-8 ${headingSpacingClass}`}>
+                            <div className="max-w-2xl">
+                                <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-[var(--site-primary-soft)]/20 border border-[var(--site-primary-soft)]/30 text-[var(--site-primary)] text-xs font-bold tracking-widest uppercase">
+                                    Directory
                                 </div>
-                                <div>
-                                    <div className="text-lg font-semibold">{t('directory.filterTitle')}</div>
-                                </div>
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--site-primary)] tracking-tight leading-[1.1]">
+                                    {t('directory.title')}
+                                </h1>
                             </div>
                         </div>
 
-                        <div className="px-6 sm:px-8 py-6 space-y-5">
-                            <div className="relative">
-                                <Input
-                                    placeholder={t('directory.searchByName')}
-                                    className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
+                        {/* Search and Filters Section */}
+                        <div className={`relative group ${filterCardClass} rounded-[2.5rem] bg-white border border-[var(--site-primary-soft)]/30 transition-all duration-500 hover:border-[var(--site-primary)]/40 overflow-hidden`}>
+                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--site-primary-soft)]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                            
+                            <div className="relative z-10 space-y-6">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="h-12 w-12 rounded-2xl bg-[var(--site-primary-soft)]/20 flex items-center justify-center transition-transform group-hover:scale-110">
+                                        <Filter className="w-5 h-5 text-[var(--site-primary)]" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-[var(--site-text)]">{t('directory.filterTitle')}</h2>
+                                </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                                <Select
-                                    value={countyFilter}
-                                    onValueChange={(value) => {
-                                        setCountyFilter(value);
-                                        setCountyQuery('');
-                                    }}
-                                    key={`county-${countyFilter}`}
-                                >
-                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
-                                        <SelectValue placeholder={t('directory.allCounties')} />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
-                                        <div className="p-2">
-                                            <Input
-                                                placeholder={t('directory.searchCounties')}
-                                                value={countyQuery}
-                                                onChange={(e) => setCountyQuery(e.target.value)}
-                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
-                                            />
-                                        </div>
-                                        <SelectItem value="all">{t('directory.allCounties')}</SelectItem>
-                                        {filteredCounties.map(county => (
-                                            <SelectItem
-                                                key={county}
-                                                value={county}
-                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
-                                            >
-                                                {county}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+                                    <div className="lg:col-span-12 relative">
+                                        <Input
+                                            placeholder={t('directory.searchByName')}
+                                            className="h-14 w-full rounded-2xl border border-[var(--site-primary-soft)]/50 bg-[var(--site-background)]/50 text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-2 focus-visible:ring-[var(--site-primary)]/20 focus-visible:border-[var(--site-primary)] transition-all shadow-none"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
 
-                                <Select
-                                    value={serviceFilter}
-                                    onValueChange={(value) => {
-                                        setServiceFilter(value);
-                                        setServiceQuery('');
-                                    }}
-                                    key={`service-${serviceFilter}`}
-                                >
-                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
-                                        <SelectValue placeholder={t('directory.allServices')} />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
-                                        <div className="p-2">
-                                            <Input
-                                                placeholder={t('directory.searchServices')}
-                                                value={serviceQuery}
-                                                onChange={(e) => setServiceQuery(e.target.value)}
-                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
-                                            />
-                                        </div>
-                                        <SelectItem value="all">{t('directory.allServices')}</SelectItem>
-                                        {filteredServicesList.map(service => (
-                                            <SelectItem
-                                                key={service}
-                                                value={service}
-                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
-                                            >
-                                                {service}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                    <div className="lg:col-span-4">
+                                        <Select
+                                            value={countyFilter}
+                                            onValueChange={(value) => {
+                                                setCountyFilter(value);
+                                                setCountyQuery('');
+                                            }}
+                                            key={`county-${countyFilter}`}
+                                        >
+                                            <SelectTrigger className="h-14 w-full rounded-2xl border border-[var(--site-primary-soft)]/50 bg-[var(--site-background)]/50 text-[var(--site-text)] transition-all focus:ring-2 focus:ring-[var(--site-primary)]/20 focus:border-[var(--site-primary)] shadow-none">
+                                                <SelectValue placeholder={t('directory.allCounties')} />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-2xl border-[var(--site-primary-soft)] p-2">
+                                                <div className="p-2 sticky top-0 bg-white z-10 mb-2">
+                                                    <Input
+                                                        placeholder={t('directory.searchCounties')}
+                                                        value={countyQuery}
+                                                        onChange={(e) => setCountyQuery(e.target.value)}
+                                                        className="h-10 rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)]"
+                                                    />
+                                                </div>
+                                                <SelectItem value="all" className="rounded-xl">{t('directory.allCounties')}</SelectItem>
+                                                {filteredCounties.map(county => (
+                                                    <SelectItem key={county} value={county} className="rounded-xl">{county}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                                <Select
-                                    value={accessibilityFilter}
-                                    onValueChange={(value) => {
-                                        setAccessibilityFilter(value);
-                                        setAccessibilityQuery('');
-                                    }}
-                                    key={`accessibility-${accessibilityFilter}`}
-                                >
-                                    <SelectTrigger className="h-12 w-full rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)] shadow-sm">
-                                        <SelectValue placeholder={t('directory.allAccessibility')} />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl max-h-75 border-[var(--site-primary-soft)]">
-                                        <div className="p-2">
-                                            <Input
-                                                placeholder={t('directory.searchAccessibility')}
-                                                value={accessibilityQuery}
-                                                onChange={(e) => setAccessibilityQuery(e.target.value)}
-                                                className="h-9 rounded-md border border-[var(--site-primary-soft)] bg-[var(--site-background)] text-[var(--site-text)] placeholder:text-[var(--site-text-soft)] focus-visible:ring-0 focus-visible:border-[var(--site-primary)]"
-                                            />
-                                        </div>
-                                        <SelectItem value="all">{t('directory.allAccessibility')}</SelectItem>
-                                        {filteredAccessibilityList.map((accessibility) => (
-                                            <SelectItem
-                                                key={accessibility}
-                                                value={accessibility}
-                                                className="data-[highlighted]:bg-[var(--site-primary-soft)] data-[highlighted]:text-[var(--site-text)]"
-                                            >
-                                                {accessibility}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    <div className="lg:col-span-4">
+                                        <Select
+                                            value={serviceFilter}
+                                            onValueChange={(value) => {
+                                                setServiceFilter(value);
+                                                setServiceQuery('');
+                                            }}
+                                            key={`service-${serviceFilter}`}
+                                        >
+                                            <SelectTrigger className="h-14 w-full rounded-2xl border border-[var(--site-primary-soft)]/50 bg-[var(--site-background)]/50 text-[var(--site-text)] transition-all focus:ring-2 focus:ring-[var(--site-primary)]/20 focus:border-[var(--site-primary)] shadow-none">
+                                                <SelectValue placeholder={t('directory.allServices')} />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-2xl border-[var(--site-primary-soft)] p-2">
+                                                <div className="p-2 sticky top-0 bg-white z-10 mb-2">
+                                                    <Input
+                                                        placeholder={t('directory.searchServices')}
+                                                        value={serviceQuery}
+                                                        onChange={(e) => setServiceQuery(e.target.value)}
+                                                        className="h-10 rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)]"
+                                                    />
+                                                </div>
+                                                <SelectItem value="all" className="rounded-xl">{t('directory.allServices')}</SelectItem>
+                                                {filteredServicesList.map(service => (
+                                                    <SelectItem key={service} value={service} className="rounded-xl">{service}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
-                                <Button
-                                    className="h-12 rounded-xl bg-[var(--site-primary)] px-8 font-medium text-white shadow-none hover:opacity-90"
-                                    onClick={() => setCurrentPage(1)}
-                                >
-                                    {t('directory.startSearch')}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="h-12 rounded-xl border border-[var(--site-primary-soft)] px-8 font-medium text-[var(--site-primary)] hover:bg-[var(--site-primary-soft)]"
-                                    onClick={clearFilters}
-                                >
-                                    {t('directory.clearAll')}
-                                </Button>
+                                    <div className="lg:col-span-4">
+                                        <Select
+                                            value={accessibilityFilter}
+                                            onValueChange={(value) => {
+                                                setAccessibilityFilter(value);
+                                                setAccessibilityQuery('');
+                                            }}
+                                            key={`accessibility-${accessibilityFilter}`}
+                                        >
+                                            <SelectTrigger className="h-14 w-full rounded-2xl border border-[var(--site-primary-soft)]/50 bg-[var(--site-background)]/50 text-[var(--site-text)] transition-all focus:ring-2 focus:ring-[var(--site-primary)]/20 focus:border-[var(--site-primary)] shadow-none">
+                                                <SelectValue placeholder={t('directory.allAccessibility')} />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-2xl border-[var(--site-primary-soft)] p-2">
+                                                <div className="p-2 sticky top-0 bg-white z-10 mb-2">
+                                                    <Input
+                                                        placeholder={t('directory.searchAccessibility')}
+                                                        value={accessibilityQuery}
+                                                        onChange={(e) => setAccessibilityQuery(e.target.value)}
+                                                        className="h-10 rounded-xl border border-[var(--site-primary-soft)] bg-[var(--site-background)]"
+                                                    />
+                                                </div>
+                                                <SelectItem value="all" className="rounded-xl">{t('directory.allAccessibility')}</SelectItem>
+                                                {filteredAccessibilityList.map(a => (
+                                                    <SelectItem key={a} value={a} className="rounded-xl">{a}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-4 border-t border-[var(--site-primary-soft)]/30">
+                                    <Button
+                                        className="h-14 px-10 rounded-2xl bg-[var(--site-primary)] text-white text-base font-bold shadow-none transition-all hover:scale-105 active:scale-95"
+                                        onClick={() => setCurrentPage(1)}
+                                    >
+                                        {t('directory.startSearch')}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        className="h-14 px-8 rounded-2xl text-[var(--site-primary)] text-base font-bold hover:bg-[var(--site-primary-soft)]/20"
+                                        onClick={clearFilters}
+                                    >
+                                        {t('directory.clearAll')}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${resultWrapClass}`}>
                     {/* Service Cards Grid */}
                     {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
@@ -472,87 +469,73 @@ const DirectoryPage = ({ embedded = false }) => {
                                 return (
                                 <div
                                     key={cardKey}
-                                    className="h-full"
+                                    className="h-full group/card"
                                 >
-                                    <SpotlightCard enableSpotlight={false} className="p-6 bg-[var(--site-background)] border border-[var(--site-primary-soft)] shadow-none hover:shadow-none hover:border-[var(--site-primary-soft)] rounded-none min-h-0">
-                                        <div ref={getPreviewHeight} className="flex flex-col gap-3" style={{ minHeight: maxPreviewHeight ? `${maxPreviewHeight}px` : undefined }}>
+                                    <div className="relative h-full flex flex-col p-6 rounded-[1.8rem] bg-white border border-[var(--site-primary-soft)]/30 transition-all duration-500 hover:border-[var(--site-primary)]/40 hover:-translate-y-1.5 overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[var(--site-primary-soft)]/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                        
+                                        <div ref={getPreviewHeight} className="relative z-10 flex flex-col gap-3" style={{ minHeight: maxPreviewHeight ? `${maxPreviewHeight}px` : undefined }}>
                                             <div className="flex items-start justify-between gap-4">
-                                            <div>
-                                                <h3 className="text-xl font-medium mb-1 leading-tight text-[var(--site-primary)] tracking-tight">
-                                                    {service.title}
-                                                </h3>
-                                                <p className="text-[var(--site-text-soft)] mb-4 text-sm font-normal leading-relaxed">
-                                                    {service.subtitle}
-                                                </p>
-                                            </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                            {previewDetails.map((detail, idx) => (
-                                                <div key={idx}>
-                                                    <div className="text-[var(--site-primary)] font-semibold text-sm mb-1">
-                                                        {t(detail.labelKey)}
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="w-6 h-0.5 rounded-full bg-[var(--site-primary-soft)] transition-all duration-500 group-hover/card:w-10 group-hover/card:bg-[var(--site-primary)]" />
                                                     </div>
-                                                    <div
-                                                        className="text-[var(--site-text)] text-xs leading-snug"
-                                                        style={
-                                                            isExpanded
-                                                                ? undefined
-                                                                : {
-                                                                    display: '-webkit-box',
-                                                                    WebkitLineClamp: 3,
-                                                                    WebkitBoxOrient: 'vertical',
-                                                                    overflow: 'hidden',
-                                                                }
-                                                        }
-                                                    >
-                                                        {detail.value}
-                                                    </div>
+                                                    <h3 className="text-[17px] font-bold leading-tight text-[var(--site-primary)] tracking-tight mb-1">
+                                                        {service.title}
+                                                    </h3>
+                                                    <p className="text-[var(--site-text-soft)] text-[13px] font-medium leading-relaxed">
+                                                        {service.subtitle}
+                                                    </p>
                                                 </div>
-                                            ))}
-                                        </div>
-                                        </div>
+                                            </div>
 
-                                        {remainingDetails.length > 0 && (
-                                            <div className={cn("mt-4 pt-4 border-t border-[var(--site-primary-soft)]", isExpanded ? "block" : "hidden")}>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                                    {remainingDetails.map((detail, idx) => (
-                                                        <div key={idx}>
-                                                            <div className="text-[var(--site-primary)] font-semibold text-sm mb-1">
-                                                                {t(detail.labelKey)}
-                                                            </div>
-                                                            <div className="text-[var(--site-text)] text-xs leading-snug">
-                                                                {detail.value}
-                                                            </div>
+                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3 mt-2">
+                                                {previewDetails.map((detail, idx) => (
+                                                    <div key={idx} className="flex flex-col">
+                                                        <div className="text-[var(--site-primary)] font-bold text-[10px] uppercase tracking-wider mb-0.5 opacity-80">
+                                                            {t(detail.labelKey)}
                                                         </div>
-                                                    ))}
-                                                </div>
+                                                        <div className="text-[var(--site-text)] text-[12px] leading-tight line-clamp-2 font-medium">
+                                                            {detail.value}
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        )}
+                                        </div>
+
+                                        <div className={cn("relative z-10 mt-3 pt-4 space-y-3 border-t border-[var(--site-primary-soft)]/20", isExpanded ? "block" : "hidden")}>
+                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                {remainingDetails.map((detail, idx) => (
+                                                    <div key={idx} className="flex flex-col">
+                                                        <div className="text-[var(--site-primary)] font-bold text-[10px] uppercase tracking-wider mb-0.5 opacity-80">
+                                                            {t(detail.labelKey)}
+                                                        </div>
+                                                        <div className="text-[var(--site-text)] text-[12px] leading-tight font-medium">
+                                                            {detail.value}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
 
                                         {remainingDetails.length > 0 && (
                                             <button
                                                 type="button"
                                                 onClick={() => toggleService(cardKey)}
-                                                className="mt-4 w-full inline-flex items-center justify-end gap-2 text-xs font-semibold text-[var(--site-primary)] hover:opacity-80"
+                                                className="relative z-10 mt-5 w-full inline-flex items-center justify-center gap-2 py-2 rounded-xl bg-[var(--site-primary-soft)]/10 text-[11px] font-bold text-[var(--site-primary)] hover:bg-[var(--site-primary)] hover:text-white transition-all duration-300"
                                             >
                                                 {isExpanded ? t('partners.showLess') : t('partners.readMore')}
-                                                <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path
-                                                        d={isExpanded
-                                                            ? "M5.23 12.23a.75.75 0 0 0 1.06 1.06L10 9.56l3.71 3.73a.75.75 0 1 0 1.06-1.06l-4.24-4.25a.75.75 0 0 0-1.06 0L5.23 12.23z"
-                                                            : "M14.77 7.77a.75.75 0 0 0-1.06-1.06L10 10.44 6.29 6.71a.75.75 0 0 0-1.06 1.06l4.24 4.25a.75.75 0 0 0 1.06 0l4.24-4.25z"
-                                                        }
-                                                    />
+                                                <svg className={cn("w-3.5 h-3.5 transition-transform duration-300", isExpanded ? "rotate-180" : "")} viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                                                 </svg>
                                             </button>
                                         )}
-                                    </SpotlightCard>
+                                    </div>
                                 </div>
                                 );
                             })
                         ) : (
-                            <div className="col-span-full py-40 flex flex-col items-center justify-center text-center space-y-4">
+                            <div className={`col-span-full ${emptyStateClass} flex flex-col items-center justify-center text-center space-y-4`}>
                                 <div className="p-6 rounded-3xl bg-[var(--site-primary-soft)] text-[var(--site-text-soft)]">
                                     <Search className="w-12 h-12 opacity-20" />
                                 </div>
@@ -572,7 +555,7 @@ const DirectoryPage = ({ embedded = false }) => {
 
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
-                        <div className="mt-16">
+                        <div className={paginationTopClass}>
                             <Pagination>
                                 <PaginationContent>
                                     <PaginationItem>
