@@ -1,21 +1,43 @@
+import heroImg from '@/assets/CloudLogos/hero-img.jpg'
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
+import axiosInstance from '@/lib/axiosInstance'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
-import heroImg from '@/assets/CloudLogos/hero-img.jpg'
-import axiosInstance from '@/lib/axiosInstance'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   heroTitle: 'CHOICE Regional Transportation Hub',
+  heroTitleEs: '',
   heroDescription1:
     'This is the CHOICE Regional Transportation Hub created to help connect community members and providers with transportation resources across the region.',
+  heroDescription1Es: '',
   heroDescription2:
     'This hub was developed in response to regional needs identified through community input and collaboration to improve access to essential care services.',
+  heroDescription2Es: '',
   heroCta: 'Start My Search',
+  heroCtaEs: '',
   heroImageUrl: '',
   heroImageAlt: 'Supportive driver providing transportation',
+  heroImageAltEs: '',
   supportingPartnersLabel: 'Supporting Partners',
+  supportingPartnersLabelEs: '',
 }
+
+const hydrateLocalizedContent = (values) => ({
+  ...values,
+  heroTitleEs: values.heroTitleEs?.trim() ? values.heroTitleEs : values.heroTitle,
+  heroDescription1Es: values.heroDescription1Es?.trim()
+    ? values.heroDescription1Es
+    : values.heroDescription1,
+  heroDescription2Es: values.heroDescription2Es?.trim()
+    ? values.heroDescription2Es
+    : values.heroDescription2,
+  heroCtaEs: values.heroCtaEs?.trim() ? values.heroCtaEs : values.heroCta,
+  heroImageAltEs: values.heroImageAltEs?.trim() ? values.heroImageAltEs : values.heroImageAlt,
+  supportingPartnersLabelEs: values.supportingPartnersLabelEs?.trim()
+    ? values.supportingPartnersLabelEs
+    : values.supportingPartnersLabel,
+})
 
 const DashboardPage = () => {
   const { user, token } = useSelector((state) => state.auth)
@@ -25,6 +47,11 @@ const DashboardPage = () => {
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
+  const [activeContentLanguage, setActiveContentLanguage] = useState('en')
+
+  const isSpanishContent = activeContentLanguage === 'es'
+  const localizedLabelSuffix = isSpanishContent ? ' (Spanish)' : ''
+  const contentField = (baseField) => (isSpanishContent ? `${baseField}Es` : baseField)
 
   const isDirty = useMemo(
     () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
@@ -51,7 +78,9 @@ const DashboardPage = () => {
         const content = data?.data?.content
 
         if (isMounted) {
-          const nextValues = content ? { ...defaultContent, ...content } : defaultContent
+          const nextValues = hydrateLocalizedContent(
+            content ? { ...defaultContent, ...content } : defaultContent
+          )
           setInitialValues(nextValues)
           setFormValues(nextValues)
           setUpdatedAt(content?.updatedAt || null)
@@ -104,7 +133,9 @@ const DashboardPage = () => {
       )
 
       const content = data?.data?.content
-      const nextValues = content ? { ...defaultContent, ...content } : { ...formValues }
+      const nextValues = hydrateLocalizedContent(
+        content ? { ...defaultContent, ...content } : { ...formValues }
+      )
 
       setInitialValues(nextValues)
       setFormValues(nextValues)
@@ -165,6 +196,26 @@ const DashboardPage = () => {
           </div>
         )}
 
+        {/* <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Content Language</p>
+          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('en')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${!isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('es')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              ES
+            </button>
+          </div>
+        </div> */}
+
         <form className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]" onSubmit={handleSave}>
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -173,80 +224,80 @@ const DashboardPage = () => {
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroTitle">
-                    {t('dashboard.home.heroTitleLabel')}
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={contentField('heroTitle')}>
+                    {t('dashboard.home.heroTitleLabel')}{localizedLabelSuffix}
                   </label>
                   <input
-                    id="heroTitle"
-                    name="heroTitle"
-                    value={formValues.heroTitle}
+                    id={contentField('heroTitle')}
+                    name={contentField('heroTitle')}
+                    value={formValues[contentField('heroTitle')]}
                     onChange={handleChange}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                    required
+                    required={!isSpanishContent}
                   />
                 </div>
 
                 <div>
                   <label
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
-                    htmlFor="heroDescription1"
+                    htmlFor={contentField('heroDescription1')}
                   >
-                    {t('dashboard.home.heroDescriptionLabel')} 1
+                    {t('dashboard.home.heroDescriptionLabel')} 1{localizedLabelSuffix}
                   </label>
                   <textarea
-                    id="heroDescription1"
-                    name="heroDescription1"
-                    value={formValues.heroDescription1}
+                    id={contentField('heroDescription1')}
+                    name={contentField('heroDescription1')}
+                    value={formValues[contentField('heroDescription1')]}
                     onChange={handleChange}
                     rows={3}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                    required
+                    required={!isSpanishContent}
                   />
                 </div>
 
                 <div>
                   <label
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
-                    htmlFor="heroDescription2"
+                    htmlFor={contentField('heroDescription2')}
                   >
-                    {t('dashboard.home.heroDescriptionLabel')} 2
+                    {t('dashboard.home.heroDescriptionLabel')} 2{localizedLabelSuffix}
                   </label>
                   <textarea
-                    id="heroDescription2"
-                    name="heroDescription2"
-                    value={formValues.heroDescription2}
+                    id={contentField('heroDescription2')}
+                    name={contentField('heroDescription2')}
+                    value={formValues[contentField('heroDescription2')]}
                     onChange={handleChange}
                     rows={3}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                    required
+                    required={!isSpanishContent}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroCta">
-                    {t('dashboard.home.ctaLabel')}
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={contentField('heroCta')}>
+                    {t('dashboard.home.ctaLabel')}{localizedLabelSuffix}
                   </label>
                   <input
-                    id="heroCta"
-                    name="heroCta"
-                    value={formValues.heroCta}
+                    id={contentField('heroCta')}
+                    name={contentField('heroCta')}
+                    value={formValues[contentField('heroCta')]}
                     onChange={handleChange}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                    required
+                    required={!isSpanishContent}
                   />
                 </div>
 
                 <div>
                   <label
                     className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
-                    htmlFor="supportingPartnersLabel"
+                    htmlFor={contentField('supportingPartnersLabel')}
                   >
-                    {t('dashboard.home.supportingPartnersLabel')}
+                    {t('dashboard.home.supportingPartnersLabel')}{localizedLabelSuffix}
                   </label>
                   <input
-                    id="supportingPartnersLabel"
-                    name="supportingPartnersLabel"
-                    value={formValues.supportingPartnersLabel}
+                    id={contentField('supportingPartnersLabel')}
+                    name={contentField('supportingPartnersLabel')}
+                    value={formValues[contentField('supportingPartnersLabel')]}
                     onChange={handleChange}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
                   />
@@ -278,13 +329,13 @@ const DashboardPage = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="heroImageAlt">
-                    {t('dashboard.home.imageAltLabel')}
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={contentField('heroImageAlt')}>
+                    {t('dashboard.home.imageAltLabel')}{localizedLabelSuffix}
                   </label>
                   <input
-                    id="heroImageAlt"
-                    name="heroImageAlt"
-                    value={formValues.heroImageAlt}
+                    id={contentField('heroImageAlt')}
+                    name={contentField('heroImageAlt')}
+                    value={formValues[contentField('heroImageAlt')]}
                     onChange={handleChange}
                     className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
                   />

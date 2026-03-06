@@ -23,8 +23,10 @@ const AboutRegionalCombined = () => {
         return () => { isMounted = false; };
     }, []);
 
-    const prefersLocalizedCopy = language !== 'en';
-    const aboutTitle = prefersLocalizedCopy ? t('about.title') : (aboutContent?.title || t('about.title'));
+    const useSpanishCopy = language === 'es';
+    const aboutTitle = useSpanishCopy
+        ? (aboutContent?.titleEs || aboutContent?.title || t('about.title'))
+        : (aboutContent?.title || t('about.title'));
     const titleParts = aboutTitle.includes('&')
         ? aboutTitle.split('&').map((part) => part.trim())
         : aboutTitle.includes(' y ')
@@ -32,8 +34,8 @@ const AboutRegionalCombined = () => {
             : [aboutTitle];
     const titleConnector = aboutTitle.includes('&') ? '&' : (aboutTitle.includes(' y ') ? 'y' : null);
     const placeholders = [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
-    const aboutParagraphs = prefersLocalizedCopy
-        ? placeholders
+    const aboutParagraphs = useSpanishCopy
+        ? (aboutContent?.paragraphsEs?.length ? aboutContent.paragraphsEs : (aboutContent?.paragraphs?.length ? aboutContent.paragraphs : placeholders))
         : (aboutContent?.paragraphs?.length ? aboutContent.paragraphs : placeholders);
 
     return (

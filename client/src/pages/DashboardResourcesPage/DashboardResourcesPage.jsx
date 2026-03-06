@@ -1,25 +1,33 @@
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
+import axiosInstance from '@/lib/axiosInstance'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
-import axiosInstance from '@/lib/axiosInstance'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   title: 'Regional Transportation Resources',
+  titleEs: '',
   subtitle: 'Key tools and partners helping people access care, food, and essential services.',
+  subtitleEs: '',
   resources: [
     {
       title: 'CWCOG Mobility Management',
+      titleEs: '',
       description:
         'Mobility management tools, travel training, and regional coordination to connect people with transportation options.',
+      descriptionEs: '',
       ctaLabel: 'Visit CWCOG Mobility Management',
+      ctaLabelEs: '',
       href: 'https://www.cwcog.org/mobility-management/',
     },
     {
       title: 'Great Rivers BH-ASO Transportation Efforts',
+      titleEs: '',
       description:
         'Regional coordination focused on improving access to transportation for behavioral health and other essential services.',
+      descriptionEs: '',
       ctaLabel: 'Learn more about Great Rivers BH-ASO',
+      ctaLabelEs: '',
       href: 'https://www.grbhaso.org',
     },
   ],
@@ -27,10 +35,27 @@ const defaultContent = {
 
 const emptyResource = {
   title: '',
+  titleEs: '',
   description: '',
+  descriptionEs: '',
   ctaLabel: '',
+  ctaLabelEs: '',
   href: '',
 }
+
+const hydrateLocalizedContent = (values) => ({
+  ...values,
+  titleEs: values.titleEs?.trim() ? values.titleEs : values.title,
+  subtitleEs: values.subtitleEs?.trim() ? values.subtitleEs : values.subtitle,
+  resources: (values.resources || []).map((resource) => ({
+    ...resource,
+    titleEs: resource?.titleEs?.trim() ? resource.titleEs : resource.title,
+    descriptionEs: resource?.descriptionEs?.trim()
+      ? resource.descriptionEs
+      : resource.description,
+    ctaLabelEs: resource?.ctaLabelEs?.trim() ? resource.ctaLabelEs : resource.ctaLabel,
+  })),
+})
 
 const DashboardResourcesPage = () => {
   const { user, token } = useSelector((state) => state.auth)
@@ -40,6 +65,14 @@ const DashboardResourcesPage = () => {
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
+  const [activeContentLanguage, setActiveContentLanguage] = useState('en')
+
+  const isSpanishContent = activeContentLanguage === 'es'
+  const localizedLabelSuffix = isSpanishContent ? ' (Spanish)' : ''
+  const titleField = isSpanishContent ? 'titleEs' : 'title'
+  const subtitleField = isSpanishContent ? 'subtitleEs' : 'subtitle'
+  const resourceField = (baseField) =>
+    isSpanishContent ? `${baseField}Es` : baseField
 
   const isDirty = useMemo(
     () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
@@ -68,7 +101,9 @@ const DashboardResourcesPage = () => {
         const content = data?.data?.content
 
         if (isMounted) {
-          const nextValues = content ? { ...defaultContent, ...content } : defaultContent
+          const nextValues = hydrateLocalizedContent(
+            content ? { ...defaultContent, ...content } : defaultContent
+          )
           setInitialValues(nextValues)
           setFormValues(nextValues)
           setUpdatedAt(content?.updatedAt || null)
@@ -157,7 +192,9 @@ const DashboardResourcesPage = () => {
       )
 
       const content = data?.data?.content
-      const nextValues = content ? { ...defaultContent, ...content } : { ...formValues }
+      const nextValues = hydrateLocalizedContent(
+        content ? { ...defaultContent, ...content } : { ...formValues }
+      )
 
       setInitialValues(nextValues)
       setFormValues(nextValues)
@@ -216,6 +253,26 @@ const DashboardResourcesPage = () => {
           </div>
         )}
 
+        {/* <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Content Language</p>
+          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('en')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${!isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('es')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              ES
+            </button>
+          </div>
+        </div> */}
+
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.common.pageCopy')}</h2>
@@ -223,31 +280,31 @@ const DashboardResourcesPage = () => {
 
             <div className="mt-6 space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="title">
-                  {t('dashboard.common.pageTitle')}
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={titleField}>
+                  {t('dashboard.common.pageTitle')}{localizedLabelSuffix}
                 </label>
                 <input
-                  id="title"
-                  name="title"
-                  value={formValues.title}
+                  id={titleField}
+                  name={titleField}
+                  value={formValues[titleField]}
                   onChange={handleChange}
                   className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                  required
+                  required={!isSpanishContent}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="subtitle">
-                  {t('dashboard.common.pageSubtitle')}
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={subtitleField}>
+                  {t('dashboard.common.pageSubtitle')}{localizedLabelSuffix}
                 </label>
                 <textarea
-                  id="subtitle"
-                  name="subtitle"
-                  value={formValues.subtitle}
+                  id={subtitleField}
+                  name={subtitleField}
+                  value={formValues[subtitleField]}
                   onChange={handleChange}
                   rows={3}
                   className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                  required
+                  required={!isSpanishContent}
                 />
               </div>
             </div>
@@ -276,38 +333,38 @@ const DashboardResourcesPage = () => {
                   <div className="mt-4 space-y-3">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        {t('dashboard.resources.titleLabel')}
+                        {t('dashboard.resources.titleLabel')}{localizedLabelSuffix}
                       </label>
                       <input
-                        value={resource.title}
-                        onChange={(event) => handleResourceChange(index, 'title', event.target.value)}
+                        value={resource[resourceField('title')] || ''}
+                        onChange={(event) => handleResourceChange(index, resourceField('title'), event.target.value)}
                         className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                        required
+                        required={!isSpanishContent}
                       />
                     </div>
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        {t('dashboard.resources.descriptionLabel')}
+                        {t('dashboard.resources.descriptionLabel')}{localizedLabelSuffix}
                       </label>
                       <textarea
                         rows={3}
-                        value={resource.description}
-                        onChange={(event) => handleResourceChange(index, 'description', event.target.value)}
+                        value={resource[resourceField('description')] || ''}
+                        onChange={(event) => handleResourceChange(index, resourceField('description'), event.target.value)}
                         className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                        required
+                        required={!isSpanishContent}
                       />
                     </div>
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        {t('dashboard.resources.ctaLabel')}
+                        {t('dashboard.resources.ctaLabel')}{localizedLabelSuffix}
                       </label>
                       <input
-                        value={resource.ctaLabel}
-                        onChange={(event) => handleResourceChange(index, 'ctaLabel', event.target.value)}
+                        value={resource[resourceField('ctaLabel')] || ''}
+                        onChange={(event) => handleResourceChange(index, resourceField('ctaLabel'), event.target.value)}
                         className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                        required
+                        required={!isSpanishContent}
                       />
                     </div>
 

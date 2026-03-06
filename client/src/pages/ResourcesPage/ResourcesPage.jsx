@@ -53,10 +53,21 @@ const ResourcesPage = ({ embedded = false }) => {
         [t]
     );
 
-    const prefersLocalizedCopy = language !== 'en';
-    const resources = prefersLocalizedCopy ? fallbackResources : (content?.resources?.length ? content.resources : fallbackResources);
-    const pageTitle = prefersLocalizedCopy ? t('resources.title') : (content?.title || t('resources.title'));
-    const pageSubtitle = prefersLocalizedCopy ? t('resources.subtitle') : (content?.subtitle || t('resources.subtitle'));
+    const useSpanishCopy = language === 'es';
+    const resources = content?.resources?.length
+        ? content.resources.map((resource) => ({
+            ...resource,
+            title: useSpanishCopy ? (resource?.titleEs || resource?.title) : resource?.title,
+            description: useSpanishCopy ? (resource?.descriptionEs || resource?.description) : resource?.description,
+            ctaLabel: useSpanishCopy ? (resource?.ctaLabelEs || resource?.ctaLabel) : resource?.ctaLabel,
+        }))
+        : fallbackResources;
+    const pageTitle = useSpanishCopy
+        ? (content?.titleEs || content?.title || t('resources.title'))
+        : (content?.title || t('resources.title'));
+    const pageSubtitle = useSpanishCopy
+        ? (content?.subtitleEs || content?.subtitle || t('resources.subtitle'))
+        : (content?.subtitle || t('resources.subtitle'));
     const sectionYClass = embedded ? 'py-8 sm:py-10' : 'py-16 sm:py-24';
     const headingSpaceClass = embedded ? 'mb-8' : 'mb-16';
     const cardGapClass = embedded ? 'gap-6 lg:gap-8' : 'gap-8 lg:gap-10';

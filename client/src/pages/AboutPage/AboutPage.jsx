@@ -34,11 +34,13 @@ const AboutPage = ({ embedded = false }) => {
         };
     }, []);
 
-    const prefersLocalizedCopy = language !== 'en';
     const translatedParagraphs = [t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4')];
-    const pageTitle = prefersLocalizedCopy ? t('about.title') : (content?.title || t('about.title'));
-    const paragraphs = prefersLocalizedCopy
-        ? translatedParagraphs
+    const useSpanishCopy = language === 'es';
+    const pageTitle = useSpanishCopy
+        ? (content?.titleEs || content?.title || t('about.title'))
+        : (content?.title || t('about.title'));
+    const paragraphs = useSpanishCopy
+        ? (content?.paragraphsEs?.length ? content.paragraphsEs : (content?.paragraphs?.length ? content.paragraphs : translatedParagraphs))
         : (content?.paragraphs?.length ? content.paragraphs : translatedParagraphs);
 
     const aboutContent = (

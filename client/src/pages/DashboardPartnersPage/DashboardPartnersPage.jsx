@@ -1,8 +1,8 @@
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
+import axiosInstance from '@/lib/axiosInstance'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
-import axiosInstance from '@/lib/axiosInstance'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   partners: [
@@ -28,6 +28,16 @@ const emptyPartner = {
   logoClass: '',
 }
 
+const hydrateLocalizedContent = (values) => ({
+  ...values,
+  partners: (values.partners || []).map((partner) => ({
+    ...partner,
+    descriptionEs: partner?.descriptionEs?.trim()
+      ? partner.descriptionEs
+      : partner.description,
+  })),
+})
+
 const DashboardPartnersPage = () => {
   const { user, token } = useSelector((state) => state.auth)
   const { t } = useLanguage()
@@ -37,6 +47,11 @@ const DashboardPartnersPage = () => {
   const [message, setMessage] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeContentLanguage, setActiveContentLanguage] = useState('en')
+
+  const isSpanishContent = activeContentLanguage === 'es'
+  const localizedLabelSuffix = isSpanishContent ? ' (Spanish)' : ''
+  const descriptionField = isSpanishContent ? 'descriptionEs' : 'description'
 
   const logoOptions = useMemo(
     () => [
@@ -105,7 +120,9 @@ const DashboardPartnersPage = () => {
         const content = data?.data?.content
 
         if (isMounted) {
-          const nextValues = content ? { ...defaultContent, ...content } : defaultContent
+          const nextValues = hydrateLocalizedContent(
+            content ? { ...defaultContent, ...content } : defaultContent
+          )
           setInitialValues(nextValues)
           setFormValues(nextValues)
           setUpdatedAt(content?.updatedAt || null)
@@ -200,7 +217,9 @@ const DashboardPartnersPage = () => {
       )
 
       const content = data?.data?.content
-      const nextValues = content ? { ...defaultContent, ...content } : { ...formValues }
+      const nextValues = hydrateLocalizedContent(
+        content ? { ...defaultContent, ...content } : { ...formValues }
+      )
 
       setInitialValues(nextValues)
       setFormValues(nextValues)
@@ -258,6 +277,26 @@ const DashboardPartnersPage = () => {
             {message}
           </div>
         )}
+
+        {/* <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Content Language</p>
+          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('en')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${!isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('es')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              ES
+            </button>
+          </div>
+        </div> */}
 
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -356,26 +395,18 @@ const DashboardPartnersPage = () => {
 
                   <div className="mt-4">
                     <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      {t('dashboard.partners.descriptionEn')}
+                      {isSpanishContent
+                        ? `${t('dashboard.partners.descriptionEs')}${localizedLabelSuffix}`
+                        : t('dashboard.partners.descriptionEn')}
                     </label>
                     <textarea
                       rows={3}
-                      value={partner.description}
-                      onChange={(event) => handlePartnerChange(index, 'description', event.target.value)}
+                      value={partner[descriptionField]}
+                      onChange={(event) =>
+                        handlePartnerChange(index, descriptionField, event.target.value)
+                      }
                       className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      {t('dashboard.partners.descriptionEs')}
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={partner.descriptionEs}
-                      onChange={(event) => handlePartnerChange(index, 'descriptionEs', event.target.value)}
-                      className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-slate-400 focus:outline-none"
+                      required={!isSpanishContent}
                     />
                   </div>
 

@@ -1,20 +1,38 @@
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
+import axiosInstance from '@/lib/axiosInstance'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
-import axiosInstance from '@/lib/axiosInstance'
-import { useLanguage } from '@/contexts/LanguageContext'
 
 const defaultContent = {
   title: 'About & Partners',
+  titleEs: '',
   paragraphs: [
     'The CHOICE Regional Transportation Hub was developed and is maintained by CHOICE Regional Health Network to improve access to transportation for community members across the region. CHOICE created this hub to make it easier for individuals, providers, and care coordinators to find and use transportation services that support access to medical care and essential needs.',
     'This work builds on regional collaboration through the Great Rivers BH-ASO Transportation Collaborative, where partners identified transportation as a major barrier to accessing care. Community surveys and partner feedback showed that many people were unaware of available transportation resources or unsure how to access them.',
     'In response, CHOICE Regional Health Network took the lead in creating this centralized hub to bring transportation information together in one place. This hub reflects CHOICE\'s ongoing commitment to improving access to care and strengthening connections between community members and essential services.',
     'Supporting partners in this effort include Great Rivers BH-ASO, UnitedHealthcare and the Cowlitz-Wahkiakum Council of Governments Mobility Management program, whose collaboration and input helped inform the development of this resource.',
   ],
+  paragraphsEs: [],
 }
 
 const emptyParagraph = ''
+
+const hydrateLocalizedContent = (values) => {
+  const paragraphs = Array.isArray(values.paragraphs) ? values.paragraphs : []
+  const incomingParagraphsEs = Array.isArray(values.paragraphsEs) ? values.paragraphsEs : []
+
+  const paragraphsEs = paragraphs.map((paragraph, index) => {
+    const candidate = incomingParagraphsEs[index]
+    return candidate?.trim() ? candidate : paragraph
+  })
+
+  return {
+    ...values,
+    titleEs: values.titleEs?.trim() ? values.titleEs : values.title,
+    paragraphsEs,
+  }
+}
 
 const DashboardAboutPage = () => {
   const { user, token } = useSelector((state) => state.auth)
@@ -24,6 +42,13 @@ const DashboardAboutPage = () => {
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [updatedAt, setUpdatedAt] = useState(null)
+  const [activeContentLanguage, setActiveContentLanguage] = useState('en')
+
+  const isSpanishContent = activeContentLanguage === 'es'
+  const localizedLabelSuffix = isSpanishContent ? ' (Spanish)' : ''
+  const titleField = isSpanishContent ? 'titleEs' : 'title'
+  const paragraphsField = isSpanishContent ? 'paragraphsEs' : 'paragraphs'
+  const activeParagraphs = formValues[paragraphsField] || []
 
   const isDirty = useMemo(
     () => JSON.stringify(formValues) !== JSON.stringify(initialValues),
@@ -46,7 +71,9 @@ const DashboardAboutPage = () => {
         const content = data?.data?.content
 
         if (isMounted) {
-          const nextValues = content ? { ...defaultContent, ...content } : defaultContent
+          const nextValues = hydrateLocalizedContent(
+            content ? { ...defaultContent, ...content } : defaultContent
+          )
           setInitialValues(nextValues)
           setFormValues(nextValues)
           setUpdatedAt(content?.updatedAt || null)
@@ -75,24 +102,25 @@ const DashboardAboutPage = () => {
 
   const handleParagraphChange = (index, value) => {
     setFormValues((prev) => {
-      const updatedParagraphs = prev.paragraphs.map((paragraph, paragraphIndex) =>
+      const paragraphs = prev[paragraphsField] || []
+      const updatedParagraphs = paragraphs.map((paragraph, paragraphIndex) =>
         paragraphIndex === index ? value : paragraph
       )
-      return { ...prev, paragraphs: updatedParagraphs }
+      return { ...prev, [paragraphsField]: updatedParagraphs }
     })
   }
 
   const handleAddParagraph = () => {
     setFormValues((prev) => ({
       ...prev,
-      paragraphs: [...prev.paragraphs, emptyParagraph],
+      [paragraphsField]: [...(prev[paragraphsField] || []), emptyParagraph],
     }))
     setStatus('idle')
     setMessage(t('dashboard.about.newParagraph'))
   }
 
   const handleRemoveParagraph = (index) => {
-    if (formValues.paragraphs.length === 1) {
+    if (activeParagraphs.length === 1) {
       setStatus('error')
       setMessage(t('dashboard.about.removeError'))
       return
@@ -103,7 +131,9 @@ const DashboardAboutPage = () => {
 
     setFormValues((prev) => ({
       ...prev,
-      paragraphs: prev.paragraphs.filter((_, paragraphIndex) => paragraphIndex !== index),
+      [paragraphsField]: (prev[paragraphsField] || []).filter(
+        (_, paragraphIndex) => paragraphIndex !== index
+      ),
     }))
     setStatus('idle')
     setMessage(t('dashboard.about.removed'))
@@ -135,7 +165,9 @@ const DashboardAboutPage = () => {
       )
 
       const content = data?.data?.content
-      const nextValues = content ? { ...defaultContent, ...content } : { ...formValues }
+      const nextValues = hydrateLocalizedContent(
+        content ? { ...defaultContent, ...content } : { ...formValues }
+      )
 
       setInitialValues(nextValues)
       setFormValues(nextValues)
@@ -194,6 +226,26 @@ const DashboardAboutPage = () => {
           </div>
         )}
 
+        {/* <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Content Language</p>
+          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('en')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${!isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveContentLanguage('es')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${isSpanishContent ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              ES
+            </button>
+          </div>
+        </div> */}
+
         <form className="space-y-6" onSubmit={handleSave}>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.common.pageCopy')}</h2>
@@ -201,25 +253,25 @@ const DashboardAboutPage = () => {
 
             <div className="mt-6 space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor="title">
-                  {t('dashboard.common.pageTitle')}
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" htmlFor={titleField}>
+                  {t('dashboard.common.pageTitle')}{localizedLabelSuffix}
                 </label>
                 <input
-                  id="title"
-                  name="title"
-                  value={formValues.title}
+                  id={titleField}
+                  name={titleField}
+                  value={formValues[titleField]}
                   onChange={handleChange}
                   className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                  required
+                  required={!isSpanishContent}
                 />
               </div>
 
               <div className="space-y-4">
-                {formValues.paragraphs.map((paragraph, index) => (
+                {activeParagraphs.map((paragraph, index) => (
                   <div key={`paragraph-${index}`} className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex items-center justify-between gap-2">
                       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        {t('dashboard.about.paragraphLabel')} {index + 1}
+                        {t('dashboard.about.paragraphLabel')} {index + 1}{localizedLabelSuffix}
                       </label>
                       <button
                         type="button"
@@ -234,7 +286,7 @@ const DashboardAboutPage = () => {
                       value={paragraph}
                       onChange={(event) => handleParagraphChange(index, event.target.value)}
                       className="mt-3 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:border-slate-400 focus:outline-none"
-                      required
+                      required={!isSpanishContent}
                     />
                   </div>
                 ))}

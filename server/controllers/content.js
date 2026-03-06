@@ -36,9 +36,15 @@ export const updateHomeContent = async (req, res, next) => {
       heroDescription1,
       heroDescription2,
       heroCta,
+      heroTitleEs,
+      heroDescription1Es,
+      heroDescription2Es,
+      heroCtaEs,
       heroImageUrl,
       heroImageAlt,
+      heroImageAltEs,
       supportingPartnersLabel,
+      supportingPartnersLabelEs,
     } = req.body
 
     if (!heroTitle || !heroDescription1 || !heroDescription2 || !heroCta) {
@@ -49,12 +55,18 @@ export const updateHomeContent = async (req, res, next) => {
       {},
       {
         heroTitle: heroTitle.trim(),
+        heroTitleEs: heroTitleEs?.trim() || '',
         heroDescription1: heroDescription1.trim(),
+        heroDescription1Es: heroDescription1Es?.trim() || '',
         heroDescription2: heroDescription2.trim(),
+        heroDescription2Es: heroDescription2Es?.trim() || '',
         heroCta: heroCta.trim(),
+        heroCtaEs: heroCtaEs?.trim() || '',
         heroImageUrl: heroImageUrl?.trim() || '',
         heroImageAlt: heroImageAlt?.trim() || '',
+        heroImageAltEs: heroImageAltEs?.trim() || '',
         supportingPartnersLabel: supportingPartnersLabel?.trim() || '',
+        supportingPartnersLabelEs: supportingPartnersLabelEs?.trim() || '',
       },
       {
         new: true,
@@ -103,7 +115,7 @@ export const getResourcesContent = async (req, res, next) => {
 
 export const updateResourcesContent = async (req, res, next) => {
   try {
-    const { title, subtitle, resources } = req.body
+    const { title, titleEs, subtitle, subtitleEs, resources } = req.body
 
     if (!title || !subtitle) {
       return next(createError(400, 'Please fill out all required fields'))
@@ -115,8 +127,11 @@ export const updateResourcesContent = async (req, res, next) => {
 
     const normalizedResources = resources.map((resource) => ({
       title: resource?.title?.trim(),
+      titleEs: resource?.titleEs?.trim() || '',
       description: resource?.description?.trim(),
+      descriptionEs: resource?.descriptionEs?.trim() || '',
       ctaLabel: resource?.ctaLabel?.trim(),
+      ctaLabelEs: resource?.ctaLabelEs?.trim() || '',
       href: resource?.href?.trim(),
     }))
 
@@ -133,7 +148,9 @@ export const updateResourcesContent = async (req, res, next) => {
       {},
       {
         title: title.trim(),
+        titleEs: titleEs?.trim() || '',
         subtitle: subtitle.trim(),
+        subtitleEs: subtitleEs?.trim() || '',
         resources: normalizedResources,
       },
       {
@@ -183,7 +200,7 @@ export const getAboutContent = async (req, res, next) => {
 
 export const updateAboutContent = async (req, res, next) => {
   try {
-    const { title, paragraphs } = req.body
+    const { title, titleEs, paragraphs, paragraphsEs } = req.body
 
     if (!title || !Array.isArray(paragraphs) || paragraphs.length === 0) {
       return next(createError(400, 'Please provide the title and at least one paragraph'))
@@ -193,6 +210,10 @@ export const updateAboutContent = async (req, res, next) => {
       .map((paragraph) => paragraph?.trim())
       .filter((paragraph) => paragraph)
 
+    const normalizedParagraphsEs = Array.isArray(paragraphsEs)
+      ? paragraphsEs.map((paragraph) => paragraph?.trim()).filter((paragraph) => paragraph)
+      : []
+
     if (normalizedParagraphs.length === 0) {
       return next(createError(400, 'Please provide valid paragraph content'))
     }
@@ -201,7 +222,9 @@ export const updateAboutContent = async (req, res, next) => {
       {},
       {
         title: title.trim(),
+        titleEs: titleEs?.trim() || '',
         paragraphs: normalizedParagraphs,
+        paragraphsEs: normalizedParagraphsEs,
       },
       {
         new: true,

@@ -8,12 +8,22 @@ import React from 'react'
 
 const Hero = ({ content }) => {
   const { t, language } = useLanguage()
-  const prefersLocalizedCopy = language !== 'en'
-  const heroTitle = prefersLocalizedCopy ? t('home.heroTitle') : (content?.heroTitle || t('home.heroTitle'))
-  const heroDescription1 = prefersLocalizedCopy ? t('home.heroDescription1') : (content?.heroDescription1 || t('home.heroDescription1'))
-  const heroDescription2 = prefersLocalizedCopy ? t('home.heroDescription2') : (content?.heroDescription2 || t('home.heroDescription2'))
-  const heroCta = prefersLocalizedCopy ? t('home.heroCta') : (content?.heroCta || t('home.heroCta'))
-  const heroImageAlt = prefersLocalizedCopy ? t('home.heroImageAlt') : (content?.heroImageAlt || t('home.heroImageAlt'))
+  const useSpanishCopy = language === 'es'
+  const heroTitle = useSpanishCopy
+    ? content?.heroTitleEs || content?.heroTitle || t('home.heroTitle')
+    : content?.heroTitle || t('home.heroTitle')
+  const heroDescription1 = useSpanishCopy
+    ? content?.heroDescription1Es || content?.heroDescription1 || t('home.heroDescription1')
+    : content?.heroDescription1 || t('home.heroDescription1')
+  const heroDescription2 = useSpanishCopy
+    ? content?.heroDescription2Es || content?.heroDescription2 || t('home.heroDescription2')
+    : content?.heroDescription2 || t('home.heroDescription2')
+  const heroCta = useSpanishCopy
+    ? content?.heroCtaEs || content?.heroCta || t('home.heroCta')
+    : content?.heroCta || t('home.heroCta')
+  const heroImageAlt = useSpanishCopy
+    ? content?.heroImageAltEs || content?.heroImageAlt || t('home.heroImageAlt')
+    : content?.heroImageAlt || t('home.heroImageAlt')
   const heroImageSrc = content?.heroImageUrl?.trim() ? content.heroImageUrl : heroImg
 
   const scrollToDirectory = () => {
